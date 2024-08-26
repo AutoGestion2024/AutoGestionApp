@@ -4,25 +4,82 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.BasicTextField
+//noinspection UsingMaterialAndMaterial3Libraries
+import androidx.compose.material.*
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.autogestion.ui.theme.AutoGestionTheme
+import androidx.compose.ui.Alignment.Companion.BottomEnd
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AutoGestionTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+            MyApp()
+        }
+    }
+}
+@Composable
+fun MyApp() {
+    var searchText by remember { mutableStateOf(TextFieldValue("")) }
+    var items by remember { mutableStateOf(listOf("Item 1", "Item 2", "Item 3")) }
+
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    items = items + "Item ${items.size + 1}"
+                },
+                modifier = Modifier
+                    .padding(16.dp)
+            ) {
+                Text("+")
+            }
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            // Barre de recherche
+            BasicTextField(
+                value = searchText,
+                onValueChange = { searchText = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
+            )
+
+            // Liste filtrée
+            val filteredItems = items.filter {
+                it.contains(searchText.text, ignoreCase = true)
+            }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                items(filteredItems.size) { index ->
+                    Text(
+                        text = filteredItems[index],
+                        fontSize = 20.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
                     )
                 }
             }
@@ -30,18 +87,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    AutoGestionTheme {
-        Greeting(", PDG 2024!")
-    }
+fun DefaultPreview() {
+    MyApp()
 }
