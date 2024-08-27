@@ -8,7 +8,7 @@ import com.example.autogestion.data.dao.ReparationDao
 import com.example.autogestion.data.dao.VehicleDao
 
 @Database(entities = [Client::class, Vehicle::class, Reparation::class], version = 1, exportSchema = false)
-abstract class ClientDatabase : RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
 
     abstract fun clientDao(): ClientDao
     abstract fun vehicleDao(): VehicleDao
@@ -16,15 +16,15 @@ abstract class ClientDatabase : RoomDatabase() {
 
     companion object {
         @Volatile
-        private var INSTANCE: ClientDatabase? = null
+        private var INSTANCE: AppDatabase? = null
 
         // Function to get the singleton instance of the database.
-        fun getDatabase(context: Context): ClientDatabase {
+        fun getDatabase(context: Context): AppDatabase {
             // Return the existing instance if it exists or create a new one in a synchronized block.
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    ClientDatabase::class.java,
+                    AppDatabase::class.java,
                     "appDB"
                 ).build()
                 INSTANCE = instance

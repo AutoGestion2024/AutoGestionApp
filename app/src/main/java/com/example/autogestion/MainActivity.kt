@@ -13,13 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.autogestion.data.Client
-import com.example.autogestion.data.ClientDatabase
+import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.ui.theme.AutoGestionTheme
 import kotlinx.coroutines.*
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var database: ClientDatabase
+    private lateinit var database: AppDatabase
     // Coroutine scope for running database operations on the IO dispatcher.
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Initialize the database
-        database = ClientDatabase.getDatabase(this)
+        database = AppDatabase.getDatabase(this)
         // Launch a coroutine to add a client to the database.
         coroutineScope.launch {
             addClient()
