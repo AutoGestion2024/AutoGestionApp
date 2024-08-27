@@ -7,7 +7,11 @@ import androidx.room.RoomDatabase
 import com.example.autogestion.data.dao.RepairDao
 import com.example.autogestion.data.dao.VehicleDao
 
-@Database(entities = [Client::class, Vehicle::class, Repair::class], version = 1, exportSchema = false)
+@Database(
+    entities = [Client::class, Vehicle::class, Repair::class],
+    version = 2,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun clientDao(): ClientDao
@@ -26,7 +30,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "appDB"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 instance
             }
