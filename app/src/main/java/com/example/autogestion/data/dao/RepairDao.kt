@@ -6,27 +6,27 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.autogestion.data.Reparation
+import com.example.autogestion.data.Repair
 
 @Dao
-interface ReparationDao {
+interface RepairDao {
     // Inserer une reparation
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun addReparation(reparation: Reparation)
+    fun addRepair(repair: Repair)
 
     // Modifier une réparation
     @Update
-    fun updateReparation(reparation: Reparation)
+    fun updateRepair(repair: Repair)
 
     // Supprimer une réparation
     @Delete
-    fun deleteReparation(reparation: Reparation)
+    fun deleteRepair(repair: Repair)
 
     // Obtenir une réparation
-    @Query("SELECT * FROM reparation_table WHERE reparationId = :reparationId")
-    fun getReparationById(reparationId: Int): Reparation?
+    @Query("SELECT * FROM repair_table WHERE repairId = :repairId")
+    fun getRepairById(repairId: Int): Repair?
 
     // Obtenir toutes les réparations
-    @Query("SELECT * FROM reparation_table")
-    fun getAllReparations(): List<Reparation>
+    @Query("SELECT * FROM repair_table")
+    fun getAllRepairs(): List<Repair>
 }

@@ -4,15 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.autogestion.data.dao.ReparationDao
+import com.example.autogestion.data.dao.RepairDao
 import com.example.autogestion.data.dao.VehicleDao
 
-@Database(entities = [Client::class, Vehicle::class, Reparation::class], version = 1, exportSchema = false)
+@Database(entities = [Client::class, Vehicle::class, Repair::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun clientDao(): ClientDao
     abstract fun vehicleDao(): VehicleDao
-    abstract fun reparationDao(): ReparationDao
+    abstract fun repairDao(): RepairDao
 
     companion object {
         @Volatile

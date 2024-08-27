@@ -32,6 +32,10 @@ interface ClientDao {
     @Query("SELECT * FROM client_table WHERE email = :email LIMIT 1")
     fun getClientByEmail(email: String): Client?
 
+    // TODO à voir
+    @Query("SELECT COUNT(*) FROM client_table WHERE email = :email")
+    fun countClientsByEmail(email: String): Int
+
     // Obtenir tous les clients
     @Query("SELECT * FROM client_table ORDER BY lastName ASC")
     fun getAllClients(): LiveData<List<Client>>
@@ -45,5 +49,5 @@ interface ClientDao {
     // Obtenir un véhicule avec ses réparations
     @Transaction
     @Query("SELECT * FROM vehicle_table WHERE vehicleId = :vehicleId")
-    fun getVehicleWithReparations(vehicleId: Int): List<VehicleWithReparations>
+    fun getVehicleWithRepairs(vehicleId: Int): List<VehicleWithRepairs>
 }

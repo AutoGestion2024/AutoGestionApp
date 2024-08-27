@@ -5,12 +5,14 @@
     import androidx.activity.ComponentActivity
     import androidx.activity.compose.setContent
     import androidx.activity.enableEdgeToEdge
+    import androidx.activity.viewModels
     import androidx.compose.foundation.layout.fillMaxSize
     import androidx.compose.foundation.layout.padding
     import androidx.compose.material3.Scaffold
     import androidx.compose.ui.Modifier
     import com.example.autogestion.data.Client
     import com.example.autogestion.data.AppDatabase
+    import com.example.autogestion.data.viewModels.ClientVehicleViewModel
     import com.example.autogestion.ui.theme.AutoGestionTheme
     import kotlinx.coroutines.*
 
@@ -18,7 +20,8 @@
     class HomeForm : ComponentActivity() {
 
         private lateinit var database: AppDatabase
-        private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
+        private val clientVehicleViewModel: ClientVehicleViewModel by viewModels()
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -34,27 +37,11 @@
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                         ClientForm(
                             onSubmit = { client ->
-                                coroutineScope.launch {
-                                    addClient(client)
-                                }
+                                clientVehicleViewModel.addClient(client)
                             },
                             modifier = Modifier.padding(innerPadding)
                         )
                     }
-                }
-            }
-        }
-
-        private suspend fun addClient(client: Client) {
-            withContext(Dispatchers.IO) {
-                val emailExists = database.clientDao().getClientByEmail(client.email)
-                if (emailExists != null) {
-                    Log.d("HomeForm", "Client avec cet email existe déjà: ${client.name} ${client.lastName} ${client.email}")
-                    return@withContext
-                }
-                else {
-                    database.clientDao().addClient(client)
-                    Log.d("HomeForm", "Client ajouté: ${client.name} ${client.lastName}")
                 }
             }
         }

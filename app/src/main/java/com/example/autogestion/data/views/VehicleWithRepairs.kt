@@ -9,5 +9,5 @@ data class VehicleWithReparations(
         parentColumn = "vehicleId",
         entityColumn = "vehicleId"
     )
-    val reparations: List<Reparation>
+    val repairs: List<Repair>
 )

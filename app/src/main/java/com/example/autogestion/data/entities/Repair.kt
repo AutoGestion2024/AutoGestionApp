@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Index
 
 @Entity(
-    tableName = "reparation_table",
+    tableName = "repair_table",
     foreignKeys = [ForeignKey(
         entity = Vehicle::class,
         parentColumns = ["vehicleId"],
@@ -15,9 +15,9 @@ import androidx.room.Index
     )],
     indices = [Index(value = ["vehicleId"])]        // index foreign key for faster queries
 )
-data class Reparation(
+data class Repair(
     @PrimaryKey(autoGenerate = true)
-    val reparationId: Int,
+    val repairId: Int,
     val vehicleId: Int,                             // foreign key to Vehicle        
     val description: String,
     val date: String,
