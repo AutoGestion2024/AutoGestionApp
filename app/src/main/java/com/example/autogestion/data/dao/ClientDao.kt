@@ -1,5 +1,6 @@
 package com.example.autogestion.data
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -33,7 +34,7 @@ interface ClientDao {
 
     // Obtenir tous les clients
     @Query("SELECT * FROM client_table ORDER BY lastName ASC")
-    fun getAllClients(): List<Client>
+    fun getAllClients(): LiveData<List<Client>>
 
     // TODO: -> views?
     // Obtenir un client avec ses véhicules
