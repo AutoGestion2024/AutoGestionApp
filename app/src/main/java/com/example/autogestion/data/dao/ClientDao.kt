@@ -27,6 +27,9 @@ interface ClientDao {
     @Query("SELECT * FROM client_table WHERE clientId = :clientId")
     fun getClientById(clientId: Int): Client?
 
+    @Query("SELECT * FROM client_table WHERE email = :email")
+    fun getClientByEmail(email: String): Client?
+
     // Obtenir tous les clients
     @Query("SELECT * FROM client_table")
     fun getAllClients(): List<Client>

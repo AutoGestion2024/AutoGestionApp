@@ -50,8 +50,16 @@ class MainActivity : ComponentActivity() {
 
     private suspend fun addClient(client: Client) {
         withContext(Dispatchers.IO) {
-            database.clientDao().addClient(client)
-            Log.d("MainActivity", "Client ajouté: ${client.name} ${client.lastName}")
+            val emailExists = database.clientDao().getClientByEmail(client.email)
+            if (emailExists != null) {
+                Log.d("MainActivity", "Client avec cet email existe déjà: ${client.name} ${client.lastName} ${client.email}")
+                return@withContext
+            }
+            else {
+                database.clientDao().addClient(client)
+                Log.d("MainActivity", "Client ajouté: ${client.name} ${client.lastName}")
+            }
+
         }
     }
 }
