@@ -11,5 +11,9 @@ class ClientVehicleRepository(private val clientDao : ClientDao) {
         clientDao.addClient(client)
     }
 
+    suspend fun clientExists(email: String): Boolean {
+        return clientDao.countClientsByEmail(email) > 0
+    }
+
     // TODO : complete the repository
 }

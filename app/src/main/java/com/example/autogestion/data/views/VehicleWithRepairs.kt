@@ -3,7 +3,7 @@ package com.example.autogestion.data
 import androidx.room.Embedded
 import androidx.room.Relation
 
-data class VehicleWithReparations(
+data class VehicleWithRepairs(
     @Embedded val vehicle: Vehicle,
     @Relation(
         parentColumn = "vehicleId",

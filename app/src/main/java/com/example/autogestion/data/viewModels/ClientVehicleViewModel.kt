@@ -3,6 +3,7 @@ package com.example.autogestion.data.viewModels
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.data.Client
@@ -14,6 +15,8 @@ class ClientVehicleViewModel(application: Application): AndroidViewModel(applica
     private val getAllClients: LiveData<List<Client>>
     private val repository: ClientVehicleRepository
 
+    val message = MutableLiveData<String>()
+
     init{
         val clientDao = AppDatabase.getDatabase(application).clientDao()
         repository = ClientVehicleRepository(clientDao)
@@ -21,8 +24,15 @@ class ClientVehicleViewModel(application: Application): AndroidViewModel(applica
     }
 
     fun addClient(client: Client){
-       viewModelScope.launch(Dispatchers.IO){
-           repository.addClient(client)
+       viewModelScope.launch(Dispatchers.IO) {
+           if (repository.clientExists(client.email)) {
+               message.postValue("Client avec cet email existe déjà.")
+           } else {
+               repository.addClient(client)
+               message.postValue("Client ajouté.")
+           }
        }
     }
+
+    // TODO : complete the view model
 }
