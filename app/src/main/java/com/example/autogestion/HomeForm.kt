@@ -8,18 +8,14 @@
     import androidx.compose.foundation.layout.fillMaxSize
     import androidx.compose.foundation.layout.padding
     import androidx.compose.material3.Scaffold
-    import androidx.compose.material3.Text
-    import androidx.compose.runtime.Composable
     import androidx.compose.ui.Modifier
-    import androidx.compose.ui.tooling.preview.Preview
     import com.example.autogestion.data.Client
     import com.example.autogestion.data.AppDatabase
     import com.example.autogestion.ui.theme.AutoGestionTheme
     import kotlinx.coroutines.*
 
-    import com.example.autogestion.ClientForm
 
-    class MainActivity : ComponentActivity() {
+    class HomeForm : ComponentActivity() {
 
         private lateinit var database: AppDatabase
         private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -29,6 +25,7 @@
 
             // Initialize the database
             database = AppDatabase.getDatabase(this)
+            Log.d("AppDatabase", "Database instance: ${database.isOpen}")
 
             // UI setup
             enableEdgeToEdge()
@@ -52,12 +49,12 @@
             withContext(Dispatchers.IO) {
                 val emailExists = database.clientDao().getClientByEmail(client.email)
                 if (emailExists != null) {
-                    Log.d("MainActivity", "Client avec cet email existe déjà: ${client.name} ${client.lastName} ${client.email}")
+                    Log.d("HomeForm", "Client avec cet email existe déjà: ${client.name} ${client.lastName} ${client.email}")
                     return@withContext
                 }
                 else {
                     database.clientDao().addClient(client)
-                    Log.d("MainActivity", "Client ajouté: ${client.name} ${client.lastName}")
+                    Log.d("HomeForm", "Client ajouté: ${client.name} ${client.lastName}")
                 }
             }
         }
