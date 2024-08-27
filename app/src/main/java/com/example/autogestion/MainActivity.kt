@@ -17,10 +17,11 @@ import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.ui.theme.AutoGestionTheme
 import kotlinx.coroutines.*
 
+import com.example.autogestion.ClientForm
+
 class MainActivity : ComponentActivity() {
 
     private lateinit var database: AppDatabase
-    // Coroutine scope for running database operations on the IO dispatcher.
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,18 +29,18 @@ class MainActivity : ComponentActivity() {
 
         // Initialize the database
         database = AppDatabase.getDatabase(this)
-        // Launch a coroutine to add a client to the database.
-        coroutineScope.launch {
-            addClient()
-        }
 
         // UI setup
         enableEdgeToEdge()
         setContent {
             AutoGestionTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    ClientForm(
+                        onSubmit = { client ->
+                            coroutineScope.launch {
+                                addClient(client)
+                            }
+                        },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -47,34 +48,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // Function to add a client to the database.
-    private fun addClient() {
-        val newClient = Client(
-            clientId = 0,  // Auto-incremented
-            name = "John",
-            lastName = "Doe",
-            phone = "1234567890",
-            email = "john.doe@example.com",
-            address = "1234 Elm Street"
-        )
-        database.clientDao().addClient(newClient)
-        Log.d("MainActivity", "Client added")
-    }
-
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AutoGestionTheme {
-        Greeting("Hello, demo!")
+    private suspend fun addClient(client: Client) {
+        withContext(Dispatchers.IO) {
+            database.clientDao().addClient(client)
+            Log.d("MainActivity", "Client ajouté: ${client.name} ${client.lastName}")
+        }
     }
 }
