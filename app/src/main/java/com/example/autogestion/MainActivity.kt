@@ -1,5 +1,6 @@
 package com.example.autogestion
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Alignment.Companion.BottomEnd
+import androidx.compose.ui.platform.LocalContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,12 +37,14 @@ class MainActivity : ComponentActivity() {
 fun MyApp() {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
     var items by remember { mutableStateOf(listOf("Item 1", "Item 2", "Item 3")) }
-
+    val context = LocalContext.current
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
                     items = items + "Item ${items.size + 1}"
+                    val intent = Intent(context, ListPage::class.java)
+                    context.startActivity(intent)
                 },
                 modifier = Modifier
                     .padding(16.dp)
