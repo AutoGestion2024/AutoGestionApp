@@ -30,7 +30,6 @@ class ClientVehicleViewModel(application: Application): AndroidViewModel(applica
             } else {
                 repository.addClient(client)
                 message.postValue("Client ajouté.")
-                //}
             }
         }
 

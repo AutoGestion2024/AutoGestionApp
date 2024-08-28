@@ -10,7 +10,7 @@ data class Client (
     val clientId : Int,
     val firstName : String,
     val lastName : String,
-    //val birthDate : DateFormat,
+    val birthDate : Long,
     val phone : String,
     val email : String?,
     val address : String?,

@@ -8,17 +8,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.autogestion.data.Client
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
+    var birthDate by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var isFirstNameError by remember { mutableStateOf(false) }
     var isLastNameError by remember { mutableStateOf(false) }
     var isPhoneError by remember { mutableStateOf(false) }
+
+    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
     Column(modifier = modifier.padding(16.dp)) {
         TextField(
@@ -65,6 +70,16 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(8.dp))
 
         TextField(
+            value = birthDate,
+            onValueChange = {
+                birthDate = it
+            },
+            label = { Text("Date de naissance (jj.mm.aaaa)") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TextField(
             value = email,
             onValueChange = {
                 email = it
@@ -80,7 +95,7 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
             },
             label = { Text("Adresse") },
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(onClick = {
             // Mettre à jour les états d'erreur pour forcer la validation
@@ -89,11 +104,13 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
             isPhoneError = phone.isEmpty()
 
             if (!isFirstNameError && !isLastNameError && !isPhoneError) {
+                val birthDateLong = dateFormat.parse(birthDate)?.time ?: 0L
                 val newClient = Client(
                     clientId = 0,  // Auto-incremented by Room
                     firstName = firstName,
                     lastName = lastName,
                     phone = phone,
+                    birthDate = birthDateLong,
                     email = email,
                     address = address
                 )
