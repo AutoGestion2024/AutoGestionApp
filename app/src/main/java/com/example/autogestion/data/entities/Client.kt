@@ -8,7 +8,7 @@ import java.text.DateFormat
 data class Client (
     @PrimaryKey(autoGenerate = true)
     val clientId : Int,
-    val name : String,
+    val firstName : String,
     val lastName : String,
     //val birthDate : DateFormat,
     val phone : String,

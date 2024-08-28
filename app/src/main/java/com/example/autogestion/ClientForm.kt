@@ -11,55 +11,109 @@ import com.example.autogestion.data.Client
 
 @Composable
 fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
-    var name by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
+    var isFirstNameError by remember { mutableStateOf(false) }
+    var isLastNameError by remember { mutableStateOf(false) }
+    var isPhoneError by remember { mutableStateOf(false) }
+    var isEmailError by remember { mutableStateOf(false) }
+    var isAddressError by remember { mutableStateOf(false) }
 
     Column(modifier = modifier.padding(16.dp)) {
         TextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Nom") }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
             value = lastName,
-            onValueChange = { lastName = it },
-            label = { Text("Prénom") }
+            onValueChange = {
+                lastName = it
+                isLastNameError = it.isEmpty()
+            },
+            label = { Text("Nom *") },
+            isError = isLastNameError
         )
+        if (isLastNameError) {
+            Text("Le nom est obligatoire", color = MaterialTheme.colorScheme.error)
+        }
         Spacer(modifier = Modifier.height(8.dp))
+
+        TextField(
+            value = firstName,
+            onValueChange = {
+                firstName = it
+                isFirstNameError = it.isEmpty()
+            },
+            label = { Text("Prénom *") },
+            isError = isFirstNameError
+        )
+        if (isFirstNameError) {
+            Text("Le prénom est obligatoire", color = MaterialTheme.colorScheme.error)
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
         TextField(
             value = phone,
-            onValueChange = { phone = it },
-            label = { Text("Téléphone") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone)
+            onValueChange = {
+                phone = it
+                isPhoneError = it.isEmpty()
+            },
+            label = { Text("Téléphone *") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
+            isError = isPhoneError
         )
+        if (isPhoneError) {
+            Text("Le téléphone est obligatoire", color = MaterialTheme.colorScheme.error)
+        }
         Spacer(modifier = Modifier.height(8.dp))
+
         TextField(
             value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
+            onValueChange = {
+                email = it
+                isEmailError = it.isEmpty() || !it.contains("@")
+            },
+            label = { Text("Email *") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+            isError = isEmailError
         )
+        if (isEmailError) {
+            Text("Un email valide est obligatoire", color = MaterialTheme.colorScheme.error)
+        }
         Spacer(modifier = Modifier.height(8.dp))
+
         TextField(
             value = address,
-            onValueChange = { address = it },
-            label = { Text("Adresse") }
+            onValueChange = {
+                address = it
+                isAddressError = it.isEmpty()
+            },
+            label = { Text("Adresse *") },
+            isError = isAddressError
         )
+        if (isAddressError) {
+            Text("L'adresse est obligatoire", color = MaterialTheme.colorScheme.error)
+        }
         Spacer(modifier = Modifier.height(16.dp))
+
         Button(onClick = {
-            val newClient = Client(
-                clientId = 0,  // Auto-incremented by Room
-                name = name,
-                lastName = lastName,
-                phone = phone,
-                email = email,
-                address = address
-            )
-            onSubmit(newClient)
+            // Mettre à jour les états d'erreur pour forcer la validation
+            isFirstNameError = firstName.isEmpty()
+            isLastNameError = lastName.isEmpty()
+            isPhoneError = phone.isEmpty()
+            isEmailError = email.isEmpty() || !email.contains("@")
+            isAddressError = address.isEmpty()
+
+            if (!isFirstNameError && !isLastNameError && !isPhoneError && !isEmailError && !isAddressError) {
+                val newClient = Client(
+                    clientId = 0,  // Auto-incremented by Room
+                    firstName = firstName,
+                    lastName = lastName,
+                    phone = phone,
+                    email = email,
+                    address = address
+                )
+                onSubmit(newClient)
+            }
         }) {
             Text("Ajouter le client")
         }
