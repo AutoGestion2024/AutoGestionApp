@@ -28,13 +28,13 @@ interface ClientDao {
     @Query("SELECT * FROM client_table WHERE clientId = :clientId")
     fun getClientById(clientId: Int): Client?
 
-    // Obtenir un client par son email
-    @Query("SELECT * FROM client_table WHERE email = :email LIMIT 1")
-    fun getClientByEmail(email: String): Client?
+    // Obtenir un client par son numéro de téléphone
+    @Query("SELECT * FROM client_table WHERE phone = :phone LIMIT 1")
+    fun getClientByPhoneNumber(phone: String): Client?
 
     // TODO à voir
     @Query("SELECT COUNT(*) FROM client_table WHERE phone = :phone")
-    fun countClientsByPhone(phone: String): Int
+    fun countClientsByPhoneNumber(phone: String): Int
 
     // Obtenir tous les clients
     @Query("SELECT * FROM client_table ORDER BY lastName ASC")
