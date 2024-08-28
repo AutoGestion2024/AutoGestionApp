@@ -4,6 +4,7 @@ import androidx.room.Room
 import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.data.Client
 import com.example.autogestion.data.ClientDao
+import com.example.autogestion.data.repositories.ClientVehicleRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.*
 import org.junit.runner.RunWith
@@ -54,6 +55,39 @@ class ClientDaoTest {
 
         val retrievedClient = clientDao.getClientById(1)
         Assert.assertEquals(client, retrievedClient)
+    }
+
+    // TODO a revoir
+    // Test the addClient method with a client with the same phone number
+    @Test
+    fun doNotAddClientWithSamePhoneNumber() = runBlocking {
+        val phoneNumber = "123456789"
+
+        // Insérer le premier client avec le numéro de téléphone
+        val client1 = Client(
+            clientId = 1,
+            firstName = "John",
+            lastName = "Doe",
+            phone = phoneNumber,
+            birthDate = 976579200000, // 12.12.2000
+            email = "john.doe@example.com",
+            address = "123 Main St"
+        )
+        clientDao.addClient(client1)
+
+        val client2 = Client(
+            clientId = 2,
+            firstName = "Jane",
+            lastName = "Doe",
+            phone = phoneNumber,
+            birthDate = 1000000000000, // 09.09.2001
+            email = "jane.doe@example.com",
+            address = "456 Elm St"
+        )
+        clientDao.addClient(client2)
+
+        val existsAfter = clientDao.countClientsByPhone(phoneNumber)
+        Assert.assertEquals(1, existsAfter)
     }
 
     // Test the updateClient method
@@ -117,7 +151,7 @@ class ClientDaoTest {
             phone = "987654321",
             birthDate = 1000000000000, // 09.09.2001
             email = "jane.doe@example.com",
-            address = "456 Elm St"
+            address = "Rue de la rue"
         )
 
         clientDao.addClient(client1)
@@ -126,6 +160,7 @@ class ClientDaoTest {
         Assert.assertEquals(2, client2.clientId)
     }
 
+    // TODO test vraiment utile ?
     // Test the countClientsByPhone method
     @Test
     fun countClientsByPhone() = runBlocking {
@@ -136,7 +171,7 @@ class ClientDaoTest {
             phone = "123456789",
             birthDate = 976579200000, // 12.12.2000
             email = "john.doe@example.com",
-            address = "123 Main St"
+            address = "Rue de la rue"
         )
         clientDao.addClient(client)
 
