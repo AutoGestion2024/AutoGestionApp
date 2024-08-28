@@ -1,5 +1,6 @@
 package com.example.autogestion.data.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -28,5 +29,9 @@ interface VehicleDao {
 
     // Obtenir tous les véhicules
     @Query("SELECT * FROM vehicle_table")
-    fun getAllVehicles(): List<Vehicle>
+    fun getAllVehicles(): LiveData<List<Vehicle>>
+
+    // Obtenir les véhicules d'un client
+    @Query("SELECT * FROM vehicle_table WHERE clientId = :clientId")
+    fun getVehiclesFromClient(clientId: Int): LiveData<List<Vehicle?>>
 }
