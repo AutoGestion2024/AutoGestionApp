@@ -2,7 +2,6 @@ package com.example.autogestion.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.text.DateFormat
 
 @Entity(tableName = "client_table")
 data class Client (

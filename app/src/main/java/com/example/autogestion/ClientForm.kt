@@ -22,6 +22,7 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
     var isFirstNameError by remember { mutableStateOf(false) }
     var isLastNameError by remember { mutableStateOf(false) }
     var isPhoneError by remember { mutableStateOf(false) }
+    var isBirthDateError by remember { mutableStateOf(false) }
 
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
@@ -33,6 +34,7 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
                 isLastNameError = it.isEmpty()
             },
             label = { Text("Nom *") },
+            modifier = Modifier.fillMaxWidth(),
             isError = isLastNameError
         )
         if (isLastNameError) {
@@ -47,6 +49,7 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
                 isFirstNameError = it.isEmpty()
             },
             label = { Text("Prénom *") },
+            modifier = Modifier.fillMaxWidth(),
             isError = isFirstNameError
         )
         if (isFirstNameError) {
@@ -62,6 +65,7 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
             },
             label = { Text("Téléphone *") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
+            modifier = Modifier.fillMaxWidth(),
             isError = isPhoneError
         )
         if (isPhoneError) {
@@ -73,10 +77,21 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
             value = birthDate,
             onValueChange = {
                 birthDate = it
+                isBirthDateError = try {
+                    dateFormat.parse(it)
+                    false
+                } catch (e: Exception) {
+                    true
+                }
             },
             label = { Text("Date de naissance (jj.mm.aaaa)") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
+            modifier = Modifier.fillMaxWidth(),
+            isError = isBirthDateError,
         )
+        if (isBirthDateError) {
+            Text("Format de date invalide", color = MaterialTheme.colorScheme.error)
+        }
         Spacer(modifier = Modifier.height(8.dp))
 
         TextField(
@@ -85,6 +100,7 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
                 email = it
             },
             label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -94,23 +110,27 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
                 address = it
             },
             label = { Text("Adresse") },
+            modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         Button(onClick = {
-            // Mettre à jour les états d'erreur pour forcer la validation
             isFirstNameError = firstName.isEmpty()
             isLastNameError = lastName.isEmpty()
             isPhoneError = phone.isEmpty()
 
-            if (!isFirstNameError && !isLastNameError && !isPhoneError) {
-                val birthDateLong = dateFormat.parse(birthDate)?.time ?: 0L
+            if (!isFirstNameError && !isLastNameError && !isPhoneError && !isBirthDateError) {
+                val birthDateLong = if (birthDate.isNotEmpty()) {
+                    dateFormat.parse(birthDate)?.time ?: 0L
+                } else {
+                    null
+                }
                 val newClient = Client(
-                    clientId = 0,  // Auto-incremented by Room
+                    clientId = 0,
                     firstName = firstName,
                     lastName = lastName,
                     phone = phone,
-                    birthDate = birthDateLong,
+                    birthDate = birthDateLong ?: 0L,
                     email = email,
                     address = address
                 )
