@@ -21,7 +21,6 @@ import androidx.lifecycle.LiveData
 import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.data.Client
 import com.example.autogestion.ui.theme.AutoGestionTheme
-import kotlinx.coroutines.launch
 
 class Home : ComponentActivity() {
 
@@ -43,10 +42,7 @@ class Home : ComponentActivity() {
 
     @Composable
     fun HomeScreen() {
-        val coroutineScope = rememberCoroutineScope()
         val clientList by getClients().observeAsState(initial = emptyList())
-
-
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -73,7 +69,7 @@ class Home : ComponentActivity() {
     fun ClientList(clients: List<Client>) {
         LazyColumn {
             items(clients) { client ->
-                Text(text = "${client.name} ${client.lastName}")
+                Text(text = "${client.lastName} ${client.firstName}")
             }
         }
     }
