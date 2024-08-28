@@ -5,7 +5,7 @@ import com.example.autogestion.data.Repair
 import com.example.autogestion.data.dao.RepairDao
 
 class RepairRepository(private val repairDao: RepairDao) {
-    val allRepairs : LiveData<List<Repair>> = repairDao.getAllRepairs()
+    val allRepairs : List<Repair?> = repairDao.getAllRepairs()
 
     suspend fun addRepair(repair: Repair) {
         repairDao.addRepair(repair)
@@ -24,7 +24,7 @@ class RepairRepository(private val repairDao: RepairDao) {
         return repairDao.getRepairById(repairId)
     }
 
-    fun getRepairsFromVehicle(vehicleId: Int): LiveData<List<Repair>> {
+    fun getRepairsFromVehicle(vehicleId: Int): List<Repair?> {
         return repairDao.getRepairsFromVehicle(vehicleId)
     }
 }

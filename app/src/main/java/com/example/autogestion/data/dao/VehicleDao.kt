@@ -29,9 +29,9 @@ interface VehicleDao {
 
     // Obtenir tous les véhicules
     @Query("SELECT * FROM vehicle_table")
-    fun getAllVehicles(): LiveData<List<Vehicle>>
+    fun getAllVehicles(): List<Vehicle>
 
     // Obtenir les véhicules d'un client
     @Query("SELECT * FROM vehicle_table WHERE clientId = :clientId")
-    fun getVehiclesFromClient(clientId: Int): LiveData<List<Vehicle?>>
+    fun getVehiclesFromClient(clientId: Int): List<Vehicle?>
 }

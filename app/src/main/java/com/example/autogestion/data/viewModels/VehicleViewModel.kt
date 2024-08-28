@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class VehicleViewModel(application: Application): AndroidViewModel(application) {
     private val repository: VehicleRepository
-    private val allVehicles: LiveData<List<Vehicle>>
+    private val allVehicles: List<Vehicle>
 
     val message = MutableLiveData<String>()
 
@@ -23,7 +23,7 @@ class VehicleViewModel(application: Application): AndroidViewModel(application) 
         allVehicles = repository.allVehicles
     }
 
-    fun getAllVehicles(): LiveData<List<Vehicle>> {
+    fun getAllVehicles(): List<Vehicle> {
         return allVehicles
     }
 
@@ -53,7 +53,7 @@ class VehicleViewModel(application: Application): AndroidViewModel(application) 
         return vehicle
     }
 
-    fun getVehiclesFromClient(clientId: Int): LiveData<List<Vehicle?>> {
+    fun getVehiclesFromClient(clientId: Int): List<Vehicle?> {
         return repository.getVehiclesFromClient(clientId)
     }
 }

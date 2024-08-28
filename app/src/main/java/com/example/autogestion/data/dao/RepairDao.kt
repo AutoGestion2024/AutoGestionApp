@@ -29,8 +29,8 @@ interface RepairDao {
 
     // Obtenir toutes les réparations
     @Query("SELECT * FROM repair_table")
-    fun getAllRepairs(): LiveData<List<Repair>>
+    fun getAllRepairs(): List<Repair?>
 
     @Query("SELECT * FROM repair_table WHERE vehicleId = :vehicleId")
-    fun getRepairsFromVehicle(vehicleId: Int): LiveData<List<Repair>>
+    fun getRepairsFromVehicle(vehicleId: Int): List<Repair?>
 }

@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class RepairViewModel(application: Application): AndroidViewModel(application) {
     private val repository: RepairRepository
-    private val allRepairs: LiveData<List<Repair>>
+    private val allRepairs: List<Repair?>
 
     val message = MutableLiveData<String>()
 
@@ -24,7 +24,7 @@ class RepairViewModel(application: Application): AndroidViewModel(application) {
         allRepairs = repository.allRepairs
     }
 
-    fun getAllRepairs(): LiveData<List<Repair>> {
+    fun getAllRepairs(): List<Repair?> {
         return allRepairs
     }
 
@@ -54,7 +54,7 @@ class RepairViewModel(application: Application): AndroidViewModel(application) {
         return repair
     }
 
-    fun getRepairsFromVehicle(vehicleId: Int): LiveData<List<Repair>> {
+    fun getRepairsFromVehicle(vehicleId: Int): List<Repair?> {
         return repository.getRepairsFromVehicle(vehicleId)
     }
 }

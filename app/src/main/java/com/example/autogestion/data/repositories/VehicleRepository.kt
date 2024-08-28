@@ -5,7 +5,7 @@ import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.dao.VehicleDao
 
 class VehicleRepository(private val vehicleDao : VehicleDao) {
-    val allVehicles: LiveData<List<Vehicle>> = vehicleDao.getAllVehicles()
+    val allVehicles: List<Vehicle> = vehicleDao.getAllVehicles()
 
     suspend fun addVehicle(vehicle : Vehicle){
         vehicleDao.addVehicle(vehicle)
@@ -25,7 +25,7 @@ class VehicleRepository(private val vehicleDao : VehicleDao) {
     }
 
     // Vehicles from given client
-    fun getVehiclesFromClient(clientId: Int): LiveData<List<Vehicle?>> {
+    fun getVehiclesFromClient(clientId: Int): List<Vehicle?> {
         return vehicleDao.getVehiclesFromClient(clientId)
     }
 }
