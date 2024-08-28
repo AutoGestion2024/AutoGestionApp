@@ -1,56 +1,96 @@
 package com.example.autogestion
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.autogestion.data.Car
 import com.example.autogestion.data.Client
 import com.example.autogestion.data.Repair
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-class ListPage : ComponentActivity() {
+class Home : ComponentActivity() {
+
+//    private lateinit var cameraExecutor: ExecutorService
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!hasRequiredPermissions()) {
+            ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
+        }
         enableEdgeToEdge()
+//        cameraExecutor = Executors.newSingleThreadExecutor()
         setContent {
             MyApp1()
         }
+
+
+//        startCamera()
     }
-}
+
+    private fun hasRequiredPermissions(): Boolean{
+        return CAMERAX_PERMISSIONS.all {
+            ContextCompat.checkSelfPermission(applicationContext, it) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    companion object{
+        private val CAMERAX_PERMISSIONS = arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.INTERNET
+        )
+    }
+//    private fun startCamera() {
+//        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+//        cameraProviderFuture.addListener({
+//            val cameraProvider = cameraProviderFuture.get()
+//
+//            val preview = Preview.Builder().build().also {
+//                it.setSurfaceProvider(previewView.surfaceProvider)
+//            }
+//
+//            imageCapture = ImageCapture.Builder().build()
+//
+//            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+//
+//            try {
+//                cameraProvider.unbindAll()
+//                cameraProvider.bindToLifecycle(
+//                    this, cameraSelector, preview, imageCapture
+//                )
+//            } catch (exc: Exception) {
+//                Log.e("CameraX", "Use case binding failed", exc)
+//            }
+//        }, ContextCompat.getMainExecutor(this))
+//    }
+
 
 @Composable
 fun MyApp1() {
+    val context = LocalContext.current
     val repair1 = Repair("Engine problem", "16.08.2024")
     val repair2 = Repair("Transmission issue", "13.04.2024")
     val repair3 = Repair("Tyre replacement", "10.01.2024")
@@ -117,6 +157,15 @@ fun MyApp1() {
                 IconButton(
                     onClick = {
                     println("Icon button clicked")
+                        val intent = Intent(context, Camera::class.java)
+                        context.startActivity(intent)
+//                        val outputDirectory = getOutputDirectory(context)
+//                        val photoFile = File(
+//                            outputDirectory,
+//                            "${System.currentTimeMillis()}.jpg"
+//                        )
+//                        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+//                        takePhoto(context, outputOptions, Uri.fromFile(photoFile) )
                     }
                 ) {
                     Icon(
@@ -162,9 +211,52 @@ fun MyApp1() {
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview1() {
-    MyApp1()
+//private fun takePhoto(context: Context, outputOptions: ImageCapture.OutputFileOptions, savedUri: Uri) {
+//    val imageCapture = ImageCapture.Builder().build()
+//    imageCapture.takePicture(
+//        outputOptions,
+//        ContextCompat.getMainExecutor(context),
+//        object : ImageCapture.OnImageSavedCallback {
+//            override fun onError(exception: ImageCaptureException) {
+//                Toast.makeText(
+//                    context,
+//                    "Error capturing photo: ${exception.message}",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//            }
+//
+//            override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+//                recognizePlate(savedUri)
+//            }
+//        }
+//    )
+//}
+//
+//
+//private fun recognizePlate(uri: Uri?) {
+//    // Implémentez la reconnaissance de plaque ici en utilisant PlateRecognizer API
+//    Toast.makeText(this, "Plate recognized from image at $uri", Toast.LENGTH_SHORT).show()
+//    // Une fois la plaque reconnue, mettez à jour la barre de recherche avec le résultat
+//}
+//
+//private fun getOutputDirectory(context: Context): File {
+//    val mediaDir = context.getExternalFilesDirs(null).firstOrNull()?.let {
+//        File(it, context.getString(R.string.app_name)).apply { mkdirs() }
+//    }
+//    return if (mediaDir != null && mediaDir.exists()) mediaDir else context.filesDir
+//}
+//
+//
+//override fun onDestroy() {
+//    super.onDestroy()
+//    cameraExecutor.shutdown()
+//}
+    @Preview(showBackground = true)
+    @Composable
+    fun DefaultPreview1() {
+        MyApp1()
+    }
 }
+
+
+
