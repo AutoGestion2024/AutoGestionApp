@@ -69,7 +69,7 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
             onValueChange = {
                 email = it
             },
-            label = { Text("Email *") },
+            label = { Text("Email") },
         )
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -78,7 +78,7 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
             onValueChange = {
                 address = it
             },
-            label = { Text("Adresse *") },
+            label = { Text("Adresse") },
         )
         Spacer(modifier = Modifier.height(16.dp))
 
