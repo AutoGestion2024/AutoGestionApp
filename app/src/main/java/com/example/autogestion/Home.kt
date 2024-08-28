@@ -1,6 +1,7 @@
 package com.example.autogestion
 
 import android.Manifest
+import android.R
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -13,14 +14,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,6 +36,7 @@ import androidx.core.content.ContextCompat
 import com.example.autogestion.data.Car
 import com.example.autogestion.data.Client
 import com.example.autogestion.data.Repair
+import com.example.autogestion.form.ClientForm
 
 
 class Home : ComponentActivity() {
@@ -114,11 +122,13 @@ fun MyApp1() {
             FloatingActionButton(
                 onClick = {
                     // TODO: Redirect to the HomeForm page when it's ready
+                    val intent = Intent(context, ClientForm::class.java)
+                    context.startActivity(intent)
                 },
                 modifier = Modifier
                     .padding(16.dp)
             ) {
-                Text("+")
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
         }
     ) { padding ->
@@ -127,6 +137,10 @@ fun MyApp1() {
                 .fillMaxSize()
                 .padding(padding)
         ) {
+            HomeTitle(text = "AutoGestion") {
+
+            }
+
             Row (
                 horizontalArrangement = Arrangement.Start, // Align items horizontally
                 verticalAlignment = Alignment.CenterVertically, // Center vertically
@@ -250,9 +264,32 @@ fun MyApp1() {
 //    super.onDestroy()
 //    cameraExecutor.shutdown()
 //}
+
+    @Composable
+    fun HomeTitle(text : String,onBackClick: () -> Unit){
+        // Up Bar
+        Row(modifier = Modifier
+            .height(56.dp)
+            .fillMaxWidth()
+            .background(Color(0xFFF3EDF7)) ,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            androidx.compose.material.Text(
+                text = text,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview1() {
         MyApp1()
     }
+
+
 }
