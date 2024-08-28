@@ -34,7 +34,7 @@ interface ClientDao {
 
     // TODO à voir
     @Query("SELECT COUNT(*) FROM client_table WHERE phone = :phone")
-    fun countClientsByEmail(phone: String): Int
+    fun countClientsByPhone(phone: String): Int
 
     // Obtenir tous les clients
     @Query("SELECT * FROM client_table ORDER BY lastName ASC")

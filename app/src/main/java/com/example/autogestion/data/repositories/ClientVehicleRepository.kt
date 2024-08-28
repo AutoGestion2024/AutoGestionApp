@@ -12,7 +12,7 @@ class ClientVehicleRepository(private val clientDao : ClientDao) {
     }
 
     suspend fun clientExists(phone: String): Boolean {
-        return clientDao.countClientsByEmail(phone) > 0
+        return clientDao.countClientsByPhone(phone) > 0
     }
 
     // TODO : complete the repository
