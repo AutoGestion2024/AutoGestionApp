@@ -10,18 +10,16 @@
     import androidx.compose.foundation.layout.padding
     import androidx.compose.material3.Scaffold
     import androidx.compose.ui.Modifier
-    import com.example.autogestion.data.Client
     import com.example.autogestion.data.AppDatabase
-    import com.example.autogestion.data.viewModels.ClientVehicleViewModel
+    import com.example.autogestion.data.viewModels.ClientViewModel
     import com.example.autogestion.ui.theme.AutoGestionTheme
-    import kotlinx.coroutines.*
 
 
     class HomeForm : ComponentActivity() {
 
         private lateinit var database: AppDatabase
 
-        private val clientVehicleViewModel: ClientVehicleViewModel by viewModels()
+        private val clientVehicleViewModel: ClientViewModel by viewModels()
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
