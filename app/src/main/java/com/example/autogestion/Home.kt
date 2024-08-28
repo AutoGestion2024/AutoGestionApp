@@ -29,8 +29,7 @@ import androidx.core.content.ContextCompat
 import com.example.autogestion.data.Car
 import com.example.autogestion.data.Client
 import com.example.autogestion.data.Repair
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+
 
 class Home : ComponentActivity() {
 
@@ -97,14 +96,14 @@ fun MyApp1() {
     val repair4 = Repair("Oil change", "10.01.2024")
     val repair5 = Repair("Service", "10.01.2024")
 
-    val car1 = Car("ABC123", "Toyota", "Camry",1, listOf(repair1))
-    val car2 = Car("XYZ789", "Honda", "Civic", 1,listOf(repair2, repair3))
-    val car3 = Car("DEF789", "Mercedes", "A35 AMG", 2,listOf(repair4))
-    val car4 = Car("DEF789", "Volkswagen", "Cocinelle", 3,listOf(repair5))
+    val car1 = Car("ABC123", "Toyota", "Camry",1, listOf(repair1), "./images/car1.jpg")
+    val car2 = Car("XYZ789", "Honda", "Civic", 1,listOf(repair2, repair3), "./images/car2.jpg")
+    val car3 = Car("DEF789", "Mercedes", "A35 AMG", 2,listOf(repair4), "./images/car3.jpg")
+    val car4 = Car("DEF789", "Volkswagen", "Cocinelle", 3,listOf(repair5), "./images/car4.jpg")
 
-    val client1 = Client(1,"John", "Doe", listOf(car1, car2))
-    val client2 = Client(2,"Lewis", "Hamilton", listOf(car3))
-    val client3 = Client(3,"Paul", "Albertini", listOf(car4))
+    val client1 = Client(1,"John", "Doe", listOf(car1, car2), "123 Main St", "555-1234", "william.henry.harrison@example-pet-store.com")
+    val client2 = Client(2,"Lewis", "Hamilton", listOf(car3), "123 Main St", "555-2345", "john.mclean@examplepetstore.com")
+    val client3 = Client(3,"Paul", "Albertini", listOf(car4), "123 Main St", "555-3456", "william.a.wheeler@example-pet-store.com")
 
 
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
@@ -182,9 +181,9 @@ fun MyApp1() {
             val filteredItems = items.filter { client ->
                 client.firstName.contains(searchText.text, ignoreCase = true) ||
                         client.lastName.contains(searchText.text, ignoreCase = true) ||
-                        client.cars.any { car ->
+                        (client.cars?.any { car ->
                             car.plateNumber.contains(searchText.text, ignoreCase = true)
-                        }
+                        } ?: false )
             }
 
             LazyColumn(
@@ -194,7 +193,7 @@ fun MyApp1() {
             ) {
                 items(filteredItems.size) { index ->
                     val client = filteredItems[index]
-                    val carsDescription = client.cars.joinToString(separator = "\n ") { "${it.make}, ${it.model}" }
+                    val carsDescription = client.cars?.joinToString(separator = "\n ") { "${it.make}, ${it.model}" }
                     Text(
                         text = "${client.firstName} ${client.lastName}\n $carsDescription",
                         fontSize = 20.sp,
