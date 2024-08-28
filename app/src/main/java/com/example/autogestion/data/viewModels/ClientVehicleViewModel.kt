@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 
 class ClientVehicleViewModel(application: Application): AndroidViewModel(application){
-    private val getAllClients: LiveData<List<Client>>
+    val allClients: LiveData<List<Client>>
     private val repository: ClientVehicleRepository
 
     val message = MutableLiveData<String>()
@@ -20,7 +20,7 @@ class ClientVehicleViewModel(application: Application): AndroidViewModel(applica
     init{
         val clientDao = AppDatabase.getDatabase(application).clientDao()
         repository = ClientVehicleRepository(clientDao)
-        getAllClients = repository.allClients
+        allClients = repository.allClients
     }
 
     fun addClient(client: Client){
@@ -35,4 +35,7 @@ class ClientVehicleViewModel(application: Application): AndroidViewModel(applica
     }
 
     // TODO : complete the view model
+    fun getAllClients(): LiveData<List<Client>> {
+        return allClients
+    }
 }
