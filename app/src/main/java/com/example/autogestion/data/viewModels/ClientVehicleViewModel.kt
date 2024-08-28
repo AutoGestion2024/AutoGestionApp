@@ -11,31 +11,32 @@ import com.example.autogestion.data.repositories.ClientVehicleRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 
-class ClientVehicleViewModel(application: Application): AndroidViewModel(application){
+class ClientVehicleViewModel(application: Application): AndroidViewModel(application) {
     private val allClients: LiveData<List<Client>>
     private val repository: ClientVehicleRepository
 
     val message = MutableLiveData<String>()
 
-    init{
+    init {
         val clientDao = AppDatabase.getDatabase(application).clientDao()
         repository = ClientVehicleRepository(clientDao)
         allClients = repository.allClients
     }
 
-    fun addClient(client: Client){
-       viewModelScope.launch(Dispatchers.IO) {
-           /*if (repository.clientExists(client.email)) {
-               message.postValue("Client avec cet email existe déjà.")
-           } else {*/
-               repository.addClient(client)
-               message.postValue("Client ajouté.")
-           //}
-       }
-    }
+    fun addClient(client: Client) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (repository.clientExists(client.phone)) {
+                message.postValue("Client avec ce numéro de téléphone existe déjà.")
+            } else {
+                repository.addClient(client)
+                message.postValue("Client ajouté.")
+                //}
+            }
+        }
 
-    // TODO : complete the view model
-    fun getAllClients(): LiveData<List<Client>> {
-        return allClients
+        // TODO : complete the view model
+        fun getAllClients(): LiveData<List<Client>> {
+            return allClients
+        }
     }
 }
