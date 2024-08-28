@@ -4,7 +4,7 @@ import androidx.room.Room
 import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.data.Client
 import com.example.autogestion.data.ClientDao
-import com.example.autogestion.data.repositories.ClientVehicleRepository
+import com.example.autogestion.data.repositories.ClientRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.*
 import org.junit.runner.RunWith
@@ -21,7 +21,7 @@ class ClientDaoTest {
 
     private lateinit var database: AppDatabase
     private lateinit var clientDao: ClientDao
-    private lateinit var repository: ClientVehicleRepository
+    private lateinit var repository: ClientRepository
 
     // Create an in-memory database and get the clientDao
     @Before
@@ -31,7 +31,7 @@ class ClientDaoTest {
             AppDatabase::class.java
         ).allowMainThreadQueries().build()
         clientDao = database.clientDao()
-        repository = ClientVehicleRepository(clientDao)
+        repository = ClientRepository(clientDao)
     }
 
     @After
@@ -84,7 +84,7 @@ class ClientDaoTest {
             clientDao.addClient(clientJane)
         }
 
-        val existsAfter = clientDao.countClientsByPhone("123456789")
+        val existsAfter = clientDao.countClientsByPhoneNumber("123456789")
         Assert.assertEquals(1, existsAfter)
     }
 
@@ -130,7 +130,7 @@ class ClientDaoTest {
 
         clientDao.addClient(clientJohn)
 
-        val count = clientDao.countClientsByPhone("123456789")
+        val count = clientDao.countClientsByPhoneNumber("123456789")
         Assert.assertEquals(1, count)
     }
 
