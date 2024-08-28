@@ -19,10 +19,10 @@ data class Vehicle(
     @PrimaryKey(autoGenerate = true)
     val vehicleId: Int,
     val clientId: Int,                          // foreign key to Client
-    val chassisNum: String,
-    val greyCard: String,
+    val chassisNum: String?,
+    val greyCard: String?,
     val registrationPlate: String,
-    val brand: String,
-    val model: String,
-    val color: String,
+    val brand: String?,
+    val model: String?,
+    val color: String?,
 )

@@ -19,8 +19,8 @@ data class Repair(
     @PrimaryKey(autoGenerate = true)
     val repairId: Int,
     val vehicleId: Int,                             // foreign key to Vehicle        
-    val description: String,
-    val date: String,
-    val invoice: String,
-    val paid : Boolean,
+    val description: String?,
+    val date: String?,
+    val invoice: String?,
+    val paid : Boolean?,
 )

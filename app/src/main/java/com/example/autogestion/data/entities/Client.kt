@@ -12,6 +12,6 @@ data class Client (
     val lastName : String,
     //val birthDate : DateFormat,
     val phone : String,
-    val email : String,
-    val address : String,
+    val email : String?,
+    val address : String?,
 )

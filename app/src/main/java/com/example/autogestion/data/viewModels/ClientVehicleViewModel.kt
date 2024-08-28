@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 
 class ClientVehicleViewModel(application: Application): AndroidViewModel(application){
-    val allClients: LiveData<List<Client>>
+    private val allClients: LiveData<List<Client>>
     private val repository: ClientVehicleRepository
 
     val message = MutableLiveData<String>()
@@ -25,12 +25,12 @@ class ClientVehicleViewModel(application: Application): AndroidViewModel(applica
 
     fun addClient(client: Client){
        viewModelScope.launch(Dispatchers.IO) {
-           if (repository.clientExists(client.email)) {
+           /*if (repository.clientExists(client.email)) {
                message.postValue("Client avec cet email existe déjà.")
-           } else {
+           } else {*/
                repository.addClient(client)
                message.postValue("Client ajouté.")
-           }
+           //}
        }
     }
 
