@@ -1,6 +1,5 @@
 package com.example.autogestion
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.autogestion.data.Car
 import com.example.autogestion.data.Client
-
 
 
 @Composable
