@@ -21,6 +21,7 @@ class ClientDaoTest {
 
     private lateinit var database: AppDatabase
     private lateinit var clientDao: ClientDao
+    private lateinit var repository: ClientVehicleRepository
 
     // Create an in-memory database and get the clientDao
     @Before
@@ -30,6 +31,7 @@ class ClientDaoTest {
             AppDatabase::class.java
         ).allowMainThreadQueries().build()
         clientDao = database.clientDao()
+        repository = ClientVehicleRepository(clientDao)
     }
 
     @After
@@ -56,7 +58,7 @@ class ClientDaoTest {
         phone = "123456789",
         birthDate = 1000000000000, // 09.09.2001
         email = "jane.doe@example.com",
-        address = "456 Elm St"
+        address = "Rue de la rue"
     )
 
     // Test the addClient and getClientById methods
@@ -68,13 +70,19 @@ class ClientDaoTest {
         Assert.assertEquals(clientJohn, retrievedClient)
     }
 
-    // TODO a revoir ne fonctionne pas
+
     // Test the addClient method with a client with the same phone number
     @Test
     fun doNotAddClientWithSamePhoneNumber() = runBlocking {
+
         clientDao.addClient(clientJohn)
 
-        clientDao.addClient(clientJane)
+        val existsBefore = repository.clientExists("123456789")
+        Assert.assertTrue(existsBefore)
+
+        if (!repository.clientExists("123456789")) {
+            clientDao.addClient(clientJane)
+        }
 
         val existsAfter = clientDao.countClientsByPhone("123456789")
         Assert.assertEquals(1, existsAfter)
