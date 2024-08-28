@@ -19,8 +19,6 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
     var isFirstNameError by remember { mutableStateOf(false) }
     var isLastNameError by remember { mutableStateOf(false) }
     var isPhoneError by remember { mutableStateOf(false) }
-    var isEmailError by remember { mutableStateOf(false) }
-    var isAddressError by remember { mutableStateOf(false) }
 
     Column(modifier = modifier.padding(16.dp)) {
         TextField(
@@ -70,29 +68,18 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
             value = email,
             onValueChange = {
                 email = it
-                isEmailError = it.isEmpty() || !it.contains("@")
             },
             label = { Text("Email *") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-            isError = isEmailError
         )
-        if (isEmailError) {
-            Text("Un email valide est obligatoire", color = MaterialTheme.colorScheme.error)
-        }
         Spacer(modifier = Modifier.height(8.dp))
 
         TextField(
             value = address,
             onValueChange = {
                 address = it
-                isAddressError = it.isEmpty()
             },
             label = { Text("Adresse *") },
-            isError = isAddressError
         )
-        if (isAddressError) {
-            Text("L'adresse est obligatoire", color = MaterialTheme.colorScheme.error)
-        }
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
@@ -100,10 +87,8 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
             isFirstNameError = firstName.isEmpty()
             isLastNameError = lastName.isEmpty()
             isPhoneError = phone.isEmpty()
-            isEmailError = email.isEmpty() || !email.contains("@")
-            isAddressError = address.isEmpty()
 
-            if (!isFirstNameError && !isLastNameError && !isPhoneError && !isEmailError && !isAddressError) {
+            if (!isFirstNameError && !isLastNameError && !isPhoneError) {
                 val newClient = Client(
                     clientId = 0,  // Auto-incremented by Room
                     firstName = firstName,
