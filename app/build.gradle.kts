@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.ui.test.junit4.android)
+    implementation(libs.androidx.runner)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -73,6 +74,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.test.ext:junit:1.1.5")
+    testImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    testImplementation("androidx.room:room-testing:2.6.1")
+    testImplementation("org.robolectric:robolectric:4.10")
 
     // Android Room
     val room_version = "2.6.1"
