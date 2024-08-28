@@ -155,7 +155,7 @@ fun MyApp1() {
                 )
                 IconButton(
                     onClick = {
-                    println("Icon button clicked")
+//                    println("Icon button clicked")
                         val intent = Intent(context, Camera::class.java)
                         context.startActivity(intent)
 //                        val outputDirectory = getOutputDirectory(context)
@@ -210,7 +210,7 @@ fun MyApp1() {
         }
     }
 }
-//private fun takePhoto(context: Context, outputOptions: ImageCapture.OutputFileOptions, savedUri: Uri) {
+    //private fun takePhoto(context: Context, outputOptions: ImageCapture.OutputFileOptions, savedUri: Uri) {
 //    val imageCapture = ImageCapture.Builder().build()
 //    imageCapture.takePicture(
 //        outputOptions,
