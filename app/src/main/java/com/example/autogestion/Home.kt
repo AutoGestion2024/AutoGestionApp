@@ -52,7 +52,7 @@ fun MyApp1() {
     val car1 = Car("ABC123", "Toyota", "Camry",1, listOf(repair1))
     val car2 = Car("XYZ789", "Honda", "Civic", 1,listOf(repair2))
 
-    val client = Client(1,"John", "Doe", listOf(car1, car2))
+    val client = Client(1,"John", "Doe", listOf(car1, car2),"Avenue 2","123456","jemange@gmail.com")
 
 
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
@@ -128,6 +128,7 @@ fun MyApp1() {
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
