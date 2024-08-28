@@ -9,8 +9,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,26 +28,7 @@ import com.example.autogestion.data.Client
 fun ProfilPage(client: Client, carList: List<Car>, onBackClick: () -> Unit) {
     Column(modifier = Modifier.fillMaxSize()) {
 
-        // Up Bar
-        Row(modifier = Modifier
-            .height(56.dp)
-            .fillMaxWidth()
-            .background(Color(0xFFF3EDF7)) ,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Button to go back
-            IconButton(onClick = onBackClick, modifier = Modifier.padding(8.dp)) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
-            }
-            Text(
-                text = "Profile client : id ${client.id}",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-
-        }
-
+        NavBar(text =  "Profile client : id ${client.id}") { onBackClick() }
 
         Row(
             modifier = Modifier
@@ -120,7 +99,9 @@ fun ProfilPage(client: Client, carList: List<Car>, onBackClick: () -> Unit) {
 
 
         // Car List
-        LazyColumn(modifier = Modifier.padding(16.dp).wrapContentSize()) {
+        LazyColumn(modifier = Modifier
+            .padding(16.dp)
+            .wrapContentSize()) {
 
             items(carList.size) { index ->
                 VoitureItem(carList[index])
@@ -136,7 +117,8 @@ fun ProfilPage(client: Client, carList: List<Car>, onBackClick: () -> Unit) {
 // One Car
 @Composable
 fun VoitureItem(car: Car) {
-    Column(modifier = Modifier.fillMaxWidth()
+    Column(modifier = Modifier
+        .fillMaxWidth()
         .clip(RoundedCornerShape(16.dp))
         .background(color = Color(0xFFF3EDF7))
         .padding(16.dp)) {
@@ -151,15 +133,15 @@ fun VoitureItem(car: Car) {
 fun ProfilPagePreview() {
     val client = Client(1,"Alex"," Doe", null,"Avenue des 2" ,"0123456789","john.doe@example.com")
     val carList = listOf(
-        Car("VD 12345","Toyota", "Corolla", 1,null),
-        Car("VD 54233","Toyota", "XD", 1,null),
-        Car("VD 73345","Toyota", "WESH", 1,null),
-        Car("VD 73345","Toyota", "WESH", 1,null),
-        Car("VD 73345","Toyota", "WESH", 1,null),
-        Car("VD 73345","Toyota", "WESH", 1,null),
-        Car("VD 73345","Toyota", "WESH", 1,null),
-        Car("VD 73345","Toyota", "WESH", 1,null),
-        Car("VD 73345","Toyota", "WESH", 1,null),
+        Car("VD 12345","Toyota", "Corolla", 1,null,""),
+        Car("VD 54233","Toyota", "XD", 1,null,""),
+        Car("VD 73345","Toyota", "WESH", 1,null,""),
+        Car("VD 73345","Toyota", "WESH", 1,null,""),
+        Car("VD 73345","Toyota", "WESH", 1,null,""),
+        Car("VD 73345","Toyota", "WESH", 1,null,""),
+        Car("VD 73345","Toyota", "WESH", 1,null,""),
+        Car("VD 73345","Toyota", "WESH", 1,null,""),
+        Car("VD 73345","Toyota", "WESH", 1,null,""),
 
 
         )

@@ -5,6 +5,6 @@ data class Car(
     val make: String,
     val model: String,
     val clientId: Long,
-    val repairs: List<Repair>? = emptyList()
-
+    val repairs: List<Repair>? = emptyList(),
+    val registrationDocURI: String
 )
