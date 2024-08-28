@@ -38,73 +38,55 @@ class ClientDaoTest {
         database.close()
     }
 
+    // Create clients object for testing
+    val clientJohn = Client(
+        clientId = 1,
+        firstName = "John",
+        lastName = "Doe",
+        phone = "123456789",
+        birthDate = 976579200000, // 12.12.2000
+        email = "john.doe@example.com",
+        address = "Rue de la rue"
+    )
+
+    val clientJane = Client(
+        clientId = 2,
+        firstName = "Jane",
+        lastName = "Doe",
+        phone = "123456789",
+        birthDate = 1000000000000, // 09.09.2001
+        email = "jane.doe@example.com",
+        address = "456 Elm St"
+    )
+
     // Test the addClient and getClientById methods
     @Test
     fun insertClientAndGetById() = runBlocking {
-        val client = Client(
-            clientId = 1,
-            firstName = "John",
-            lastName = "Doe",
-            phone = "123456789",
-            birthDate = 976579200000, // 12.12.2000
-            email = "john.doe@example.com",
-            address = "Rue de la rue"
-        )
-
-        clientDao.addClient(client)
+        clientDao.addClient(clientJohn)
 
         val retrievedClient = clientDao.getClientById(1)
-        Assert.assertEquals(client, retrievedClient)
+        Assert.assertEquals(clientJohn, retrievedClient)
     }
 
-    // TODO a revoir
+    // TODO a revoir ne fonctionne pas
     // Test the addClient method with a client with the same phone number
     @Test
     fun doNotAddClientWithSamePhoneNumber() = runBlocking {
-        val phoneNumber = "123456789"
+        clientDao.addClient(clientJohn)
 
-        // Insérer le premier client avec le numéro de téléphone
-        val client1 = Client(
-            clientId = 1,
-            firstName = "John",
-            lastName = "Doe",
-            phone = phoneNumber,
-            birthDate = 976579200000, // 12.12.2000
-            email = "john.doe@example.com",
-            address = "123 Main St"
-        )
-        clientDao.addClient(client1)
+        clientDao.addClient(clientJane)
 
-        val client2 = Client(
-            clientId = 2,
-            firstName = "Jane",
-            lastName = "Doe",
-            phone = phoneNumber,
-            birthDate = 1000000000000, // 09.09.2001
-            email = "jane.doe@example.com",
-            address = "456 Elm St"
-        )
-        clientDao.addClient(client2)
-
-        val existsAfter = clientDao.countClientsByPhone(phoneNumber)
+        val existsAfter = clientDao.countClientsByPhone("123456789")
         Assert.assertEquals(1, existsAfter)
     }
 
     // Test the updateClient method
     @Test
     fun updateClient() = runBlocking {
-        val client = Client(
-            clientId = 1,
-            firstName = "John",
-            lastName = "Doe",
-            phone = "123456789",
-            birthDate = 976579200000, // 12.12.2000
-            email = "john.doe@example.com",
-            address = "Rue de la rue"
-        )
-        clientDao.addClient(client)
 
-        val updatedClient = client.copy(email = "new.email@example.com")
+        clientDao.addClient(clientJohn)
+
+        val updatedClient = clientJohn.copy(email = "new.email@example.com")
         clientDao.updateClient(updatedClient)
 
         val retrievedClient = clientDao.getClientById(1)
@@ -114,17 +96,9 @@ class ClientDaoTest {
     // Test the deleteClient method
     @Test
     fun deleteClient() = runBlocking {
-        val client = Client(
-            clientId = 1,
-            firstName = "John",
-            lastName = "Doe",
-            phone = "123456789",
-            birthDate = 976579200000, // 12.12.2000
-            email = "john.doe@example.com",
-            address = "Rue de la rue"
-        )
-        clientDao.addClient(client)
-        clientDao.deleteClient(client)
+
+        clientDao.addClient(clientJohn)
+        clientDao.deleteClient(clientJohn)
 
         val retrievedClient = clientDao.getClientById(1)
         Assert.assertNull(retrievedClient)
@@ -134,63 +108,29 @@ class ClientDaoTest {
     // Test the getAllClients method
     @Test
     fun getAllClients() = runBlocking {
-        val client1 = Client(
-            clientId = 1,
-            firstName = "John",
-            lastName = "Doe",
-            phone = "123456789",
-            birthDate = 976579200000, // 12.12.2000
-            email = "john.doe@example.com",
-            address = "123 Main St"
-        )
 
-        val client2 = Client(
-            clientId = 2,
-            firstName = "Jane",
-            lastName = "Doe",
-            phone = "987654321",
-            birthDate = 1000000000000, // 09.09.2001
-            email = "jane.doe@example.com",
-            address = "Rue de la rue"
-        )
+        clientDao.addClient(clientJohn)
+        clientDao.addClient(clientJane)
 
-        clientDao.addClient(client1)
-        clientDao.addClient(client2)
-
-        Assert.assertEquals(2, client2.clientId)
+        Assert.assertEquals(2, clientJane.clientId)
     }
 
     // TODO test vraiment utile ?
     // Test the countClientsByPhone method
     @Test
     fun countClientsByPhone() = runBlocking {
-        val client = Client(
-            clientId = 1,
-            firstName = "John",
-            lastName = "Doe",
-            phone = "123456789",
-            birthDate = 976579200000, // 12.12.2000
-            email = "john.doe@example.com",
-            address = "Rue de la rue"
-        )
-        clientDao.addClient(client)
+
+        clientDao.addClient(clientJohn)
 
         val count = clientDao.countClientsByPhone("123456789")
         Assert.assertEquals(1, count)
     }
 
+    // Test the searchClients method
     @Test
     fun getClientWithVehicles() = runBlocking {
-        val client = Client(
-            clientId = 1,
-            firstName = "John",
-            lastName = "Doe",
-            phone = "123456789",
-            birthDate = 976579200000, // 12.12.2000
-            email = "john.doe@example.com",
-            address = "Rue de la rue"
-        )
-        clientDao.addClient(client)
+
+        clientDao.addClient(clientJohn)
 
         val vehicle1 = Vehicle(
             vehicleId = 1,
@@ -227,16 +167,8 @@ class ClientDaoTest {
 
     @Test
     fun getVehicleWithRepairs() = runBlocking {
-        val client = Client(
-            clientId = 1,
-            firstName = "John",
-            lastName = "Doe",
-            phone = "123456789",
-            birthDate = 976579200000, // 12.12.2000
-            email = "john.doe@example.com",
-            address = "Rue de la rue"
-        )
-        clientDao.addClient(client)
+
+        clientDao.addClient(clientJohn)
 
         val vehicle = Vehicle(
             vehicleId = 1,
