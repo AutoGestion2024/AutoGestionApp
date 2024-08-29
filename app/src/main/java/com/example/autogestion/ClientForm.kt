@@ -1,18 +1,28 @@
 package com.example.autogestion
 
+import android.content.Intent
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.autogestion.data.Client
+import com.example.autogestion.data.viewModels.ClientViewModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
+fun ClientForm(
+    onSubmit: (Client) -> Unit,
+    clientViewModel: ClientViewModel = viewModel(), // Inject the ViewModel
+    modifier: Modifier = Modifier
+) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
@@ -25,6 +35,8 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
     var isBirthDateError by remember { mutableStateOf(false) }
 
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Column(modifier = modifier.padding(16.dp)) {
         TextField(
@@ -126,7 +138,7 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
                     null
                 }
                 val newClient = Client(
-                    clientId = 0,
+                    clientId = 0,  // Room will auto-generate the ID
                     lastName = lastName,
                     firstName = firstName,
                     phone = phone,
@@ -134,10 +146,24 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
                     email = email,
                     address = address
                 )
-                onSubmit(newClient)
+
+                // Add the client to the database and redirect to Home
+                coroutineScope.launch {
+                    clientViewModel.addClient(newClient)
+                    redirectToHome(context)
+                }
             }
         }) {
             Text("Ajouter le client")
         }
+    }
+
+}
+
+fun redirectToHome(context: android.content.Context) {
+    val intent = Intent(context, Home::class.java)
+    context.startActivity(intent)
+    if (context is ComponentActivity) {
+        context.finish()  // Close the current activity
     }
 }
