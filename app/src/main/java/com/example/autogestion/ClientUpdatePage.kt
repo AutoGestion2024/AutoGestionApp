@@ -1,5 +1,6 @@
 package com.example.autogestion
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -51,24 +52,6 @@ class ClientUpdatePage : ComponentActivity() {
         val client = clientViewModel.currentClient.observeAsState().value
 
         Scaffold(
-            floatingActionButton = {
-                ExtendedFloatingActionButton(
-                    onClick = {
-                        client?.let {
-                            clientViewModel.updateClient(it.copy(
-                                firstName = it.firstName,
-                                lastName = it.lastName,
-                                phone = it.phone,
-                                birthDate = it.birthDate,
-                                email = it.email,
-                                address = it.address
-                            ))
-                            finish()
-                        }
-                    },
-                    content = { Text("Update") }
-                )
-            }
         ) { innerPadding ->
             client?.let {
                 ClientUpdateForm(it, clientViewModel, innerPadding)
@@ -77,7 +60,11 @@ class ClientUpdatePage : ComponentActivity() {
     }
 
     @Composable
-    fun ClientUpdateForm(client: Client, viewModel: ClientViewModel, innerPadding: PaddingValues) {
+    fun ClientUpdateForm(client: Client, clientViewModel: ClientViewModel, innerPadding: PaddingValues) {
+        LaunchedEffect(client.clientId) {
+            clientViewModel.getClientById(client.clientId)
+        }
+
         var firstName = rememberSaveable { mutableStateOf(client.firstName) }
         var lastName = rememberSaveable { mutableStateOf(client.lastName) }
         var phone = rememberSaveable { mutableStateOf(client.phone) }
@@ -89,19 +76,19 @@ class ClientUpdatePage : ComponentActivity() {
             TextField(
                 value = lastName.value,
                 onValueChange = { lastName.value = it },
-                label = { Text("Nom*") },
+                label = { Text("Nom *") },
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
             )
             TextField(
                 value = firstName.value,
                 onValueChange = { firstName.value = it },
-                label = { Text("Prénom*") },
+                label = { Text("Prénom *") },
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
             )
             TextField(
                 value = phone.value,
                 onValueChange = { phone.value = it },
-                label = { Text("Téléphone*") },
+                label = { Text("Téléphone *") },
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
             )
             TextField(
@@ -126,7 +113,7 @@ class ClientUpdatePage : ComponentActivity() {
             )
             Button(onClick = {
                 val birthDateLong = parseDate(birthDate) ?: client.birthDate
-                viewModel.updateClient(client.copy(
+                clientViewModel.updateClient(client.copy(
                     lastName = lastName.value,
                     firstName = firstName.value,
                     phone = phone.value,
@@ -134,7 +121,11 @@ class ClientUpdatePage : ComponentActivity() {
                     email = email.value,
                     address = address,
                 ))
-                finish() // Retourner à la page précédente après la mise à jour
+                val intent = Intent(this@ClientUpdatePage, ClientDetails::class.java).apply {
+                    putExtra("clientId", client.clientId)
+                }
+                startActivity(intent)
+                finish()
             }) {
                 Text("Enregistrer")
             }

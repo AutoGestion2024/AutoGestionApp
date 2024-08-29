@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,44 +27,48 @@ import java.util.Locale
 
 class ClientDetails : ComponentActivity() {
 
-    private lateinit var database: AppDatabase
+    private var clientId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        database = AppDatabase.getDatabase(this)
-
-        val clientId = intent.getIntExtra("clientId", -1)
+        clientId = intent.getIntExtra("clientId", -1)
 
         setContent {
             ClientDetailScreen(clientId)
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        setContent {
+            ClientDetailScreen(clientId)
+        }
+    }
     @Composable
     fun ClientDetailScreen(clientId: Int,  clientViewModel: ClientViewModel = viewModel()) {
-        var client by remember { mutableStateOf<Client?>(null) }
+
         val coroutineScope = rememberCoroutineScope()
 
         LaunchedEffect(clientId) {
-            // Exécuter l'opération de base de données dans Dispatchers.IO
-            client = withContext(Dispatchers.IO) {
-                database.clientDao().getClientById(clientId)
-            }
+            clientViewModel.getClientById(clientId)
         }
+
+        val client by clientViewModel.currentClient.observeAsState()
+
 
         client?.let { client ->
             Column(modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)) {
 
-                Text(text = "Nom: ${client.lastName}")
-                Text(text = "Prénom: ${client.firstName}")
-                Text(text = "Téléphone: ${client.phone}")
+                Text(text = "Nom : ${client.lastName}")
+                Text(text = "Prénom : ${client.firstName}")
+                Text(text = "Téléphone : ${client.phone}")
                 val birthDateFormatted = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(client.birthDate)
-                Text(text = "Date de naissance: $birthDateFormatted")
-                Text(text = "Email: ${client.email}")
-                Text(text = "Adresse: ${client.address}")
+                Text(text = "Date de naissance : $birthDateFormatted")
+                Text(text = "Email : ${client.email}")
+                Text(text = "Adresse : ${client.address}")
 
 
                 Spacer(modifier = Modifier.height(16.dp))
