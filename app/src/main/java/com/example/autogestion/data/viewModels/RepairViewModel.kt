@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.autogestion.data.AppDatabase
+import com.example.autogestion.data.Client
 import com.example.autogestion.data.Repair
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.repositories.RepairRepository
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 class RepairViewModel(application: Application): AndroidViewModel(application) {
     private val repository: RepairRepository
     private val allRepairs: List<Repair?>
+    val currentRepair: MutableLiveData<Repair?> = MutableLiveData(null)
 
     val message = MutableLiveData<String>()
 
@@ -37,6 +39,7 @@ class RepairViewModel(application: Application): AndroidViewModel(application) {
     fun updateRepair(repair: Repair) {
         viewModelScope.launch(Dispatchers.IO){
             repository.updateRepair(repair)
+            currentRepair.postValue(repository.getRepairById(repair.repairId))
         }
     }
 

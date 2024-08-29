@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.autogestion.data.AppDatabase
+import com.example.autogestion.data.Client
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.repositories.VehicleRepository
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 class VehicleViewModel(application: Application): AndroidViewModel(application) {
     private val repository: VehicleRepository
     private val allVehicles: List<Vehicle>
+    val currentVehicle: MutableLiveData<Vehicle?> = MutableLiveData(null)
 
     val message = MutableLiveData<String>()
 
@@ -36,6 +38,7 @@ class VehicleViewModel(application: Application): AndroidViewModel(application) 
     fun updateVehicle(vehicle: Vehicle) {
         viewModelScope.launch(Dispatchers.IO){
             repository.updateVehicle(vehicle)
+            currentVehicle.postValue(repository.getVehicleById(vehicle.vehicleId))
         }
     }
 
