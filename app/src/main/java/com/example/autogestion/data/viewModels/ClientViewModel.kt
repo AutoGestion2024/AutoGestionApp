@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 class ClientViewModel(application: Application): AndroidViewModel(application){
     private val allClients: LiveData<List<Client>>
     private val repository: ClientRepository
+    val currentClient: MutableLiveData<Client?> = MutableLiveData(null)
 
     val message = MutableLiveData<String>()
 
@@ -52,11 +53,10 @@ class ClientViewModel(application: Application): AndroidViewModel(application){
     }
 
     fun getClientById(clientId: Int): LiveData<Client?> {
-        val client = MutableLiveData<Client?>()
         viewModelScope.launch(Dispatchers.IO) {
-            client.postValue(repository.getClientById(clientId))
+            currentClient.postValue(repository.getClientById(clientId))
         }
-        return client
+        return currentClient
     }
 
     fun getClientByPhoneNumber(phone: String): LiveData<Client?> {
