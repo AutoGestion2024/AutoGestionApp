@@ -127,8 +127,8 @@ fun ClientForm(onSubmit: (Client) -> Unit, modifier: Modifier = Modifier) {
                 }
                 val newClient = Client(
                     clientId = 0,
-                    firstName = firstName,
                     lastName = lastName,
+                    firstName = firstName,
                     phone = phone,
                     birthDate = birthDateLong ?: 0L,
                     email = email,

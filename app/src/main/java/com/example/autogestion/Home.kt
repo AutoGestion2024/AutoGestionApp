@@ -6,8 +6,10 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.data.Client
@@ -69,7 +72,17 @@ class Home : ComponentActivity() {
     fun ClientList(clients: List<Client>) {
         LazyColumn {
             items(clients) { client ->
-                Text(text = "${client.lastName} ${client.firstName}")
+                Text(
+                    text = "${client.lastName} ${client.firstName}",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .clickable {
+                            val intent = Intent(this@Home, ClientDetails::class.java)
+                            intent.putExtra("clientId", client.clientId)
+                            startActivity(intent)
+                        }
+                )
             }
         }
     }

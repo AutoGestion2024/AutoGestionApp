@@ -74,7 +74,4 @@ class ClientViewModel(application: Application): AndroidViewModel(application){
         }
         return result
     }
-
-
-
 }

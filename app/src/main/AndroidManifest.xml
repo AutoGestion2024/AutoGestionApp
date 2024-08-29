@@ -28,6 +28,14 @@
 
         <!-- Déclaration de l'Activity HomeForm -->
         <activity android:name=".HomeForm"></activity>
+
+        <!-- Déclaration de l'Activity ClientsDetails -->
+        <activity android:name=".ClientDetails"></activity>
+
+        <!-- Déclaration de l'Activity com.example.autogestion.ClientUpdatePage -->
+        <activity android:name=".ClientUpdatePage"></activity>
+
+
     </application>
 
 </manifest>
