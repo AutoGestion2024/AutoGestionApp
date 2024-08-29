@@ -14,9 +14,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.data.Client
+import com.example.autogestion.data.viewModels.ClientViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -38,8 +41,9 @@ class ClientDetails : ComponentActivity() {
     }
 
     @Composable
-    fun ClientDetailScreen(clientId: Int) {
+    fun ClientDetailScreen(clientId: Int,  clientViewModel: ClientViewModel = viewModel()) {
         var client by remember { mutableStateOf<Client?>(null) }
+        val coroutineScope = rememberCoroutineScope()
 
         LaunchedEffect(clientId) {
             // Exécuter l'opération de base de données dans Dispatchers.IO
@@ -56,10 +60,11 @@ class ClientDetails : ComponentActivity() {
                 Text(text = "Nom: ${client.lastName}")
                 Text(text = "Prénom: ${client.firstName}")
                 Text(text = "Téléphone: ${client.phone}")
-                Text(text = "Email: ${client.email}")
-                Text(text = "Adresse: ${client.address}")
                 val birthDateFormatted = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(client.birthDate)
                 Text(text = "Date de naissance: $birthDateFormatted")
+                Text(text = "Email: ${client.email}")
+                Text(text = "Adresse: ${client.address}")
+
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -71,9 +76,22 @@ class ClientDetails : ComponentActivity() {
                 }) {
                     Text("Modifier")
                 }
+                Button(onClick = {
+                    coroutineScope.launch {
+                        clientViewModel.deleteClient(client)
+                        redirectToHome()
+                    }
+                }) {
+                    Text("Supprimer")
+                }
             }
         } ?: run {
             Text(text = "Client non trouvé", modifier = Modifier.padding(16.dp))
         }
+    }
+    private fun redirectToHome() {
+        val intent = Intent(this, Home::class.java)
+        startActivity(intent)
+        finish() // Ferme l'activité actuelle pour éviter le retour avec le bouton "Back"
     }
 }

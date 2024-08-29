@@ -39,7 +39,6 @@ class ClientViewModel(application: Application): AndroidViewModel(application){
        }
     }
 
-    // TODO check
     fun updateClient(client: Client){
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateClient(client)
