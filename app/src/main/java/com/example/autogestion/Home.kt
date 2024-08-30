@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,7 +85,7 @@ class Home : ComponentActivity() {
     fun HomeApp() {
         val context = LocalContext.current
 
-        var clients = clientViewModel.getAllClients().value
+        val clients by database.clientDao().getAllClients().observeAsState(initial = emptyList())
 
         var items by remember { mutableStateOf(clients) }
         var searchText by remember { mutableStateOf(TextFieldValue("")) }
