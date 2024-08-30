@@ -4,9 +4,11 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,16 +35,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.autogestion.data.Car
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.data.Client
-import com.example.autogestion.data.Repair
+import com.example.autogestion.data.viewModels.ClientViewModel
+import com.example.autogestion.data.viewModels.RepairViewModel
+import com.example.autogestion.data.viewModels.VehicleViewModel
 import com.example.autogestion.form.ClientForm
 
 
 class Home : ComponentActivity() {
 
+    // Create an instance of the database
+    private lateinit var database: AppDatabase
+
+    private val clientViewModel: ClientViewModel by viewModels()
+    private val vehicleViewModel: VehicleViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        database = AppDatabase.getDatabase(this)
+        Log.d("AppDatabase", "Database instance: ${database.isOpen}")
+
         if (!hasRequiredPermissions()) {
             ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
         }
@@ -68,24 +84,11 @@ class Home : ComponentActivity() {
     @Composable
     fun HomeApp() {
         val context = LocalContext.current
-        val repair1 = Repair("Engine problem", "16.08.2024")
-        val repair2 = Repair("Transmission issue", "13.04.2024")
-        val repair3 = Repair("Tyre replacement", "10.01.2024")
-        val repair4 = Repair("Oil change", "10.01.2024")
-        val repair5 = Repair("Service", "10.01.2024")
 
-        val car1 = Car("ABC123", "Toyota", "Camry",1, listOf(repair1), "./images/car1.jpg")
-        val car2 = Car("XYZ789", "Honda", "Civic", 1,listOf(repair2, repair3), "./images/car2.jpg")
-        val car3 = Car("DEF789", "Mercedes", "A35 AMG", 2,listOf(repair4), "./images/car3.jpg")
-        val car4 = Car("DEF789", "Volkswagen", "Cocinelle", 3,listOf(repair5), "./images/car4.jpg")
+        val clients by database.clientDao().getAllClients().observeAsState(initial = emptyList())
 
-        val client1 = Client(1,"John", "Doe", listOf(car1, car2), "123 Main St", "555-1234", "william.henry.harrison@example-pet-store.com")
-        val client2 = Client(2,"Lewis", "Hamilton", listOf(car3), "123 Main St", "555-2345", "john.mclean@examplepetstore.com")
-        val client3 = Client(3,"Paul", "Albertini", listOf(car4), "123 Main St", "555-3456", "william.a.wheeler@example-pet-store.com")
-
-
+        var items by remember { mutableStateOf(clients) }
         var searchText by remember { mutableStateOf(TextFieldValue("")) }
-        var items by remember { mutableStateOf(listOf(client1, client2, client3)) }
 
         Scaffold(
             floatingActionButton = {
@@ -151,12 +154,12 @@ class Home : ComponentActivity() {
                 }
 
                 // Liste filtrée
-                val filteredItems = items.filter { client ->
+                val filteredItems = items?.filter { client ->
                     client.firstName.contains(searchText.text, ignoreCase = true) ||
                             client.lastName.contains(searchText.text, ignoreCase = true) ||
-                            (client.cars?.any { car ->
-                                car.plateNumber.contains(searchText.text, ignoreCase = true)
-                            } ?: false )
+                            ( vehicleViewModel.getVehiclesFromClient(client.clientId).any { vehicle ->
+                                vehicle?.registrationPlate?.contains(searchText.text, ignoreCase = true) == true
+                            } ?: false)
                 }
 
                 LazyColumn(
@@ -164,11 +167,13 @@ class Home : ComponentActivity() {
                         .padding(16.dp)
                         .wrapContentSize()
                 ) {
-                    items(filteredItems.size) { index ->
-                        val client = filteredItems[index]
-                        ClientCarInfo(client = client)
-                        if (index < filteredItems.size - 1) {
-                            Spacer(modifier = Modifier.height(8.dp))
+                    if (filteredItems != null) {
+                        items(filteredItems.size) { index ->
+                            val client = filteredItems[index]
+                            ClientVehicleInfo(client = client)
+                            if (index < filteredItems.size - 1) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
                         }
                     }
                 }
@@ -177,7 +182,7 @@ class Home : ComponentActivity() {
     }
 
     @Composable
-    fun ClientCarInfo(client : Client){
+    fun ClientVehicleInfo(client : Client, vehicleViewModel: VehicleViewModel = viewModel()) {
         val current = LocalContext.current
         Column(modifier = Modifier
             .fillMaxWidth()
@@ -185,7 +190,10 @@ class Home : ComponentActivity() {
             .background(color = Color(0xFFF3EDF7))
             .padding(15.dp)
             .clickable {
-                val intent = Intent(current, ClientProfile::class.java)
+                val intent = Intent(current, ClientProfile::class.java).apply {
+                    putExtra("clientId", client.clientId)
+                }
+
                 current.startActivity(intent)
                 /*TODO ajouter les parametre de transmission */
             }) {
@@ -194,7 +202,7 @@ class Home : ComponentActivity() {
                 modifier = Modifier.padding(bottom = 4.dp),
                 fontSize = 20.sp
             )
-            client.cars?.joinToString(separator = "\n ") { "${it.make}, ${it.model}" }?.let {
+            vehicleViewModel.getVehiclesFromClient(client.clientId).joinToString(separator = "\n ") { "${it?.brand}, ${it?.model}" }.let {
                 Text(
                     text = it,
                     modifier = Modifier

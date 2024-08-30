@@ -57,6 +57,10 @@ class VehicleViewModel(application: Application): AndroidViewModel(application) 
     }
 
     fun getVehiclesFromClient(clientId: Int): List<Vehicle?> {
-        return repository.getVehiclesFromClient(clientId)
+        val vehicles = MutableLiveData<List<Vehicle?>>()
+        viewModelScope.launch(Dispatchers.IO){
+            vehicles.postValue(repository.getVehiclesFromClient(clientId))
+        }
+        return vehicles.value!!
     }
 }

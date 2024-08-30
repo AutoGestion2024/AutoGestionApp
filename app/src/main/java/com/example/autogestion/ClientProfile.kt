@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -23,49 +23,41 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.autogestion.data.Car
-import com.example.autogestion.data.Client
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.autogestion.data.Vehicle
+import com.example.autogestion.data.viewModels.ClientViewModel
+import com.example.autogestion.data.viewModels.RepairViewModel
+import com.example.autogestion.data.viewModels.VehicleViewModel
 
 class ClientProfile : ComponentActivity(){
+
+    private val clientViewModel: ClientViewModel by viewModels()
+    private val vehicleViewModel: VehicleViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-
-        val client = Client(1,"Alex"," Doe", null,"Avenue des 2" ,"0123456789","john.doe@example.com")
-        val carList = listOf(
-            Car("VD 12345","Toyota", "Corolla", 1,null,""),
-            Car("VD 54233","Toyota", "XD", 1,null,""),
-            Car("VD 73345","Toyota", "WESH", 1,null,""),
-            Car("VD 73345","Toyota", "WESH", 1,null,""),
-            Car("VD 73345","Toyota", "WESH", 1,null,""),
-            Car("VD 73345","Toyota", "WESH", 1,null,""),
-            Car("VD 73345","Toyota", "WESH", 1,null,""),
-            Car("VD 73345","Toyota", "WESH", 1,null,""),
-            Car("VD 73345","Toyota", "WESH", 1,null,""),
-
-
-            )
+        val clientId = intent.getIntExtra("clientId", 0)
 
         setContent {
-            ProfilPage(client,carList)
+            ProfilPage(clientId)
         }
     }
 
 
 
     @Composable
-    fun ProfilPage(client: Client, carList: List<Car>) {
+    fun ProfilPage(clientId: Int) {
         val context = LocalContext.current
 
-
+        var client = clientViewModel.getClientById(clientId).value
+        val vehicleList = vehicleViewModel.getVehiclesFromClient(clientId)
 
         Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-            NavBar(text =  "Profile client : id ${client.id}") {
+            NavBar(text =  "Profile client : id ${clientId}") {
                 val intent = Intent(context, Home::class.java)
                 context.startActivity(intent)
             }
@@ -79,10 +71,11 @@ class ClientProfile : ComponentActivity(){
 
                 // Client information
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "${client.firstName} ${client.lastName} ", modifier = Modifier.padding(bottom = 8.dp))
-                    Text(text = client.email, modifier = Modifier.padding(bottom = 8.dp))
-                    Text(text = client.phone, modifier = Modifier.padding(bottom = 8.dp))
-                    Text(text = client.address)
+                    Text(text = "${client?.firstName} ${client?.lastName} ", modifier = Modifier.padding(bottom = 8.dp))
+                    // TODO add birthdate
+                    Text(text = "${client?.phone}", modifier = Modifier.padding(bottom = 8.dp))
+                    Text(text = "${client?.email}", modifier = Modifier.padding(bottom = 8.dp))
+                    Text(text = "${client?.address}")
                 }
 
                 Row {
@@ -142,9 +135,9 @@ class ClientProfile : ComponentActivity(){
                 .padding(16.dp)
                 .wrapContentSize()) {
 
-                items(carList.size) { index ->
-                    VoitureItem(carList[index])
-                    if (index < carList.size - 1) {
+                items(vehicleList.size) { index ->
+                    vehicleList[index]?.let { VoitureItem(it) }
+                    if (index < vehicleList.size - 1) {
 
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -157,7 +150,7 @@ class ClientProfile : ComponentActivity(){
 
     // One Car
     @Composable
-    fun VoitureItem(car: Car) {
+    fun VoitureItem(vehicle: Vehicle) {
         val context = LocalContext.current
 
         Column(modifier = Modifier
@@ -166,42 +159,17 @@ class ClientProfile : ComponentActivity(){
             .background(color = Color(0xFFF3EDF7))
             .padding(16.dp)
             .clickable {
-                val intent = Intent(context, CarProfile::class.java)
+                val intent = Intent(context, VehicleProfile::class.java).apply{
+                    putExtra("vehicleId", vehicle.vehicleId)
+                }
                 context.startActivity(intent)
                 /* TODO Ajouter les parametres */
             }
         ) {
-            Text(text = "Plaque: ${car.plateNumber}", modifier = Modifier.padding(bottom = 4.dp))
-            Text(text = "Marque: ${car.make}", modifier = Modifier.padding(bottom = 4.dp))
-            Text(text = "Modèle: ${car.model}", modifier = Modifier.padding(bottom = 4.dp))
+            Text(text = "Plaque: ${vehicle.registrationPlate}", modifier = Modifier.padding(bottom = 4.dp))
+            Text(text = "Marque: ${vehicle.brand}", modifier = Modifier.padding(bottom = 4.dp))
+            Text(text = "Modèle: ${vehicle.model}", modifier = Modifier.padding(bottom = 4.dp))
         }
     }
 
-}
-
-
-
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun ProfilPagePreview() {
-
-    val client = Client(1,"Alex"," Doe", null,"Avenue des 2" ,"0123456789","john.doe@example.com")
-    val carList = listOf(
-        Car("VD 12345","Toyota", "Corolla", 1,null,""),
-        Car("VD 54233","Toyota", "XD", 1,null,""),
-        Car("VD 73345","Toyota", "WESH", 1,null,""),
-        Car("VD 73345","Toyota", "WESH", 1,null,""),
-        Car("VD 73345","Toyota", "WESH", 1,null,""),
-        Car("VD 73345","Toyota", "WESH", 1,null,""),
-        Car("VD 73345","Toyota", "WESH", 1,null,""),
-        Car("VD 73345","Toyota", "WESH", 1,null,""),
-        Car("VD 73345","Toyota", "WESH", 1,null,""),
-
-
-        )
-
-    ClientProfile().ProfilPage(client = client, carList = carList)
 }
