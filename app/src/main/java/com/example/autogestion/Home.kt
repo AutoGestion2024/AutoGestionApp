@@ -180,6 +180,7 @@ class Home : ComponentActivity() {
 
     @Composable
     fun ClientCarInfo(client : Client){
+        val current = LocalContext.current
         Column(modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
@@ -195,7 +196,11 @@ class Home : ComponentActivity() {
                     text = it,
                     modifier = Modifier
                         .padding(bottom = 4.dp)
-                        .clickable {/*TODO */ }
+                        .clickable {
+                            /*TODO */
+                            val intent = Intent(current, ClientProfile::class.java)
+                            current.startActivity(intent)
+                        }
                 )
             }
         }

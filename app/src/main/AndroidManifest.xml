@@ -37,6 +37,8 @@
 
         <activity android:name=".Home"/>
         <activity android:name=".Camera" />
+        <activity android:name=".ClientProfile" />
+        <activity android:name=".CarProfile" />
         <activity android:name=".form.ClientForm" />
         <activity android:name=".form.CarForm" />
         <activity android:name=".form.RepairForm" />

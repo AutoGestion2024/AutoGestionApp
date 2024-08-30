@@ -24,7 +24,7 @@ fun NavBar(text : String,onBackClick: () -> Unit){
     Row(modifier = Modifier
         .height(56.dp)
         .fillMaxWidth()
-        .background(Color(0xFFF3EDF7)) ,
+        .background(Color(0xFFF3EDF7)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Button to go back
