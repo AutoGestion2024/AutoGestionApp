@@ -13,29 +13,6 @@
         android:theme="@style/Theme.AutoGestion"
         tools:targetApi="31">
 
-        <!-- Déclaration de l'Activity Home -->
-        <activity
-            android:name=".Home"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AutoGestion">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <!-- Déclaration de l'Activity HomeForm -->
-        <activity android:name=".HomeForm"></activity>
-
-        <!-- Déclaration de l'Activity ClientsDetails -->
-        <activity android:name=".ClientDetails"></activity>
-
-        <!-- Déclaration de l'Activity com.example.autogestion.ClientUpdatePage -->
-        <activity android:name=".ClientUpdatePage"></activity>
-
-
     </application>
 
 </manifest>
