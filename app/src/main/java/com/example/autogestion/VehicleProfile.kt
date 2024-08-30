@@ -24,7 +24,7 @@ import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import com.example.autogestion.data.Car
+import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.Repair
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,34 +35,37 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.autogestion.data.viewModels.RepairViewModel
+import com.example.autogestion.data.viewModels.VehicleViewModel
 
-class CarProfile : ComponentActivity(){
+class VehicleProfile : ComponentActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val car = Car("VD 12345","Toyota", "Corolla", 1,null,"")
-        val listeRepar = listOf(
-            Repair("ok cass","20 janvier 2000"),
-            Repair("ok cass","20 janvier 2000"),
-            Repair("ok cass","20 janvier 2000")
-        )
+        val vehicleId = intent.getIntExtra("vehicleId", 0)
 
         setContent {
-            Carpage(car,listeRepar)
+            VehiclePage(vehicleId)
         }
     }
 
     @Composable
-    fun Carpage(car: Car, repairList: List<Repair>){
+    fun VehiclePage(vehicleId: Int){
         val context = LocalContext.current
-
+        var vehicleViewModel: VehicleViewModel = viewModel()
+        var repairViewModel: RepairViewModel = viewModel()
+        var vehicle = vehicleViewModel.getVehicleById(vehicleId).value
+        var repairList = repairViewModel.getRepairsFromVehicle(vehicleId)
 
         Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
 
             NavBar(text = "Profile Voiture") {
-                val intent = Intent(context, ClientProfile::class.java)
+                val intent = Intent(context, ClientProfile::class.java).apply{
+                    putExtra("clientId", vehicle?.clientId)
+                }
                 context.startActivity(intent)
             }
 
@@ -74,9 +77,10 @@ class CarProfile : ComponentActivity(){
             ) {
                 // Car information
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "${car.make}, ${car.model}", modifier = Modifier.padding(bottom = 4.dp))
-                    Text(text = "Plaque: ${car.plateNumber}", modifier = Modifier.padding(bottom = 4.dp))
-                    Text(text = "Carte grise")
+                    Text(text = "${vehicle?.brand}, ${vehicle?.model}", modifier = Modifier.padding(bottom = 4.dp))
+                    Text(text = "Plaque: ${vehicle?.registrationPlate}", modifier = Modifier.padding(bottom = 4.dp))
+                    // TODO add link to grey card
+                    Text(text = "Carte grise: ${vehicle?.greyCard}", modifier = Modifier.padding(bottom = 4.dp))
                 }
 
                 Row {
@@ -137,7 +141,7 @@ class CarProfile : ComponentActivity(){
                 .wrapContentSize()) {
 
                 items(repairList.size) { index ->
-                    RepairItem(repairList[index])
+                    repairList[index]?.let { RepairItem(it) }
                     if (index < repairList.size - 1) {
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -155,28 +159,11 @@ class CarProfile : ComponentActivity(){
             .clip(RoundedCornerShape(16.dp))
             .background(color = Color(0xFFF3EDF7))
             .padding(16.dp)) {
-            Text(text = repair.description, modifier = Modifier.padding(bottom = 4.dp))
-            Text(text = repair.date, modifier = Modifier.padding(bottom = 4.dp))
+            Text(text = "${repair.description}", modifier = Modifier.padding(bottom = 4.dp))
+            Text(text = "${repair.date}", modifier = Modifier.padding(bottom = 4.dp))
         }
     }
 
 
 
-}
-
-
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun ProfilePrew() {
-    val car = Car("VD 12345","Toyota", "Corolla", 1,null,"")
-    val listeRepar = listOf(
-        Repair("ok cass","20 janvier 2000"),
-        Repair("ok cass","20 janvier 2000"),
-        Repair("ok cass","20 janvier 2000")
-    )
-
-    CarProfile().Carpage(car = car, repairList = listeRepar)
 }
