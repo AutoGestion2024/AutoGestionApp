@@ -1,10 +1,12 @@
 package com.example.autogestion
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -24,7 +26,7 @@ fun NavBar(text : String,onBackClick: () -> Unit){
     Row(modifier = Modifier
         .height(56.dp)
         .fillMaxWidth()
-        .background(Color(0xFFF3EDF7)) ,
+        .background(Color(0xFFF3EDF7)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Button to go back
