@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -27,9 +28,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.ClientViewModel
+import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
 
 class ClientProfile : ComponentActivity(){
+
+    private val clientViewModel: ClientViewModel by viewModels()
+    private val vehicleViewModel: VehicleViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,9 +53,7 @@ class ClientProfile : ComponentActivity(){
     fun ProfilPage(clientId: Int) {
         val context = LocalContext.current
 
-        var clientViewModel: ClientViewModel = viewModel()
         var client = clientViewModel.getClientById(clientId).value
-        var vehicleViewModel: VehicleViewModel = viewModel()
         val vehicleList = vehicleViewModel.getVehiclesFromClient(clientId)
 
         Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {

@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,10 +37,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
 
 class VehicleProfile : ComponentActivity(){
+
+    private val vehicleViewModel: VehicleViewModel by viewModels()
+    private val repairViewModel: RepairViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,8 +60,6 @@ class VehicleProfile : ComponentActivity(){
     @Composable
     fun VehiclePage(vehicleId: Int){
         val context = LocalContext.current
-        var vehicleViewModel: VehicleViewModel = viewModel()
-        var repairViewModel: RepairViewModel = viewModel()
         var vehicle = vehicleViewModel.getVehicleById(vehicleId).value
         var repairList = repairViewModel.getRepairsFromVehicle(vehicleId)
 

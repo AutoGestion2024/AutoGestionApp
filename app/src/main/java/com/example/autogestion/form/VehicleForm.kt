@@ -18,7 +18,7 @@ import com.example.autogestion.NavBar
 
 
 
-class CarForm : ComponentActivity() {
+class VehicleForm : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,15 +28,16 @@ class CarForm : ComponentActivity() {
         val lastName = intent.getStringExtra("lastName") ?: ""
         val phoneNumber = intent.getStringExtra("phoneNumber") ?: ""
         val birthDate = intent.getStringExtra("birthDate") ?: ""
+        val address = intent.getStringExtra("address") ?: ""
         val email = intent.getStringExtra("email") ?: ""
 
         val initPlateNumber = intent.getStringExtra("plateNumber") ?: ""
-        val initMake = intent.getStringExtra("make") ?: ""
+        val initBrand = intent.getStringExtra("brand") ?: ""
         val initModel = intent.getStringExtra("model") ?: ""
         val initClientId = intent.getLongExtra("clientId", 0)
 
         setContent {
-            CarFormApp(firstName, lastName, phoneNumber, birthDate, email, initPlateNumber, initMake, initModel, initClientId)
+            CarFormApp(firstName, lastName, phoneNumber, birthDate, email, initPlateNumber, initBrand, initModel, initClientId)
         }
     }
 
@@ -45,7 +46,7 @@ class CarForm : ComponentActivity() {
         val context = LocalContext.current
 
         var plateNumber by remember { mutableStateOf(TextFieldValue(initPlateNumber)) }
-        var make by remember { mutableStateOf(TextFieldValue(initMake)) }
+        var brand by remember { mutableStateOf(TextFieldValue(initMake)) }
         var model by remember { mutableStateOf(TextFieldValue(initModel)) }
         var clientId by remember { mutableStateOf(initClientId) }
 
@@ -79,11 +80,11 @@ class CarForm : ComponentActivity() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
-                    value = make,
-                    onValueChange = { make = it },
+                    value = brand,
+                    onValueChange = { brand = it },
                     label = { Text("Marque") },
                     modifier = Modifier.fillMaxWidth(),
-                    isError = make.text.isEmpty()
+                    isError = brand.text.isEmpty()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -105,14 +106,14 @@ class CarForm : ComponentActivity() {
                             putExtra("birthDate", birthDate)
                             putExtra("email", email)
                             putExtra("plateNumber", plateNumber.text)
-                            putExtra("make", make.text)
+                            putExtra("brand", brand.text)
                             putExtra("model", model.text)
                             putExtra("clientId", clientId)
                         }
                         context.startActivity(intent)
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    enabled = plateNumber.text.isNotEmpty() && make.text.isNotEmpty() && model.text.isNotEmpty()
+                    enabled = plateNumber.text.isNotEmpty() && brand.text.isNotEmpty() && model.text.isNotEmpty()
                 ) {
                     Text("Suivant")
                 }

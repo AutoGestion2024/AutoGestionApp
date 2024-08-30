@@ -17,7 +17,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            initDB()
             Home().HomeApp()
         }
     }
@@ -28,11 +27,4 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     Home().HomeApp()
-}
-
-@Composable
-fun initDB(){
-    // Create an instance of the database
-    lateinit var database: AppDatabase
-    database = AppDatabase.getDatabase(LocalContext.current)
 }

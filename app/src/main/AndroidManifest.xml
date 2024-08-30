@@ -25,7 +25,7 @@
         android:theme="@style/Theme.AutoGestion"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".Home"
             android:exported="true"
             android:theme="@style/Theme.AutoGestion">
             <intent-filter>
@@ -35,12 +35,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Home"/>
+        <!-- <activity android:name=".Home"/> -->
         <activity android:name=".Camera" />
         <activity android:name=".ClientProfile" />
         <activity android:name=".VehicleProfile" />
         <activity android:name=".form.ClientForm" />
-        <activity android:name=".form.CarForm" />
+        <activity android:name=".form.VehicleForm" />
         <activity android:name=".form.RepairForm" />
 
     </application>

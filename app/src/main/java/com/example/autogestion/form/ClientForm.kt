@@ -115,7 +115,7 @@ class ClientForm : ComponentActivity() {
                 Button(
                     onClick = {
                         // TODO: Navigate to the CarForm screen
-                        val intent = Intent(context, CarForm::class.java).apply {
+                        val intent = Intent(context, VehicleForm::class.java).apply {
                             putExtra("firstName", firstName.text)
                             putExtra("lastName", lastName.text)
                             putExtra("phoneNumber", phoneNumber.text)
