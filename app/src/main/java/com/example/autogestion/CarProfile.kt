@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,7 +58,9 @@ class CarProfile : ComponentActivity(){
     fun Carpage(car: Car, repairList: List<Repair>){
         val context = LocalContext.current
 
-        Column(modifier = Modifier.fillMaxSize()) {
+
+        Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+
             NavBar(text = "Profile Voiture") {
                 val intent = Intent(context, ClientProfile::class.java)
                 context.startActivity(intent)
@@ -77,21 +80,20 @@ class CarProfile : ComponentActivity(){
                 }
 
                 Row {
-                    // TODO
-                    IconButton(onClick = { println("TODO") }) {
+
+                    IconButton(onClick = { println("TODO") /* TODO Bouton Supprimer */ }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.baseline_delete_24), // Remplacez par votre icône de poubelle
+                            painter = painterResource(id = R.drawable.baseline_delete_24),
                             contentDescription = "Supprimer",
-                            tint = Color.Black // Couleur de l'icône
+                            tint = Color.Black
                         )
                     }
 
-                    // TODO
-                    IconButton(onClick = { println("TODO") }) {
+                    IconButton(onClick = { println("TODO") /* TODO Bouton Modifier */ }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.baseline_edit_24), // Remplacez par votre icône de crayon
+                            painter = painterResource(id = R.drawable.baseline_edit_24),
                             contentDescription = "Modifier",
-                            tint = Color.Black // Couleur de l'icône
+                            tint = Color.Black
                         )
                     }
                 }
@@ -106,7 +108,7 @@ class CarProfile : ComponentActivity(){
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Liste Voitures",
+                    text = "Liste Pannes",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 16.dp)

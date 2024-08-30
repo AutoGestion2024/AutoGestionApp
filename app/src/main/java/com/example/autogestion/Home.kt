@@ -107,9 +107,7 @@ class Home : ComponentActivity() {
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                HomeTitle(text = "AutoGestion") {
-
-                }
+                HomeTitle(text = "AutoGestion") {}
 
                 Row (
                     horizontalArrangement = Arrangement.Start, // Align items horizontally
@@ -185,7 +183,12 @@ class Home : ComponentActivity() {
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(color = Color(0xFFF3EDF7))
-            .padding(15.dp)) {
+            .padding(15.dp)
+            .clickable {
+                val intent = Intent(current, ClientProfile::class.java)
+                current.startActivity(intent)
+                /*TODO ajouter les parametre de transmission */
+            }) {
             Text(
                 text = "${client.firstName} ${client.lastName}",
                 modifier = Modifier.padding(bottom = 4.dp),
@@ -196,11 +199,6 @@ class Home : ComponentActivity() {
                     text = it,
                     modifier = Modifier
                         .padding(bottom = 4.dp)
-                        .clickable {
-                            /*TODO */
-                            val intent = Intent(current, ClientProfile::class.java)
-                            current.startActivity(intent)
-                        }
                 )
             }
         }

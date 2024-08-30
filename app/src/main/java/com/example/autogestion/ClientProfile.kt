@@ -62,96 +62,96 @@ class ClientProfile : ComponentActivity(){
     fun ProfilPage(client: Client, carList: List<Car>) {
         val context = LocalContext.current
 
-        Scaffold(){padding ->
-            Column(modifier = Modifier.fillMaxSize().padding(padding)) {
 
-                NavBar(text =  "Profile client : id ${client.id}") {
-                    val intent = Intent(context, Home::class.java)
-                    context.startActivity(intent)
+
+        Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+            NavBar(text =  "Profile client : id ${client.id}") {
+                val intent = Intent(context, Home::class.java)
+                context.startActivity(intent)
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                // Client information
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(text = "${client.firstName} ${client.lastName} ", modifier = Modifier.padding(bottom = 8.dp))
+                    Text(text = client.email, modifier = Modifier.padding(bottom = 8.dp))
+                    Text(text = client.phone, modifier = Modifier.padding(bottom = 8.dp))
+                    Text(text = client.address)
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row {
 
-                    // Client information
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(text = "${client.firstName} ${client.lastName} ", modifier = Modifier.padding(bottom = 8.dp))
-                        Text(text = client.email, modifier = Modifier.padding(bottom = 8.dp))
-                        Text(text = client.phone, modifier = Modifier.padding(bottom = 8.dp))
-                        Text(text = client.address)
-                    }
-
-                    Row {
-
-                        IconButton(onClick = { println("TODO") /* TODO Bouton Supprimer */ }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_delete_24),
-                                contentDescription = "Supprimer",
-                                tint = Color.Black
-                            )
-                        }
-
-                        IconButton(onClick = { println("TODO") /* TODO Bouton Modifier */ }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_edit_24),
-                                contentDescription = "Modifier",
-                                tint = Color.Black
-                            )
-                        }
-                    }
-                }
-
-                // Header add button + text
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(36.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Liste Voitures",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-
-                    IconButton(onClick = { println("TODO") /* TODO bouton + cote Liste Voiture */ })
-                    {
+                    IconButton(onClick = { println("TODO") /* TODO Bouton Supprimer */ }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.baseline_add_24),
-                            contentDescription = "Ajouter",
+                            painter = painterResource(id = R.drawable.baseline_delete_24),
+                            contentDescription = "Supprimer",
+                            tint = Color.Black
+                        )
+                    }
+
+                    IconButton(onClick = { println("TODO") /* TODO Bouton Modifier */ }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_edit_24),
+                            contentDescription = "Modifier",
                             tint = Color.Black
                         )
                     }
                 }
+            }
 
-                // Divide profile and car list
-                Divider(
-                    color = Color.Gray, // Couleur de la ligne
-                    thickness = 2.dp,   // Épaisseur de la ligne
+            // Header add button + text
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(36.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Liste Voitures",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
+                IconButton(onClick = { println("TODO") /* TODO bouton + cote Liste Voiture */ })
+                {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_add_24),
+                        contentDescription = "Ajouter",
+                        tint = Color.Black
+                    )
+                }
+            }
 
-                // Car List
-                LazyColumn(modifier = Modifier
-                    .padding(16.dp)
-                    .wrapContentSize()) {
+            // Divide profile and car list
+            Divider(
+                color = Color.Gray, // Couleur de la ligne
+                thickness = 2.dp,   // Épaisseur de la ligne
+            )
 
-                    items(carList.size) { index ->
-                        VoitureItem(carList[index])
-                        if (index < carList.size - 1) {
 
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
+            // Car List
+            LazyColumn(modifier = Modifier
+                .padding(16.dp)
+                .wrapContentSize()) {
+
+                items(carList.size) { index ->
+                    VoitureItem(carList[index])
+                    if (index < carList.size - 1) {
+
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
         }
+
     }
 
 
