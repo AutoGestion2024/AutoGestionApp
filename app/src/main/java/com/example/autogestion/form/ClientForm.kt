@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,24 +45,27 @@ class ClientForm : ComponentActivity() {
         val address = intent.getStringExtra("address") ?: ""
         setContent {
 
-            ClientFormApp(initFirstName = firstName,
+            ClientFormApp(
+                initFirstName = firstName,
                 initLastName = lastName,
                 initPhoneNumber = phoneNumber,
                 initBirthDate = birthDate,
                 initEmail = email,
-                initAddress = address)
+                initAddress = address
+            )
 
         }
     }
 
     @Composable
-    fun ClientFormApp(initFirstName: String,
-                      initLastName: String,
-                      initPhoneNumber: String,
-                      initBirthDate: String,
-                      initEmail: String,
-                      initAddress: String,
-                      clientViewModel: ClientViewModel = viewModel()
+    fun ClientFormApp(
+        initFirstName: String,
+        initLastName: String,
+        initPhoneNumber: String,
+        initBirthDate: String,
+        initEmail: String,
+        initAddress: String,
+        clientViewModel: ClientViewModel = viewModel()
     ) {
         val context = LocalContext.current
 
@@ -78,23 +80,26 @@ class ClientForm : ComponentActivity() {
         var isLastNameError by remember { mutableStateOf(false) }
         var isPhoneError by remember { mutableStateOf(false) }
         var isBirthDateError by remember { mutableStateOf(false) }
+        var phoneExistsError by remember { mutableStateOf(false) }
 
         val coroutineScope = rememberCoroutineScope()
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val calendar = Calendar.getInstance()
 
-        Scaffold(
-        ) { padding ->
+        Scaffold { padding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
             ) {
 
-                NavBar(text = "Formulaire Client",
+                NavBar(
+                    text = "Formulaire Client",
                     onBackClick = {
                         val intent = Intent(context, Home::class.java)
-                    context.startActivity(intent)})
+                        context.startActivity(intent)
+                    }
+                )
 
                 OutlinedTextField(
                     value = firstName,
@@ -114,14 +119,22 @@ class ClientForm : ComponentActivity() {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
+
                 OutlinedTextField(
                     value = phoneNumber,
                     onValueChange = { phoneNumber = it },
                     label = { Text("Numéro de téléphone") },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
                     modifier = Modifier.fillMaxWidth(),
-                    isError = phoneNumber.text.isEmpty()
+                    isError = phoneNumber.text.isEmpty() || phoneExistsError
                 )
+                if (phoneExistsError) {
+                    Text(
+                        "Ce numéro de téléphone existe déjà.",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
@@ -183,24 +196,34 @@ class ClientForm : ComponentActivity() {
                             isPhoneError = phoneNumber.text.isEmpty()
 
                             if (!isFirstNameError && !isLastNameError && !isPhoneError && !isBirthDateError) {
-                                val birthDateLong = if (birthDate.text.isNotEmpty()) {
-                                    dateFormat.parse(birthDate.text)?.time ?: 0L
-                                } else {
-                                    null
-                                }
-                                val newClient = Client(
-                                    clientId = 0,  // Room will auto-generate the ID
-                                    lastName = lastName.text,
-                                    firstName = firstName.text,
-                                    phone = phoneNumber.text,
-                                    birthDate = birthDateLong ?: 0L,
-                                    email = email.text,
-                                    address = ""
-                                )
-
                                 coroutineScope.launch {
-                                    clientViewModel.addClient(newClient)
-                                    redirectToHome(context)
+                                    val clientLiveData = clientViewModel.getClientByPhoneNumber(phoneNumber.text)
+                                    clientLiveData.observe(context as ComponentActivity) { existingClient ->
+                                        if (existingClient != null) {
+                                            phoneExistsError = true
+                                        } else {
+                                            phoneExistsError = false
+                                            val birthDateLong = if (birthDate.text.isNotEmpty()) {
+                                                dateFormat.parse(birthDate.text)?.time ?: 0L
+                                            } else {
+                                                null
+                                            }
+                                            val newClient = Client(
+                                                clientId = 0,  // Room auto-generate the ID
+                                                lastName = lastName.text,
+                                                firstName = firstName.text,
+                                                phone = phoneNumber.text,
+                                                birthDate = birthDateLong ?: 0L,
+                                                email = email.text,
+                                                address = address.text
+                                            )
+
+                                            coroutineScope.launch {
+                                                clientViewModel.addClient(newClient)
+                                                redirectToHome(context)
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -210,43 +233,56 @@ class ClientForm : ComponentActivity() {
                     }
                     Button(
                         onClick = {
-                            val intent = Intent(context, VehicleForm::class.java).apply {
-                                putExtra("firstName", firstName.text)
-                                putExtra("lastName", lastName.text)
-                                putExtra("phoneNumber", phoneNumber.text)
-                                putExtra("birthDate", birthDate.text)
-                                putExtra("address", address.text)
+                            isFirstNameError = firstName.text.isEmpty()
+                            isLastNameError = lastName.text.isEmpty()
+                            isPhoneError = phoneNumber.text.isEmpty()
+
+                            if (!isFirstNameError && !isLastNameError && !isPhoneError && !isBirthDateError) {
+                                coroutineScope.launch {
+                                    val clientLiveData = clientViewModel.getClientByPhoneNumber(phoneNumber.text)
+                                    clientLiveData.observe(context as ComponentActivity) { existingClient ->
+                                        if (existingClient != null) {
+                                            phoneExistsError = true
+                                        } else {
+                                            phoneExistsError = false
+                                            val intent = Intent(context, VehicleForm::class.java).apply {
+                                                putExtra("firstName", firstName.text)
+                                                putExtra("lastName", lastName.text)
+                                                putExtra("phoneNumber", phoneNumber.text)
+                                                putExtra("birthDate", birthDate.text)
+                                                putExtra("address", address.text)
+                                            }
+                                            context.startActivity(intent)
+                                        }
+                                    }
+                                }
                             }
-                            context.startActivity(intent)
                         },
                         enabled = firstName.text.isNotEmpty() && lastName.text.isNotEmpty() && phoneNumber.text.isNotEmpty() && !isBirthDateError
                     ) {
                         Text("Suivant")
                     }
-
-
+                }
             }
         }
     }
-        }
-
 
 
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview2() {
-        ClientFormApp("","","","","","")
+        ClientFormApp("", "", "", "", "", "")
     }
 
 
 }
 
-    private fun redirectToHome(context: android.content.Context) {
-        val intent = Intent(context, Home::class.java)
-        context.startActivity(intent)
-        if (context is ComponentActivity) {
-            context.finish()
-        }
+private fun redirectToHome(context: android.content.Context) {
+    val intent = Intent(context, Home::class.java)
+    context.startActivity(intent)
+    if (context is ComponentActivity) {
+        context.finish()
     }
+}
 
 
