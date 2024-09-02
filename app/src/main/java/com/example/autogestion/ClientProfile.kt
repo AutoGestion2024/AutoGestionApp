@@ -16,6 +16,10 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,98 +57,105 @@ class ClientProfile : ComponentActivity(){
     fun ProfilPage(clientId: Int) {
         val context = LocalContext.current
 
-        var client = clientViewModel.getClientById(clientId).value
-        val vehicleList = vehicleViewModel.getVehiclesFromClient(clientId)
+        val client by clientViewModel.getClientById(clientId).observeAsState()
+        val vehicleList by remember { mutableStateOf(vehicleViewModel.getVehiclesFromClient(clientId)) }
 
         Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-            NavBar(text =  "Profile client : id ${clientId}") {
+            NavBar(text = "Profile client : id $clientId") {
                 val intent = Intent(context, Home::class.java)
                 context.startActivity(intent)
             }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            client?.let { currentClient ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
-                // Client information
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "${client?.firstName} ${client?.lastName} ", modifier = Modifier.padding(bottom = 8.dp))
-                    // TODO add birthdate
-                    Text(text = "${client?.phone}", modifier = Modifier.padding(bottom = 8.dp))
-                    Text(text = "${client?.email}", modifier = Modifier.padding(bottom = 8.dp))
-                    Text(text = "${client?.address}")
+                    // Client information
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "${currentClient.firstName} ${currentClient.lastName}",
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        // TODO: Add birthdate
+                        Text(text = "${currentClient.phone}", modifier = Modifier.padding(bottom = 8.dp))
+                        Text(text = "${currentClient.email}", modifier = Modifier.padding(bottom = 8.dp))
+                        Text(text = "${currentClient.address}")
+                    }
+
+                    Row {
+                        IconButton(onClick = { println("TODO") /* TODO: Bouton Supprimer */ }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_delete_24),
+                                contentDescription = "Supprimer",
+                                tint = Color.Black
+                            )
+                        }
+
+                        IconButton(onClick = { println("TODO") /* TODO: Bouton Modifier */ }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_edit_24),
+                                contentDescription = "Modifier",
+                                tint = Color.Black
+                            )
+                        }
+                    }
                 }
 
-                Row {
+                // Header add button + text
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(36.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Liste Voitures",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
 
-                    IconButton(onClick = { println("TODO") /* TODO Bouton Supprimer */ }) {
+                    IconButton(onClick = { println("TODO") /* TODO: bouton + cote Liste Voiture */ }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.baseline_delete_24),
-                            contentDescription = "Supprimer",
+                            painter = painterResource(id = R.drawable.baseline_add_24),
+                            contentDescription = "Ajouter",
                             tint = Color.Black
                         )
                     }
-
-                    IconButton(onClick = { println("TODO") /* TODO Bouton Modifier */ }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_edit_24),
-                            contentDescription = "Modifier",
-                            tint = Color.Black
-                        )
-                    }
                 }
-            }
 
-            // Header add button + text
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(36.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Liste Voitures",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                // Divide profile and car list
+                Divider(
+                    color = Color.Gray, // Couleur de la ligne
+                    thickness = 2.dp   // Épaisseur de la ligne
                 )
 
-                IconButton(onClick = { println("TODO") /* TODO bouton + cote Liste Voiture */ })
-                {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_add_24),
-                        contentDescription = "Ajouter",
-                        tint = Color.Black
-                    )
-                }
-            }
-
-            // Divide profile and car list
-            Divider(
-                color = Color.Gray, // Couleur de la ligne
-                thickness = 2.dp,   // Épaisseur de la ligne
-            )
-
-
-            // Car List
-            LazyColumn(modifier = Modifier
-                .padding(16.dp)
-                .wrapContentSize()) {
-
-                items(vehicleList.size) { index ->
-                    vehicleList[index]?.let { VoitureItem(it) }
-                    if (index < vehicleList.size - 1) {
-
-                        Spacer(modifier = Modifier.height(8.dp))
+                // Car List
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .wrapContentSize()
+                ) {
+                    items(vehicleList.size) { index ->
+                        vehicleList[index]?.let { VoitureItem(it) }
+                        if (index < vehicleList.size - 1) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
                 }
+            } ?: run {
+                Text(
+                    text = "Client non trouvé",
+                    modifier = Modifier.padding(16.dp),
+                    color = Color.Red
+                )
             }
         }
-
     }
 
 
