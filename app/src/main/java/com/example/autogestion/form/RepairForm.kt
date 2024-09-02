@@ -62,6 +62,7 @@ class RepairForm : ComponentActivity() {
         var date by remember { mutableStateOf(TextFieldValue("")) }
         var invoice by remember { mutableStateOf<String?>(null) }
         val calendar = Calendar.getInstance()
+        var paid by remember { mutableStateOf(false) }
 
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         var isDateError by remember { mutableStateOf(false) }
@@ -108,7 +109,6 @@ class RepairForm : ComponentActivity() {
                     onValueChange = { description = it },
                     label = { Text("Description de la réparation") },
                     modifier = Modifier.fillMaxWidth(),
-                    isError = description.text.isEmpty()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -142,6 +142,28 @@ class RepairForm : ComponentActivity() {
                 if (isDateError) {
                     Text("Format de date invalide", color = MaterialTheme.colorScheme.error)
                 }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text("Statut du paiement", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().padding(16.dp)
+                ) {
+                    RadioButton(
+                        selected = paid,
+                        onClick = { paid = true }
+                    )
+                    Text("Payé", modifier = Modifier.padding(start = 8.dp))
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    RadioButton(
+                        selected = !paid,
+                        onClick = { paid = false }
+                    )
+                    Text("Non payé", modifier = Modifier.padding(start = 8.dp))
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
 

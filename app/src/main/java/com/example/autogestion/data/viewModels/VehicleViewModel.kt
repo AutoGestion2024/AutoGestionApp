@@ -64,12 +64,12 @@ class VehicleViewModel(application: Application): AndroidViewModel(application) 
         return vehicle
     }
 
-    fun getVehiclesFromClient(clientId: Int): MutableLiveData<List<Vehicle>> {
-        val vehicles = MutableLiveData<List<Vehicle>>()
+    fun getVehiclesFromClient(clientId: Int): List<Vehicle?> {
+        val vehicles = MutableLiveData<List<Vehicle?>>()
         viewModelScope.launch(Dispatchers.IO) {
             val fetchedVehicles = repository.getVehiclesFromClient(clientId)
-            vehicles.postValue((fetchedVehicles ?: emptyList()) as List<Vehicle>?)
+            vehicles.postValue(fetchedVehicles ?: emptyList())
         }
-        return vehicles
+        return vehicles.value ?: emptyList()
     }
 }
