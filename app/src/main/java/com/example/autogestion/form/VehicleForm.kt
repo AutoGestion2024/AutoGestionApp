@@ -3,6 +3,7 @@ package com.example.autogestion.form
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -51,7 +52,7 @@ class VehicleForm : ComponentActivity() {
         val initBrand = intent.getStringExtra("brand") ?: ""
         val initModel = intent.getStringExtra("model") ?: ""
         val initColor = intent.getStringExtra("model") ?: ""
-        val initClientId = intent.getLongExtra("clientId", 0)
+        val initClientId = intent.getIntExtra("clientId", 0)
 
         setContent {
             CarFormApp(firstName, lastName, phoneNumber, birthDate, email, address, initRegistrationPlate, initChassisNum, initBrand, initModel, initColor, initClientId)
@@ -71,7 +72,7 @@ class VehicleForm : ComponentActivity() {
         initBrand: String,
         initModel: String,
         initColor: String,
-        initClientId: Long,
+        initClientId: Int,
         clientViewModel: ClientViewModel = viewModel(),
         vehicleViewModel: VehicleViewModel = viewModel()
     ) {
@@ -172,6 +173,8 @@ class VehicleForm : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    var clientId by remember { mutableStateOf(initClientId) }
+
                     Button(
                         onClick = {
                             isRegistrationPlateError = registrationPlate.text.isEmpty()
@@ -187,8 +190,8 @@ class VehicleForm : ComponentActivity() {
                                         0L
                                     }
 
-                                    val client = Client(
-                                        clientId = 0,  // Room will auto-generate the ID
+                                    val newClient = Client(
+                                        clientId = 0,  // Room générera automatiquement l'ID
                                         lastName = lastName,
                                         firstName = firstName,
                                         phone = phoneNumber,
@@ -197,22 +200,30 @@ class VehicleForm : ComponentActivity() {
                                         address = address
                                     )
 
-                                    clientViewModel.addClient(client)
-                                    val newClientId = clientViewModel.getClientByPhoneNumber(phoneNumber).value?.clientId ?: 0
+                                    val newClientId = clientViewModel.addClientAndRetrieveId(newClient)
 
-                                    val vehicle = Vehicle(
-                                        vehicleId = 0,  // Room will auto-generate the ID
-                                        registrationPlate = registrationPlate.text,
-                                        chassisNum = chassisNum.text,
-                                        brand = brand.text,
-                                        model = model.text,
-                                        color = color.text,
-                                        greyCard = greyCard,
-                                        clientId = newClientId
-                                    )
-                                    vehicleViewModel.addVehicle(vehicle)
+                                    Log.e("VehicleForm", "New client: $newClient.clientId")
 
-                                    redirectToHome(context)
+                                    if (newClientId != null) {
+                                        if (newClientId > 0) {
+
+                                            val vehicle = Vehicle(
+                                                vehicleId = 0,  // Room générera automatiquement l'ID
+                                                registrationPlate = registrationPlate.text,
+                                                chassisNum = chassisNum.text,
+                                                brand = brand.text,
+                                                model = model.text,
+                                                color = color.text,
+                                                greyCard = greyCard,
+                                                clientId = newClientId
+                                            )
+                                            vehicleViewModel.addVehicle(vehicle)
+
+                                            redirectToHome(context)
+                                        } else {
+                                            Log.e("VehicleForm", "Failed to retrieve clientId")
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -223,22 +234,24 @@ class VehicleForm : ComponentActivity() {
 
                     Button(
                         onClick = {
-                            val intent = Intent(context, RepairForm::class.java).apply {
-                                putExtra("firstName", firstName)
-                                putExtra("lastName", lastName)
-                                putExtra("phoneNumber", phoneNumber)
-                                putExtra("birthDate", birthDate)
-                                putExtra("email", email)
-                                putExtra("address", address)
-                                putExtra("registrationPlate", registrationPlate.text)
-                                putExtra("chassisNum", chassisNum.text)
-                                putExtra("greyCard", greyCard)
-                                putExtra("brand", brand.text)
-                                putExtra("model", model.text)
-                                putExtra("color", color.text)
-                                putExtra("clientId", clientId)
+                            isRegistrationPlateError = registrationPlate.text.isEmpty()
+                            if (!isRegistrationPlateError) {
+                                val intent = Intent(context, RepairForm::class.java).apply {
+                                    putExtra("firstName", firstName)
+                                    putExtra("lastName", lastName)
+                                    putExtra("phoneNumber", phoneNumber)
+                                    putExtra("birthDate", birthDate)
+                                    putExtra("email", email)
+                                    putExtra("address", address)
+                                    putExtra("registrationPlate", registrationPlate.text)
+                                    putExtra("chassisNum", chassisNum.text)
+                                    putExtra("greyCard", greyCard)
+                                    putExtra("brand", brand.text)
+                                    putExtra("model", model.text)
+                                    putExtra("color", color.text)
+                                }
+                                context.startActivity(intent)
                             }
-                            context.startActivity(intent)
                         },
                         enabled = registrationPlate.text.isNotEmpty()
                     ) {
@@ -280,6 +293,4 @@ class VehicleForm : ComponentActivity() {
     fun DefaultPreview2() {
         CarFormApp("","","","","","", "","","","","",0)
     }
-
-
 }

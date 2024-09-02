@@ -10,6 +10,7 @@ import com.example.autogestion.data.Client
 import com.example.autogestion.data.repositories.ClientRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ClientViewModel(application: Application): AndroidViewModel(application){
     private val allClients: LiveData<List<Client>>
@@ -28,7 +29,7 @@ class ClientViewModel(application: Application): AndroidViewModel(application){
         return allClients
     }
 
-    fun addClient(client: Client){
+    suspend fun addClient(client: Client){
         viewModelScope.launch(Dispatchers.IO) {
             if (repository.clientExists(client.phone)) {
                 message.postValue("Client avec ce numéro de téléphone existe déjà.")
@@ -73,5 +74,19 @@ class ClientViewModel(application: Application): AndroidViewModel(application){
             result.postValue(repository.clientExists(phone))
         }
         return result
+    }
+
+    suspend fun addClientAndRetrieveId(client: Client): Int? {
+        return withContext(Dispatchers.IO) {
+            if (repository.clientExists(client.phone)) {
+                message.postValue("Client avec ce numéro de téléphone existe déjà.")
+                return@withContext null
+            } else {
+                repository.addClient(client)
+                val insertedClient = repository.getClientByPhoneNumber(client.phone)
+                message.postValue("Client ajouté.")
+                return@withContext insertedClient?.clientId
+            }
+        }
     }
 }

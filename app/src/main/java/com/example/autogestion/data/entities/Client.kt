@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "client_table")
 data class Client (
     @PrimaryKey(autoGenerate = true)
-    val clientId : Int,
+    val clientId : Int = 0,
     val firstName : String,
     val lastName : String,
     val birthDate : Long?,
