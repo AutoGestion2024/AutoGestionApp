@@ -86,7 +86,7 @@ class RepairForm : ComponentActivity() {
 
                 NavBar(text = "Formulaire Réparation",
                     onBackClick = {
-                        val intent = Intent(context, ClientForm::class.java).apply {
+                        val intent = Intent(context, VehicleForm::class.java).apply {
                             putExtra("firstName", firstName)
                             putExtra("lastName", lastName)
                             putExtra("phoneNumber", phoneNumber)
