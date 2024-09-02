@@ -56,6 +56,7 @@ android {
 }
 
 dependencies {
+
     implementation (libs.coil.compose)
     implementation (libs.androidx.camera.core)
     implementation (libs.androidx.camera.camera2)
@@ -63,10 +64,25 @@ dependencies {
     implementation (libs.androidx.camera.view)
 
     implementation (libs.retrofit)
-    implementation (libs.converter.gson)
     implementation (libs.okhttp)
 
     implementation(libs.androidx.material.icons.extended)
+
+    // GSON
+    implementation (libs.converter.gson)
+
+    // coroutine
+    implementation(libs.kotlinx.coroutines.core)
+    implementation (libs.kotlinx.coroutines.android)
+
+    implementation (libs.compressor)
+
+    implementation (libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx.v220)
+
+    implementation (libs.picasso)
+    implementation (libs.picasso2.okhttp3.downloader)
+
 
 // AndroidX Core
     implementation(libs.androidx.core.ktx)
@@ -80,10 +96,10 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
 
     // AndroidX Testing dependencies
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
+    testImplementation(libs.junit)
+    testImplementation(libs.androidx.junit.v115)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core.v350)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
@@ -91,19 +107,19 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.material3)
     // Additional test dependencies
-    testImplementation("org.robolectric:robolectric:4.10")
-    testImplementation("androidx.test:core:1.4.0")
-    testImplementation("androidx.room:room-testing:2.6.1")
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.core)
+    testImplementation(libs.androidx.room.testing)
 
     // Android Room
-    val room_version = "2.6.1"
-    implementation("androidx.room:room-runtime:$room_version")
-    annotationProcessor("androidx.room:room-compiler:$room_version")
-    kapt("androidx.room:room-compiler:$room_version")
+    implementation(libs.androidx.room.runtime)
+    annotationProcessor(libs.androidx.room.compiler)
+    kapt("androidx.room:room-compiler:2.6.1")
 
     // ViewModel
-    val lifecycle_version = "2.8.4"
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+
 
 }
