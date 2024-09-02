@@ -27,6 +27,10 @@ interface VehicleDao {
     @Query("SELECT * FROM vehicle_table WHERE vehicleId = :vehicleId")
     fun getVehicleById(vehicleId: Int): Vehicle?
 
+    // Obtenir un véhicule par sa plaque d'immatriculation
+    @Query("SELECT * FROM vehicle_table WHERE registrationPlate = :registrationPlate LIMIT 1")
+    suspend fun getVehicleByRegistrationPlate(registrationPlate: String): Vehicle?
+
     // Obtenir tous les véhicules
     @Query("SELECT * FROM vehicle_table")
     suspend fun getAllVehicles(): List<Vehicle>

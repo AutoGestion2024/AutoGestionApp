@@ -13,9 +13,12 @@ import com.example.autogestion.data.repositories.RepairRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class RepairViewModel(application: Application): AndroidViewModel(application) {
+class RepairViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: RepairRepository
-    private val allRepairs: List<Repair?>
+
+    private val _allRepairs: LiveData<List<Repair?>> = MutableLiveData()
+    val allRepairs: LiveData<List<Repair?>> get() = _allRepairs
+
     val currentRepair: MutableLiveData<Repair?> = MutableLiveData(null)
 
     val message = MutableLiveData<String>()
@@ -23,41 +26,43 @@ class RepairViewModel(application: Application): AndroidViewModel(application) {
     init {
         val repairDao = AppDatabase.getDatabase(application).repairDao()
         repository = RepairRepository(repairDao)
-        allRepairs = repository.allRepairs
-    }
-
-    fun getAllRepairs(): List<Repair?> {
-        return allRepairs
+        viewModelScope.launch {
+            (_allRepairs as MutableLiveData).postValue(repository.getAllRepairs())
+        }
     }
 
     fun addRepair(repair: Repair) {
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
             repository.addRepair(repair)
         }
     }
 
     fun updateRepair(repair: Repair) {
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
             repository.updateRepair(repair)
-            currentRepair.postValue(repository.getRepairById(repair.repairId))
+            currentRepair.postValue(repository.getRepairById(repair.repairId))  // Mise à jour du repair actuel
         }
     }
 
     fun deleteRepair(repair: Repair) {
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
             repository.deleteRepair(repair)
         }
     }
 
     fun getRepairById(repairId: Int): LiveData<Repair?> {
         val repair = MutableLiveData<Repair?>()
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
             repair.postValue(repository.getRepairById(repairId))
         }
         return repair
     }
 
-    fun getRepairsFromVehicle(vehicleId: Int): List<Repair?> {
-        return repository.getRepairsFromVehicle(vehicleId)
+    fun getRepairsFromVehicle(vehicleId: Int): LiveData<List<Repair?>> {
+        val repairs = MutableLiveData<List<Repair?>>()
+        viewModelScope.launch(Dispatchers.IO) {
+            repairs.postValue(repository.getRepairsFromVehicle(vehicleId))
+        }
+        return repairs
     }
 }

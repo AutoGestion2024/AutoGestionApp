@@ -38,4 +38,12 @@ class VehicleRepository(private val vehicleDao : VehicleDao) {
             vehicleDao.getAllVehicles()
         }
     }
+
+    suspend fun vehicleExists(registrationPlate: String): Boolean {
+        return vehicleDao.getVehicleByRegistrationPlate(registrationPlate) != null
+    }
+
+    suspend fun getVehicleByRegistrationPlate(registrationPlate: String): Vehicle? {
+        return vehicleDao.getVehicleByRegistrationPlate(registrationPlate)
+    }
 }

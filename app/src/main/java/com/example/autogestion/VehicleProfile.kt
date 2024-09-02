@@ -41,7 +41,7 @@ import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
 
-class VehicleProfile : ComponentActivity(){
+class VehicleProfile : ComponentActivity() {
 
     private val vehicleViewModel: VehicleViewModel by viewModels()
     private val repairViewModel: RepairViewModel by viewModels()
@@ -58,15 +58,17 @@ class VehicleProfile : ComponentActivity(){
     }
 
     @Composable
-    fun VehiclePage(vehicleId: Int){
+    fun VehiclePage(vehicleId: Int) {
         val context = LocalContext.current
         var vehicle = vehicleViewModel.getVehicleById(vehicleId).value
         var repairList = repairViewModel.getRepairsFromVehicle(vehicleId)
 
-        Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()) {
 
             NavBar(text = "Profile Voiture") {
-                val intent = Intent(context, ClientProfile::class.java).apply{
+                val intent = Intent(context, ClientProfile::class.java).apply {
                     putExtra("clientId", vehicle?.clientId)
                 }
                 context.startActivity(intent)
@@ -80,10 +82,19 @@ class VehicleProfile : ComponentActivity(){
             ) {
                 // Car information
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "${vehicle?.brand}, ${vehicle?.model}", modifier = Modifier.padding(bottom = 4.dp))
-                    Text(text = "Plaque: ${vehicle?.registrationPlate}", modifier = Modifier.padding(bottom = 4.dp))
+                    Text(
+                        text = "${vehicle?.brand}, ${vehicle?.model}",
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = "Plaque: ${vehicle?.registrationPlate}",
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
                     // TODO add link to grey card
-                    Text(text = "Carte grise: ${vehicle?.greyCard}", modifier = Modifier.padding(bottom = 4.dp))
+                    Text(
+                        text = "Carte grise: ${vehicle?.greyCard}",
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
                 }
 
                 Row {
@@ -139,7 +150,7 @@ class VehicleProfile : ComponentActivity(){
             )
 
             // Repair List
-            LazyColumn(modifier = Modifier
+            /*LazyColumn(modifier = Modifier
                 .padding(16.dp)
                 .wrapContentSize()) {
 
@@ -149,24 +160,23 @@ class VehicleProfile : ComponentActivity(){
 
                         Spacer(modifier = Modifier.height(8.dp))
                     }
-                }
-            }
+                }*/
         }
     }
+}
 
-    // One Car
-    @Composable
-    fun RepairItem(repair: Repair) {
-        Column(modifier = Modifier
+// One Car
+@Composable
+fun RepairItem(repair: Repair) {
+    Column(
+        modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(color = Color(0xFFF3EDF7))
-            .padding(16.dp)) {
-            Text(text = "${repair.description}", modifier = Modifier.padding(bottom = 4.dp))
-            Text(text = "${repair.date}", modifier = Modifier.padding(bottom = 4.dp))
-        }
+            .padding(16.dp)
+    ) {
+        Text(text = "${repair.description}", modifier = Modifier.padding(bottom = 4.dp))
+        Text(text = "${repair.date}", modifier = Modifier.padding(bottom = 4.dp))
     }
-
-
-
 }
+

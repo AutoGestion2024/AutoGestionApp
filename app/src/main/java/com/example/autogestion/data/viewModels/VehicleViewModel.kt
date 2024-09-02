@@ -11,6 +11,7 @@ import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.repositories.VehicleRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class VehicleViewModel(application: Application): AndroidViewModel(application) {
     private val repository: VehicleRepository
@@ -71,5 +72,20 @@ class VehicleViewModel(application: Application): AndroidViewModel(application) 
             vehicles.postValue(fetchedVehicles ?: emptyList())
         }
         return vehicles.value ?: emptyList()
+    }
+
+
+    suspend fun addVehicleAndRetrieveId(vehicle: Vehicle): Int? {
+        return withContext(Dispatchers.IO) {
+            if (repository.vehicleExists(vehicle.registrationPlate)) { // Vous devez implémenter `vehicleExists` dans le repository
+                message.postValue("Véhicule avec cette plaque d'immatriculation existe déjà.")
+                return@withContext null
+            } else {
+                repository.addVehicle(vehicle)
+                val insertedVehicle = repository.getVehicleByRegistrationPlate(vehicle.registrationPlate) // Implémentez `getVehicleByRegistrationPlate`
+                message.postValue("Véhicule ajouté.")
+                return@withContext insertedVehicle?.vehicleId
+            }
+        }
     }
 }
