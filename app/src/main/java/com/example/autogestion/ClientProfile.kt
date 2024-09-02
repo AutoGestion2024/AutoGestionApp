@@ -77,7 +77,7 @@ class ClientProfile : ComponentActivity(){
                     // Client information
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "${currentClient.firstName} ${currentClient.lastName}",
+                            text = "${currentClient.lastName} ${currentClient.firstName} ",
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         // TODO: Add birthdate

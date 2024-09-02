@@ -86,10 +86,10 @@ class Home : ComponentActivity() {
         val clients by getClients().observeAsState(initial = emptyList())
         var searchText by remember { mutableStateOf(TextFieldValue("")) }
 
-        val filteredItems = clients.filter { client ->
-            Log.d("Filter", "Processing client: ${client.firstName} ${client.lastName}")
+        val sortedClients = clients.sortedBy { it.lastName }
+
+        val filteredItems = sortedClients.filter { client ->
             val vehicles = vehicleViewModel.getVehiclesFromClient(client.clientId)
-            Log.d("Filter", "Client ${client.clientId} has ${vehicles.size} vehicles")
 
             client.firstName.contains(searchText.text, ignoreCase = true) ||
                     client.lastName.contains(searchText.text, ignoreCase = true) ||
@@ -189,7 +189,7 @@ class Home : ComponentActivity() {
                 }
         ) {
             Text(
-                text = "${client.firstName} ${client.lastName}",
+                text = "${client.lastName} ${client.firstName}",
                 modifier = Modifier.padding(bottom = 4.dp),
                 fontSize = 20.sp
             )
