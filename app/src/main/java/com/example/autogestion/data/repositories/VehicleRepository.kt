@@ -3,12 +3,16 @@ package com.example.autogestion.data.repositories
 import androidx.lifecycle.LiveData
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.dao.VehicleDao
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class VehicleRepository(private val vehicleDao : VehicleDao) {
-    val allVehicles: List<Vehicle> = vehicleDao.getAllVehicles()
+    //val allVehicles: List<Vehicle> = vehicleDao.getAllVehicles()
 
     suspend fun addVehicle(vehicle : Vehicle){
-        vehicleDao.addVehicle(vehicle)
+        withContext(Dispatchers.IO) {
+            vehicleDao.addVehicle(vehicle)
+        }
     }
 
     // TODO check
@@ -27,5 +31,11 @@ class VehicleRepository(private val vehicleDao : VehicleDao) {
     // Vehicles from given client
     fun getVehiclesFromClient(clientId: Int): List<Vehicle?> {
         return vehicleDao.getVehiclesFromClient(clientId)
+    }
+
+    suspend fun fetchAllVehicles(): List<Vehicle>? {
+        return withContext(Dispatchers.IO) {
+            vehicleDao.getAllVehicles()
+        }
     }
 }

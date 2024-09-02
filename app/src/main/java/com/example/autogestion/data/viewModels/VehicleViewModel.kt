@@ -14,31 +14,39 @@ import kotlinx.coroutines.launch
 
 class VehicleViewModel(application: Application): AndroidViewModel(application) {
     private val repository: VehicleRepository
-    private val allVehicles: List<Vehicle>
-    val currentVehicle: MutableLiveData<Vehicle?> = MutableLiveData(null)
+    private val _currentVehicle: MutableLiveData<Vehicle?> = MutableLiveData()
+    val currentVehicle: LiveData<Vehicle?> = _currentVehicle
+
+    private val _allVehicles: MutableLiveData<List<Vehicle>> = MutableLiveData()
+    val allVehicles: LiveData<List<Vehicle>> = _allVehicles
 
     val message = MutableLiveData<String>()
 
-    init{
+    init {
         val vehicleDao = AppDatabase.getDatabase(application).vehicleDao()
         repository = VehicleRepository(vehicleDao)
-        allVehicles = repository.allVehicles
+
+        // Charger tous les véhicules au démarrage
+        viewModelScope.launch {
+            _allVehicles.postValue(repository.fetchAllVehicles())
+        }
     }
 
-    fun getAllVehicles(): List<Vehicle> {
+    /*fun getAllVehicles(): MutableLiveData<List<Vehicle>> {
         return allVehicles
-    }
+    }*/
 
     fun addVehicle(vehicle: Vehicle) {
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch {
             repository.addVehicle(vehicle)
+            _allVehicles.postValue(repository.fetchAllVehicles())
         }
     }
 
     fun updateVehicle(vehicle: Vehicle) {
         viewModelScope.launch(Dispatchers.IO){
             repository.updateVehicle(vehicle)
-            currentVehicle.postValue(repository.getVehicleById(vehicle.vehicleId))
+            _currentVehicle.postValue(repository.getVehicleById(vehicle.vehicleId))
         }
     }
 

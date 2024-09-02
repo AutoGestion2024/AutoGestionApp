@@ -9,7 +9,7 @@ import com.example.autogestion.data.dao.VehicleDao
 
 @Database(
     entities = [Client::class, Vehicle::class, Repair::class],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

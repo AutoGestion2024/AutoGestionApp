@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.data.Client
@@ -83,9 +84,11 @@ class Home : ComponentActivity() {
 
     @Composable
     fun HomeApp() {
+
         val context = LocalContext.current
 
-        val clients by database.clientDao().getAllClients().observeAsState(initial = emptyList())
+        val clients by getClients().observeAsState(initial = emptyList())
+        //val clients by getClients().observeAsState(initial = emptyList())
 
         var items by remember { mutableStateOf(clients) }
         var searchText by remember { mutableStateOf(TextFieldValue("")) }
@@ -190,12 +193,9 @@ class Home : ComponentActivity() {
             .background(color = Color(0xFFF3EDF7))
             .padding(15.dp)
             .clickable {
-                val intent = Intent(current, ClientProfile::class.java).apply {
-                    putExtra("clientId", client.clientId)
-                }
-
-                current.startActivity(intent)
-                /*TODO ajouter les parametre de transmission */
+                val intent = Intent(this@Home, ClientProfile::class.java)
+                intent.putExtra("clientId", client.clientId)
+                startActivity(intent)
             }) {
             Text(
                 text = "${client.firstName} ${client.lastName}",
@@ -237,4 +237,10 @@ class Home : ComponentActivity() {
     fun DefaultPreview() {
         Home().HomeApp()
     }
+
+
+    private fun getClients(): LiveData<List<Client>> {
+        return database.clientDao().getAllClients()
+    }
+
 }

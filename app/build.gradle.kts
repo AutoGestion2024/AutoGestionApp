@@ -104,4 +104,29 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
+   /* // Kotlin standard library
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")*/
+
+    // Core ktx - pour des fonctionnalités Kotlin dans Android
+    implementation(libs.androidx.core.ktx.v1120)
+
+    // Room runtime
+    implementation(libs.androidx.room.runtime.v252)
+
+    // Room KTX - pour utiliser les coroutines et d'autres fonctionnalités Kotlin avec Room
+    implementation(libs.androidx.room.ktx)
+
+    // Room Compiler - nécessaire pour la génération de code
+    kapt(libs.androidx.room.compiler.v252)
+
+    // Lifecycle KTX - pour des fonctionnalités avancées de gestion du cycle de vie
+    implementation(libs.androidx.lifecycle.runtime.ktx.v262)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx.v262)
+
+    // Coroutine - pour utiliser les coroutines Kotlin
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+
+
+
 }

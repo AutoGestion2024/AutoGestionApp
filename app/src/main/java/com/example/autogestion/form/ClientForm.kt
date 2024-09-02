@@ -130,7 +130,7 @@ class ClientForm : ComponentActivity() {
                     label = { Text("Date de naissance (optionnel)") },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
-                    readOnly = true, // Make it readonly to open the date picker on click
+                    readOnly = true,
                     isError = isBirthDateError,
                     trailingIcon = {
                         IconButton(onClick = {
@@ -162,7 +162,7 @@ class ClientForm : ComponentActivity() {
                     label = { Text("Email (optionnel)") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
                     value = address,
@@ -170,28 +170,12 @@ class ClientForm : ComponentActivity() {
                     label = { Text("Adresse (optionnel)") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Button(
-                        onClick = {
-                            val intent = Intent(context, VehicleForm::class.java).apply {
-                                putExtra("firstName", firstName.text)
-                                putExtra("lastName", lastName.text)
-                                putExtra("phoneNumber", phoneNumber.text)
-                                putExtra("birthDate", birthDate.text)
-                                putExtra("address", address.text)
-                            }
-                            context.startActivity(intent)
-                        },
-                        enabled = firstName.text.isNotEmpty() && lastName.text.isNotEmpty() && phoneNumber.text.isNotEmpty() && !isBirthDateError
-                    ) {
-                        Text("Suivant")
-                    }
-
                     Button(
                         onClick = {
                             isFirstNameError = firstName.text.isEmpty()
@@ -211,10 +195,9 @@ class ClientForm : ComponentActivity() {
                                     phone = phoneNumber.text,
                                     birthDate = birthDateLong ?: 0L,
                                     email = email.text,
-                                    address = ""  // Assuming address field is not used in this form
+                                    address = ""
                                 )
 
-                                // Add the client to the database and redirect to Home
                                 coroutineScope.launch {
                                     clientViewModel.addClient(newClient)
                                     redirectToHome(context)
@@ -223,8 +206,25 @@ class ClientForm : ComponentActivity() {
                         },
                         enabled = firstName.text.isNotEmpty() && lastName.text.isNotEmpty() && phoneNumber.text.isNotEmpty() && !isBirthDateError
                     ) {
-                        Text("Enregistrer")
+                        Text("Enregistrer le client")
                     }
+                    Button(
+                        onClick = {
+                            val intent = Intent(context, VehicleForm::class.java).apply {
+                                putExtra("firstName", firstName.text)
+                                putExtra("lastName", lastName.text)
+                                putExtra("phoneNumber", phoneNumber.text)
+                                putExtra("birthDate", birthDate.text)
+                                putExtra("address", address.text)
+                            }
+                            context.startActivity(intent)
+                        },
+                        enabled = firstName.text.isNotEmpty() && lastName.text.isNotEmpty() && phoneNumber.text.isNotEmpty() && !isBirthDateError
+                    ) {
+                        Text("Suivant")
+                    }
+
+
             }
         }
     }
