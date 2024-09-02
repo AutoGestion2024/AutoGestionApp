@@ -20,7 +20,7 @@ data class Repair(
     val repairId: Int,
     val vehicleId: Int,                             // foreign key to Vehicle        
     val description: String?,
-    val date: String?,
+    val date: Long?,
     val invoice: String?,
     val paid : Boolean?,
 )

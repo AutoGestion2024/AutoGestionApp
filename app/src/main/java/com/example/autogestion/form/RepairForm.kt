@@ -9,17 +9,24 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.autogestion.Home
 import com.example.autogestion.NavBar
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class RepairForm : ComponentActivity() {
 
@@ -32,43 +39,40 @@ class RepairForm : ComponentActivity() {
         val phoneNumber = intent.getStringExtra("phoneNumber") ?: ""
         val birthDate = intent.getStringExtra("birthDate") ?: ""
         val email = intent.getStringExtra("email") ?: ""
+        val address = intent.getStringExtra("address") ?: ""
 
-        val plateNumber = intent.getStringExtra("plateNumber") ?: ""
-        val make = intent.getStringExtra("make") ?: ""
+        val registrationPlate = intent.getStringExtra("registrationPlate") ?: ""
+        val brand = intent.getStringExtra("brand") ?: ""
         val model = intent.getStringExtra("model") ?: ""
-        val clientId = intent.getLongExtra("clientId", 0)
+        val color = intent.getStringExtra("color") ?: ""
+        val greyCard = intent.getStringExtra("greyCard") ?: ""
+        val clientId = intent.getIntExtra("clientId", 0)
+        val vehicleId = intent.getIntExtra("vehicleId", 0)
 
         setContent {
-            RepairFormApp(firstName, lastName, phoneNumber, birthDate, email, plateNumber, make, model, clientId)
+            RepairFormApp(firstName, lastName, phoneNumber, birthDate, email, address, registrationPlate, brand, model, color, greyCard, clientId, vehicleId)
         }
     }
 
     @Composable
-    fun RepairFormApp(firstName: String, lastName: String, phoneNumber: String, birthDate: String, email: String, plateNumber: String, make: String, model: String, clientId: Long) {
+    fun RepairFormApp(firstName: String, lastName: String, phoneNumber: String, birthDate: String, email: String, address: String, registrationPlate: String, brand: String, model: String, color: String, greyCard: String, clientId: Int, vehicleId: Int) {
         val context = LocalContext.current
 
         var description by remember { mutableStateOf(TextFieldValue("")) }
         var date by remember { mutableStateOf(TextFieldValue("")) }
-        var carRegistrationDoc by remember { mutableStateOf<String?>(null) }
-        var quote by remember { mutableStateOf<String?>(null) }
+        var invoice by remember { mutableStateOf<String?>(null) }
+        val calendar = Calendar.getInstance()
 
-        // Launcher for car registration document
-        val carRegistrationDocLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent()
-        ) { uri: Uri? ->
-            uri?.let {
-                val path = getFilePathFromUri(context, it)
-                carRegistrationDoc = path
-            }
-        }
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        var isDateError by remember { mutableStateOf(false) }
 
         // Launcher for quote document
-        val quoteLauncher = rememberLauncherForActivityResult(
+        val invoiceLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
             uri?.let {
                 val path = getFilePathFromUri(context, it)
-                quote = path
+                invoice = path
             }
         }
 
@@ -88,10 +92,13 @@ class RepairForm : ComponentActivity() {
                             putExtra("phoneNumber", phoneNumber)
                             putExtra("birthDate", birthDate)
                             putExtra("email", email)
-                            putExtra("plateNumber", plateNumber)
-                            putExtra("make", make)
+                            putExtra("address", address)
+                            putExtra("registrationPlate", registrationPlate)
+                            putExtra("brand", brand)
                             putExtra("model", model)
+                            putExtra("color", color)
                             putExtra("clientId", clientId)
+                            putExtra("vehicleId", vehicleId)
                         }
                         context.startActivity(intent)
                     })
@@ -108,32 +115,47 @@ class RepairForm : ComponentActivity() {
                 OutlinedTextField(
                     value = date,
                     onValueChange = { date = it },
-                    label = { Text("Date de réparation") },
+                    label = { Text("Date de la réparation (optionnel)") },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
-                    isError = date.text.isEmpty()
+                    readOnly = true,
+                    isError = isDateError,
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            val datePickerDialog = android.app.DatePickerDialog(
+                                context,
+                                { _, year, month, dayOfMonth ->
+                                    calendar.set(year, month, dayOfMonth)
+                                    date = TextFieldValue(dateFormat.format(calendar.time))
+                                    isDateError = false
+                                },
+                                calendar.get(Calendar.YEAR),
+                                calendar.get(Calendar.MONTH),
+                                calendar.get(Calendar.DAY_OF_MONTH)
+                            )
+                            datePickerDialog.show()
+                        }) {
+                            Icon(Icons.Default.CalendarToday, contentDescription = "Select Date")
+                        }
+                    }
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = { carRegistrationDocLauncher.launch("*/*") },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(if (carRegistrationDoc.isNullOrEmpty()) "Télécharger le document d'immatriculation" else "Document d'immatriculation sélectionné")
+                if (isDateError) {
+                    Text("Format de date invalide", color = MaterialTheme.colorScheme.error)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
+
                 Button(
-                    onClick = { quoteLauncher.launch("*/*") },
+                    onClick = { invoiceLauncher.launch("*/*") },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(if (quote.isNullOrEmpty()) "Télécharger le devis" else "Devis sélectionné")
+                    Text(if (invoice.isNullOrEmpty()) "Télécharger de la facture" else "Facture sélectionnée")
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
                     onClick = {
-                        println("chemin de la carte grise : $carRegistrationDoc")
-                        println("chemin du devis : $quote")
+                        println("chemin de la facture : $invoice")
                         // Envoyer les données à la prochaine activité
                         val intent = Intent(context, Home::class.java).apply {
                             putExtra("firstName", firstName)
@@ -141,19 +163,21 @@ class RepairForm : ComponentActivity() {
                             putExtra("phoneNumber", phoneNumber)
                             putExtra("birthDate", birthDate)
                             putExtra("email", email)
-                            putExtra("plateNumber", plateNumber)
-                            putExtra("make", make)
+                            putExtra("address", address)
+                            putExtra("registrationPlate", registrationPlate)
+                            putExtra("brand", brand)
                             putExtra("model", model)
+                            putExtra("greyCard", greyCard)
                             putExtra("clientId", clientId)
-                            putExtra("carRegistrationDoc", carRegistrationDoc)
-                            putExtra("quote", quote)
+                            putExtra("vehicleId", vehicleId)
+                            putExtra("invoice", invoice)
                         }
                         context.startActivity(intent)
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    enabled = description.text.isNotEmpty() && date.text.isNotEmpty() && !carRegistrationDoc.isNullOrEmpty() && !quote.isNullOrEmpty()
+                    //enabled = description.text.isNotEmpty() && date.text.isNotEmpty() && !carRegistrationDoc.isNullOrEmpty() && !quote.isNullOrEmpty()
                 ) {
-                    Text("Suivant")
+                    Text("Enregistrer")
                 }
             }
         }
@@ -180,6 +204,6 @@ class RepairForm : ComponentActivity() {
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview2() {
-        RepairFormApp("","","","","","","","",0)
+        RepairFormApp("","","","","","","","","","","",0,0)
     }
 }
