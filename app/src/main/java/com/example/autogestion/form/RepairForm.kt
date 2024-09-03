@@ -263,7 +263,15 @@ class RepairForm : ComponentActivity() {
                                     val newRepair = Repair(
                                         repairId = 0,  // Room générera automatiquement l'ID
                                         description = description.text,
-                                        date = dateFormat.parse(date.text)?.time ?: 0L,
+                                        date = if (date.text.isNotEmpty()) {
+                                            try {
+                                                dateFormat.parse(date.text)?.time ?: 0L
+                                            } catch (e: ParseException) {
+                                                0L
+                                            }
+                                        } else {
+                                            0L  // ou une autre valeur par défaut
+                                        },
                                         invoice = invoice,
                                         paid = paid,
                                         vehicleId = newVehicleId
@@ -281,7 +289,7 @@ class RepairForm : ComponentActivity() {
                         }
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    enabled = description.text.isNotEmpty()
+                    //enabled = description.text.isNotEmpty()
                 ) {
                     Text("Enregistrer")
                 }
