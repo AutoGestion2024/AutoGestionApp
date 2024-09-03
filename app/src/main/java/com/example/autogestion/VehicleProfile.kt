@@ -143,8 +143,12 @@ class VehicleProfile : ComponentActivity() {
                 Row {
                     IconButton(onClick = {
                         coroutineScope.launch {
+                            val clientId = vehicle!!.clientId
                             vehicleViewModel.deleteVehicle(vehicle!!)
-                            redirectToHome()
+                            val intent = Intent(context, ClientProfile::class.java).apply {
+                                putExtra("clientId", clientId)
+                            }
+                            context.startActivity(intent)
                         }
                     }) {
                         Icon(
@@ -251,8 +255,12 @@ class VehicleProfile : ComponentActivity() {
             Row {
                 IconButton(onClick = {
                     coroutineScope.launch {
+                        val vehicleId = repair.vehicleId
                         repairViewModel.deleteRepair(repair!!)
-                        redirectToHome()
+                        val intent = Intent(context, VehicleProfile::class.java).apply {
+                            putExtra("vehicleId", vehicleId)
+                        }
+                        context.startActivity(intent)
                     }
                 }) {
                     Icon(
