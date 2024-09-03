@@ -212,7 +212,7 @@ class VehicleProfile : ComponentActivity() {
             }
             } ?: run {
                 Text(
-                    text = "Client non trouvé",
+                    text = "Véhicule non trouvé",
                     modifier = Modifier.padding(16.dp),
                     color = Color.Red
                 )
