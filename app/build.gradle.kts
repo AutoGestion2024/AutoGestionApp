@@ -56,13 +56,19 @@ android {
 }
 
 dependencies {
+
+
+    implementation (libs.compressor)
+    
     implementation (libs.coil.compose)
     implementation (libs.androidx.camera.core)
     implementation (libs.androidx.camera.camera2)
     implementation (libs.androidx.camera.lifecycle)
     implementation (libs.androidx.camera.view)
 
+
     implementation (libs.retrofit)
+    // GSON
     implementation (libs.converter.gson)
     implementation (libs.okhttp)
 
@@ -105,5 +111,7 @@ dependencies {
     val lifecycle_version = "2.8.4"
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
+
+
 
 }
