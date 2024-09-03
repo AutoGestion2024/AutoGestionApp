@@ -23,8 +23,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.autogestion.ClientProfile
 import com.example.autogestion.Home
 import com.example.autogestion.NavBar
+import com.example.autogestion.VehicleProfile
 import com.example.autogestion.data.Repair
 import com.example.autogestion.data.viewModels.RepairViewModel
 import kotlinx.coroutines.Dispatchers
@@ -182,9 +184,13 @@ class RepairFormAdd : ComponentActivity() {
                                 vehicleId = vehicleId
                             )
 
-                            repairViewModel.addRepair(repair)
-
-                            redirectToHome(context)
+                            coroutineScope.launch {
+                                repairViewModel.addRepair(repair)
+                                val intent = Intent(context, VehicleProfile::class.java).apply {
+                                    putExtra("vehicleId", repair.vehicleId)
+                                }
+                                context.startActivity(intent)
+                            }
                         }
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally),
