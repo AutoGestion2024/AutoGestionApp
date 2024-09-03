@@ -40,6 +40,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.data.Client
+import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
@@ -88,7 +89,7 @@ class Home : ComponentActivity() {
 
         val sortedClients = clients.sortedBy { it.lastName }
 
-        val filteredItems = sortedClients.filter { client ->
+        /*val filteredItems = sortedClients.filter { client ->
             val vehicles = vehicleViewModel.getVehiclesFromClient(client.clientId)
 
             client.firstName.contains(searchText.text, ignoreCase = true) ||
@@ -96,7 +97,7 @@ class Home : ComponentActivity() {
                     vehicles.any { vehicle ->
                         vehicle?.registrationPlate?.contains(searchText.text, ignoreCase = true) == true
                     }
-        }
+        }*/
 
         Scaffold(
             floatingActionButton = {
@@ -161,8 +162,8 @@ class Home : ComponentActivity() {
                         .wrapContentSize()
                 ) {
                     // Passez la liste directement à la fonction items
-                    items(filteredItems) { client ->
-                        ClientVehicleInfo(client)
+                    items(sortedClients) { client ->
+                        ClientVehicleInfo(client, searchText.text)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
@@ -171,36 +172,46 @@ class Home : ComponentActivity() {
     }
 
     @Composable
-    fun ClientVehicleInfo(client: Client) {
+    fun ClientVehicleInfo(client: Client, searchText: String) {
         val context = LocalContext.current
-        val vehicles = vehicleViewModel.getVehiclesFromClient(client.clientId)
+        val vehicles by vehicleViewModel.getVehiclesFromClient(client.clientId).observeAsState(initial = emptyList())
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(color = Color(0xFFF3EDF7))
-                .padding(15.dp)
-                .clickable {
-                    val intent = Intent(context, ClientProfile::class.java).apply {
-                        putExtra("clientId", client.clientId)
+        if (searchText.isEmpty() || clientMatchesSearch(client, vehicles, searchText)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(color = Color(0xFFF3EDF7))
+                    .padding(15.dp)
+                    .clickable {
+                        val intent = Intent(context, ClientProfile::class.java).apply {
+                            putExtra("clientId", client.clientId)
+                        }
+                        context.startActivity(intent)
                     }
-                    context.startActivity(intent)
-                }
-        ) {
-            Text(
-                text = "${client.lastName} ${client.firstName}",
-                modifier = Modifier.padding(bottom = 4.dp),
-                fontSize = 20.sp
-            )
-            vehicles.joinToString(separator = "\n ") { "${it?.brand}, ${it?.model}" }
-                .let {
-                    Text(
-                        text = it,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                }
+            ) {
+                Text(
+                    text = "${client.lastName} ${client.firstName}",
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    fontSize = 20.sp
+                )
+                vehicles.joinToString(separator = "\n ") { "${it?.brand}, ${it?.model}" }
+                    .let {
+                        Text(
+                            text = it,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                    }
+            }
         }
+    }
+
+    private fun clientMatchesSearch(client: Client, vehicles: List<Vehicle>, searchText: String): Boolean {
+        return client.firstName.contains(searchText, ignoreCase = true) ||
+                client.lastName.contains(searchText, ignoreCase = true) ||
+                vehicles.any { vehicle ->
+                    vehicle.registrationPlate.contains(searchText, ignoreCase = true)
+                }
     }
 
     @Composable

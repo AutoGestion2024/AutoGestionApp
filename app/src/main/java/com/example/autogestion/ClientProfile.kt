@@ -2,6 +2,7 @@ package com.example.autogestion
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -54,19 +55,18 @@ class ClientProfile : ComponentActivity() {
         }
     }
 
-
     @Composable
     fun ProfilPage(clientId: Int) {
         val context = LocalContext.current
-
         val coroutineScope = rememberCoroutineScope()
 
         val client by clientViewModel.getClientById(clientId).observeAsState()
-        val vehicleList by remember { mutableStateOf(vehicleViewModel.getVehiclesFromClient(clientId)) }
+        val vehicleList by vehicleViewModel.getVehiclesFromClient(clientId).observeAsState(emptyList())
 
         Column(modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()) {
+
             NavBar(text = "Profile client : id $clientId") {
                 val intent = Intent(context, Home::class.java)
                 context.startActivity(intent)
@@ -79,29 +79,26 @@ class ClientProfile : ComponentActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
-                    // Client information
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             text = "${currentClient.lastName} ${currentClient.firstName} ",
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
-                        // TODO: Add birthdate
                         Text(
-                            text = "${currentClient.phone}",
+                            text = currentClient.phone,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         Text(
-                            text = "${currentClient.email}",
+                            text = currentClient.email ?: "",
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
-                        Text(text = "${currentClient.address}")
+                        Text(text = currentClient.address ?: "")
                     }
 
                     Row {
                         IconButton(onClick = {
                             coroutineScope.launch {
-                                clientViewModel.deleteClient(client!!)
+                                clientViewModel.deleteClient(currentClient)
                                 redirectToHome()
                             }
                         }) {
@@ -113,9 +110,8 @@ class ClientProfile : ComponentActivity() {
                         }
 
                         IconButton(onClick = {
-                            //val context = LocalContext.current
                             val intent = Intent(context, ClientFormUpdate::class.java).apply {
-                                putExtra("clientId", client!!.clientId) // Passez l'ID du client ici
+                                putExtra("clientId", currentClient.clientId)
                             }
                             context.startActivity(intent)
                         }) {
@@ -128,7 +124,6 @@ class ClientProfile : ComponentActivity() {
                     }
                 }
 
-                // Header add button + text
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -143,7 +138,7 @@ class ClientProfile : ComponentActivity() {
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
 
-                    IconButton(onClick = { println("TODO") /* TODO: bouton + cote Liste Voiture */ }) {
+                    IconButton(onClick = { println("TODO") }) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_add_24),
                             contentDescription = "Ajouter",
@@ -152,13 +147,11 @@ class ClientProfile : ComponentActivity() {
                     }
                 }
 
-                // Divide profile and car list
                 Divider(
-                    color = Color.Gray, // Couleur de la ligne
-                    thickness = 2.dp   // Épaisseur de la ligne
+                    color = Color.Gray,
+                    thickness = 2.dp
                 )
 
-                // Car List
                 LazyColumn(
                     modifier = Modifier
                         .padding(16.dp)
@@ -184,11 +177,9 @@ class ClientProfile : ComponentActivity() {
     private fun redirectToHome() {
         val intent = Intent(this, Home::class.java)
         startActivity(intent)
-        finish() // Ferme l'activité actuelle pour éviter le retour avec le bouton "Back"
+        finish()
     }
 
-
-    // One Car
     @Composable
     fun VoitureItem(vehicle: Vehicle) {
         val context = LocalContext.current
@@ -203,16 +194,16 @@ class ClientProfile : ComponentActivity() {
                     putExtra("vehicleId", vehicle.vehicleId)
                 }
                 context.startActivity(intent)
-                /* TODO Ajouter les parametres */
             }
         ) {
-            Text(
-                text = "Plaque: ${vehicle.registrationPlate}",
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
+            Text(text = "Plaque: ${vehicle.registrationPlate}", modifier = Modifier.padding(bottom = 4.dp))
+            Text(text = "Numéro chassis: ${vehicle.chassisNum}", modifier = Modifier.padding(bottom = 4.dp))
             Text(text = "Marque: ${vehicle.brand}", modifier = Modifier.padding(bottom = 4.dp))
             Text(text = "Modèle: ${vehicle.model}", modifier = Modifier.padding(bottom = 4.dp))
+            Text(text = "Colour: ${vehicle.color}", modifier = Modifier.padding(bottom = 4.dp))
+            Text(text = "Carte grise: ${vehicle.greyCard}", modifier = Modifier.padding(bottom = 4.dp))
+            Log.d("ClientProfile", "Client ID: ${vehicle.clientId}")
+            Log.d("ClientProfile", "Vehicle ID: ${vehicle.vehicleId}")
         }
     }
-
 }
