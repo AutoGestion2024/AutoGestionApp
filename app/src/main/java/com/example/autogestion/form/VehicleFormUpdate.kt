@@ -165,7 +165,7 @@ class VehicleFormUpdate : ComponentActivity() {
                 },
                 enabled = registrationPlate.isNotEmpty()
             ) {
-                Text("Enregistrer le véhicule")
+                Text("Enregistrer les modifications")
             }
         }
     }
