@@ -45,6 +45,7 @@ import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
 import com.example.autogestion.form.ClientFormUpdate
+import com.example.autogestion.form.RepairFormUpdate
 import com.example.autogestion.form.VehicleFormUpdate
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -209,7 +210,8 @@ class VehicleProfile : ComponentActivity() {
     // One Car
     @Composable
     fun RepairItem(repair: Repair) {
-
+        val coroutineScope = rememberCoroutineScope()
+        val context = LocalContext.current
 
         Row(
             modifier = Modifier
@@ -228,14 +230,24 @@ class VehicleProfile : ComponentActivity() {
             }
 
             Row {
-                IconButton(onClick = {/*TODO*/}) {
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        repairViewModel.deleteRepair(repair!!)
+                        redirectToHome()
+                    }
+                }) {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_delete_24),
                         contentDescription = "Supprimer",
                         tint = Color.Black
                     )
                 }
-                IconButton(onClick = {/*TODO*/}) {
+                IconButton(onClick = {
+                    val intent = Intent(context, RepairFormUpdate::class.java).apply {
+                        putExtra("repairId", repair!!.repairId)
+                    }
+                    context.startActivity(intent)
+                }) {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_edit_24),
                         contentDescription = "Modifier",
