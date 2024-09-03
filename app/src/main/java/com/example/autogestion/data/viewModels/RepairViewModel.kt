@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 class RepairViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: RepairRepository
 
-    private val _allRepairs: LiveData<List<Repair?>> = MutableLiveData()
-    val allRepairs: LiveData<List<Repair?>> get() = _allRepairs
+    private val _allRepairs: MutableLiveData<List<Repair>> = MutableLiveData()
+    //val allRepairs: LiveData<List<Repair?>> get() = _allRepairs
 
     val currentRepair: MutableLiveData<Repair?> = MutableLiveData(null)
 
@@ -27,13 +27,14 @@ class RepairViewModel(application: Application) : AndroidViewModel(application) 
         val repairDao = AppDatabase.getDatabase(application).repairDao()
         repository = RepairRepository(repairDao)
         viewModelScope.launch {
-            (_allRepairs as MutableLiveData).postValue(repository.getAllRepairs())
+            _allRepairs.postValue(repository.fetchAllRepairs())
         }
     }
 
     fun addRepair(repair: Repair) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.addRepair(repair)
+            _allRepairs.postValue(repository.fetchAllRepairs())
         }
     }
 

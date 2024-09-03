@@ -29,7 +29,7 @@ interface RepairDao {
 
     // Obtenir toutes les réparations
     @Query("SELECT * FROM repair_table")
-    fun getAllRepairs(): List<Repair?>
+    suspend fun getAllRepairs(): List<Repair>
 
     @Query("SELECT * FROM repair_table WHERE vehicleId = :vehicleId")
     fun getRepairsFromVehicle(vehicleId: Int): List<Repair?>
