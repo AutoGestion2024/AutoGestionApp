@@ -26,6 +26,7 @@ picasso = "2.8"
 picasso2Okhttp3Downloader = "1.1.0"
 retrofit = "2.9.0"
 robolectric = "4.10"
+roomCompiler = "2.5.2"
 roomTesting = "2.6.1"
 runtimeLivedata = "1.6.8"
 uiTestJunit4Android = "1.6.8"
@@ -47,6 +48,7 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomTesting" }
+androidx-room-compiler-v252 = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomTesting" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "roomTesting" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }

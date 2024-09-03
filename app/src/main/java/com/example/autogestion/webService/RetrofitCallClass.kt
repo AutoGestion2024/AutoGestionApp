@@ -1,24 +1,20 @@
+package com.example.autogestion.webService
+
 import android.content.Context
-import com.example.autogestion.webService.ApiService
 import android.net.Uri
 import android.util.Log
-
-import com.example.autogestion.webService.RetrofitHelper
-import com.example.autogestion.webService.getFileFromUri
-
 import id.zelory.compressor.Compressor
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 
-class RetrofitCallClass (private val scope: CoroutineScope){
+class RetrofitCallClass {
 
     private val API_TOKEN = "8e9dab6d5db9ea25c8adc6ca6419a44d27a12948"
     private  var vrn: String = ""
@@ -39,7 +35,7 @@ class RetrofitCallClass (private val scope: CoroutineScope){
                 val imageFilePart = MultipartBody.Part.createFormData(
                     "upload",
                     compressedImageFile.name,
-                    RequestBody.create("image/*".toMediaTypeOrNull(), compressedImageFile)
+                    compressedImageFile.asRequestBody("image/*".toMediaTypeOrNull())
                 )
 
                 // Call the API to upload the image and get the results

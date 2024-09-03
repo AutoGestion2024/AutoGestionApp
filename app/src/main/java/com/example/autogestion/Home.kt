@@ -11,7 +11,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -19,9 +27,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,8 +55,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.data.Client
-import com.example.autogestion.data.viewModels.ClientViewModel
-import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
 import com.example.autogestion.form.ClientForm
 
@@ -49,7 +64,6 @@ class Home : ComponentActivity() {
     // Create an instance of the database
     private lateinit var database: AppDatabase
 
-    private val clientViewModel: ClientViewModel by viewModels()
     private val vehicleViewModel: VehicleViewModel by viewModels()
 
 
@@ -63,11 +77,11 @@ class Home : ComponentActivity() {
             ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
         }
 
-        val search_text = intent.getStringExtra("search_text") ?: ""
+        val textSearch = intent.getStringExtra("search_text") ?: ""
 
         enableEdgeToEdge()
         setContent {
-            HomeApp(search_text)
+            HomeApp(textSearch)
         }
     }
 
@@ -86,14 +100,14 @@ class Home : ComponentActivity() {
 
 
     @Composable
-    fun HomeApp(search_text: String ) {
+    fun HomeApp(textSearch: String ) {
         val context = LocalContext.current
 
         val clients by database.clientDao().getAllClients().observeAsState(initial = emptyList())
 
-        var items by remember { mutableStateOf(clients) }
+        val items by remember { mutableStateOf(clients) }
 //        var searchText by remember { mutableStateOf(TextFieldValue("")) }
-        var searchText by remember { mutableStateOf(if (search_text.isNotEmpty()) TextFieldValue(search_text) else TextFieldValue("")) }
+        var searchText by remember { mutableStateOf(if (textSearch.isNotEmpty()) TextFieldValue(textSearch) else TextFieldValue("")) }
 
         println("Dans HomeApp: $searchText")
 
@@ -116,7 +130,7 @@ class Home : ComponentActivity() {
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                HomeTitle(text = "AutoGestion") {}
+                HomeTitle(text = "AutoGestion")
 
                 Row (
                     horizontalArrangement = Arrangement.Start, // Align items horizontally
@@ -162,12 +176,12 @@ class Home : ComponentActivity() {
                 }
 
                 // Filtered List
-                val filteredItems = items?.filter { client ->
+                val filteredItems = items.filter { client ->
                     client.firstName.contains(searchText.text, ignoreCase = true) ||
                             client.lastName.contains(searchText.text, ignoreCase = true) ||
-                            ( vehicleViewModel.getVehiclesFromClient(client.clientId).any { vehicle ->
+                            vehicleViewModel.getVehiclesFromClient(client.clientId).any { vehicle ->
                                 vehicle?.registrationPlate?.contains(searchText.text, ignoreCase = true) == true
-                            } ?: false)
+                            }
                 }
 
 
@@ -176,13 +190,11 @@ class Home : ComponentActivity() {
                         .padding(16.dp)
                         .wrapContentSize()
                 ) {
-                    if (filteredItems != null) {
-                        items(filteredItems.size) { index ->
-                            val client = filteredItems[index]
-                            ClientVehicleInfo(client = client)
-                            if (index < filteredItems.size - 1) {
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
+                    items(filteredItems.size) { index ->
+                        val client = filteredItems[index]
+                        ClientVehicleInfo(client = client)
+                        if (index < filteredItems.size - 1) {
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }
@@ -222,7 +234,7 @@ class Home : ComponentActivity() {
     }
 
     @Composable
-    fun HomeTitle(text : String,onBackClick: () -> Unit){
+    fun HomeTitle(text: String){
         // Up Bar
         Row(modifier = Modifier
             .height(56.dp)

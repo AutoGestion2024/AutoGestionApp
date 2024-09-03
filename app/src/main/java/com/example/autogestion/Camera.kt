@@ -2,7 +2,7 @@
 
 package com.example.autogestion
 
-import RetrofitCallClass
+import com.example.autogestion.webService.RetrofitCallClass
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -43,7 +43,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -70,7 +69,6 @@ class Camera : ComponentActivity(){
         }
         enableEdgeToEdge()
         setContent {
-            val scope = rememberCoroutineScope()
             val scaffoldState = rememberBottomSheetScaffoldState()
             val controller = remember {
                 LifecycleCameraController(applicationContext).apply {
@@ -113,7 +111,7 @@ class Camera : ComponentActivity(){
                             onClick = {
                                 // Capture photo and handle the result
                                 takePhoto(controller) { uri ->
-                                    RetrofitCallClass(scope).uploadImageToServerAndGetResults(this@Camera, uri) { vrn ->
+                                    RetrofitCallClass().uploadImageToServerAndGetResults(this@Camera, uri) { vrn ->
                                         vrn?.let {
                                             val intent = Intent(this@Camera, Home::class.java)
                                             intent.putExtra("search_text", it)
