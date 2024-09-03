@@ -89,7 +89,9 @@ class VehicleFormUpdate : ComponentActivity() {
             NavBar(
                 text = "Modifier le Véhicule",
                 onBackClick = {
-                    val intent = Intent(context, Home::class.java)
+                    val intent = Intent(context, VehicleProfile::class.java).apply {
+                        putExtra("vehicleId", vehicle.vehicleId)
+                    }
                     context.startActivity(intent)
                 }
             )
