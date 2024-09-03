@@ -20,8 +20,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.autogestion.ClientProfile
 import com.example.autogestion.Home
 import com.example.autogestion.NavBar
+import com.example.autogestion.VehicleProfile
 import com.example.autogestion.data.Client
 import com.example.autogestion.data.viewModels.ClientViewModel
 import kotlinx.coroutines.launch
@@ -212,7 +214,10 @@ class ClientFormUpdate : ComponentActivity() {
 
                                         coroutineScope.launch {
                                             clientViewModel.updateClient(updatedClient)
-                                            redirectToHome(context)
+                                            val intent = Intent(context, ClientProfile::class.java).apply {
+                                                putExtra("clientId", updatedClient.clientId)
+                                            }
+                                            context.startActivity(intent)
                                         }
                                     }
                                 }
