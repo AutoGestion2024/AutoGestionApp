@@ -23,83 +23,50 @@ class RetrofitCallClass (private val scope: CoroutineScope){
     private val API_TOKEN = "8e9dab6d5db9ea25c8adc6ca6419a44d27a12948"
     private  var vrn: String = ""
 
-//    @OptIn(DelicateCoroutinesApi::class)
-//    suspend fun uploadImageToServerAndGetResults(context: Context, savedUri: Uri?) : String {
-//        return if (savedUri != null) {
-//            withContext(Dispatchers.IO) {
-//
-//                val apiService: ApiService = RetrofitHelper.getInstance().create(ApiService::class.java)
-//                val imgFile = context.getFileFromUri(savedUri)
-//                val compressedImageFile = Compressor.compress(context, imgFile)
-//                val imageFilePart = MultipartBody.Part.createFormData(
-//                    "upload",
-//                    compressedImageFile.name,
-//                    RequestBody.create(
-//                        "image/*".toMediaTypeOrNull(),
-//                        compressedImageFile
-//                    )
-//                )
-//
-//                val response = apiService.getNumberPlateDetails(
-//                    token = "TOKEN $API_TOKEN",
-//                    imagePart = imageFilePart
-//                )
-//
-//                if(response.isSuccessful && response.body() != null && (response.body()?.results?.size ?: 0) > 0 ) {
-//                    vrn = response.body()?.results?.get(0)?.plate.toString().uppercase()
-//                    vrn
-//                }
-//                else{
-//                    "No Plate Found !"
-//                }
-//            }
-//        } else {
-//            "No Uri found !"
-//        }
-//
-//    }
-//}
-
     @OptIn(DelicateCoroutinesApi::class)
     fun uploadImageToServerAndGetResults(context: Context, savedUri: Uri, onResult: (String?) -> Unit) {
         val apiService: ApiService = RetrofitHelper.getInstance().create(ApiService::class.java)
 
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                // Convertir l'URI en fichier
+                // Convert the URI to a File object
                 val imgFile = File(savedUri.path ?: return@launch)
 
-                // Compresser l'image (si nécessaire)
+                // Compress the image file if necessary
                 val compressedImageFile = Compressor.compress(context, imgFile)
 
-                // Créer un MultipartBody.Part pour l'envoi
+                // Create a MultipartBody.Part for sending the image
                 val imageFilePart = MultipartBody.Part.createFormData(
                     "upload",
                     compressedImageFile.name,
                     RequestBody.create("image/*".toMediaTypeOrNull(), compressedImageFile)
                 )
 
-                // Appeler l'API pour envoyer l'image
+                // Call the API to upload the image and get the results
                 val response = apiService.getNumberPlateDetails(
                     token = "TOKEN $API_TOKEN",
                     imagePart = imageFilePart
                 )
 
+                // Check if the response is successful and contains results
                 if(response.isSuccessful && response.body() != null && (response.body()?.results?.size ?: 0) > 0 ) {
                     vrn = response.body()?.results?.get(0)?.plate.toString().uppercase()
+                    // Pass the result back to the main thread
                     withContext(Dispatchers.Main) {
                         onResult(vrn)
                     }
                 }else{
+                    // Pass null if there are no results or if the response is not successful
                     withContext(Dispatchers.Main) {
                         onResult(null)
                     }
                 }
 
             } catch (e: Exception) {
+                // Log any exceptions that occur during the upload
                 Log.e("Upload", "Failed to upload image", e)
             } finally {
-                // Supprimer le fichier temporaire après utilisation
+                // Delete the temporary file after use
                 File(savedUri.path ?: return@launch).delete()
             }
         }

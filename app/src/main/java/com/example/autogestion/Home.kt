@@ -132,7 +132,7 @@ class Home : ComponentActivity() {
                             .padding(end = 8.dp)
                     )
 
-                    // Barre de recherche
+                    // Search Bar
                     BasicTextField(
                         value = searchText,
                         onValueChange = { searchText = it },
@@ -161,7 +161,7 @@ class Home : ComponentActivity() {
 
                 }
 
-                // Liste filtrée
+                // Filtered List
                 val filteredItems = items?.filter { client ->
                     client.firstName.contains(searchText.text, ignoreCase = true) ||
                             client.lastName.contains(searchText.text, ignoreCase = true) ||
