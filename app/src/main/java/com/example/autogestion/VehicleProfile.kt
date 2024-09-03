@@ -24,6 +24,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.Repair
@@ -40,6 +41,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
+import com.example.autogestion.form.ClientFormUpdate
+import com.example.autogestion.form.VehicleFormUpdate
+import kotlinx.coroutines.launch
 
 class VehicleProfile : ComponentActivity() {
 
@@ -62,6 +66,8 @@ class VehicleProfile : ComponentActivity() {
         val context = LocalContext.current
         var vehicle = vehicleViewModel.getVehicleById(vehicleId).value
         var repairList = repairViewModel.getRepairsFromVehicle(vehicleId)
+
+        val coroutineScope = rememberCoroutineScope()
 
         Column(modifier = Modifier
             .fillMaxSize()
@@ -99,7 +105,12 @@ class VehicleProfile : ComponentActivity() {
 
                 Row {
 
-                    IconButton(onClick = { println("TODO") /* TODO Bouton Supprimer */ }) {
+                    IconButton(onClick = {
+                        coroutineScope.launch {
+                            vehicleViewModel.deleteVehicle(vehicle!!)
+                            redirectToHome()
+                        }
+                    }) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_delete_24),
                             contentDescription = "Supprimer",
@@ -107,7 +118,13 @@ class VehicleProfile : ComponentActivity() {
                         )
                     }
 
-                    IconButton(onClick = { println("TODO") /* TODO Bouton Modifier */ }) {
+                    IconButton(onClick = {
+                        //val context = LocalContext.current
+                        val intent = Intent(context, VehicleFormUpdate::class.java).apply {
+                            putExtra("vehicleId", vehicle!!.vehicleId)
+                        }
+                        context.startActivity(intent)
+                    }) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_edit_24),
                             contentDescription = "Modifier",
@@ -162,6 +179,12 @@ class VehicleProfile : ComponentActivity() {
                     }
                 }*/
         }
+    }
+
+    private fun redirectToHome() {
+        val intent = Intent(this, Home::class.java)
+        startActivity(intent)
+        finish() // Ferme l'activité actuelle pour éviter le retour avec le bouton "Back"
     }
 }
 

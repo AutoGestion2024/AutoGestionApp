@@ -43,6 +43,7 @@
         <activity android:name=".form.VehicleForm" />
         <activity android:name=".form.RepairForm" />
         <activity android:name=".form.ClientFormUpdate" />
+        <activity android:name=".form.VehicleFormUpdate" />
 
     </application>
 

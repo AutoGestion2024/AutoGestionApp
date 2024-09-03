@@ -242,22 +242,4 @@ class ClientFormUpdate : ComponentActivity() {
             ""
         }
     }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun DefaultPreview2() {
-        ClientFormUpdateApp(
-            Client(
-                clientId = 1,
-                firstName = "John",
-                lastName = "Doe",
-                phone = "1234567890",
-                birthDate = System.currentTimeMillis(),
-                email = "john.doe@example.com",
-                address = "123 Main St"
-            ),
-            viewModel(),
-            PaddingValues(16.dp)
-        )
-    }
 }
