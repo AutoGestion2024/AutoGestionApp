@@ -194,7 +194,7 @@ class ClientDaoTest {
             repairId = 1,
             vehicleId = 1,
             description = "Pneu crevé",
-            date = "12.12.2022",
+            date = 976579200000, //"12.12.2022",
             invoice = "/path/to/invoice1",
             paid = true
         )
@@ -203,7 +203,7 @@ class ClientDaoTest {
             repairId = 2,
             vehicleId = 1,
             description = "Panne technique",
-            date = "08.07.2022",
+            date = 976579200000, //"08.07.2022",
             invoice = "/path/to/invoice2",
             paid = false
         )
