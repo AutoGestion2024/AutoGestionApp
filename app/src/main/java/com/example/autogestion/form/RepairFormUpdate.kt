@@ -51,7 +51,7 @@ class RepairFormUpdate : ComponentActivity() {
             repairViewModel.getRepairById(repairId)
         }
 
-        val repair by repairViewModel.currentRepair.observeAsState()
+        val repair by repairViewModel.getRepairById(repairId).observeAsState()
 
         Scaffold { innerPadding ->
             repair?.let {
