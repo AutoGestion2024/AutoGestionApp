@@ -80,7 +80,7 @@ class VehicleProfile : ComponentActivity() {
     @Composable
     fun VehiclePage(vehicleId: Int) {
         val context = LocalContext.current
-        var vehicle = vehicleViewModel.getVehicleById(vehicleId).value
+        val vehicle by vehicleViewModel.getVehicleById(vehicleId).observeAsState()
         val repairList by repairViewModel.getRepairsFromVehicle(vehicleId).observeAsState(emptyList())
 
 
