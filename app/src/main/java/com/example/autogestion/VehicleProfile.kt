@@ -27,6 +27,8 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import com.example.autogestion.data.Repair
@@ -65,7 +67,7 @@ class VehicleProfile : ComponentActivity() {
         val vehicleId = intent.getIntExtra("vehicleId", 0)
 
         setContent {
-            //VehiclePage(vehicleId)
+            VehiclePage(vehicleId)
         }
     }
 
@@ -76,10 +78,11 @@ class VehicleProfile : ComponentActivity() {
     }
 
     @Composable
-    fun VehiclePage(/*vehicleId: Int*/ vehicle : Vehicle?, repairList : List<Repair>) {
+    fun VehiclePage(vehicleId: Int) {
         val context = LocalContext.current
-        //var vehicle = vehicleViewModel.getVehicleById(vehicleId).value
-        //var repairList = repairViewModel.getRepairsFromVehicle(vehicleId)
+        var vehicle = vehicleViewModel.getVehicleById(vehicleId).value
+        val repairList by repairViewModel.getRepairsFromVehicle(vehicleId).observeAsState(emptyList())
+
 
         val coroutineScope = rememberCoroutineScope()
 
@@ -242,54 +245,6 @@ class VehicleProfile : ComponentActivity() {
             }
 
         }
-
-    }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun ProfilePrew() {
-
-        val vehicle = Vehicle(
-            vehicleId = 1,               // L'ID du véhicule (auto-généré)
-            clientId = 123,              // ID du client associé
-            chassisNum = "1234567890987654",    // Numéro de châssis
-            greyCard = "/url",     // Numéro de carte grise
-            registrationPlate = "AB-123-CD", // Plaque d'immatriculation
-            brand = "Toyota",            // Marque du véhicule
-            model = "Corolla",           // Modèle du véhicule
-            color = "Bleu"               // Couleur du véhicule
-        )
-
-
-        val listeRepar = listOf(
-            Repair(
-                repairId = 1,                // ID de la réparation (auto-généré)
-                vehicleId = 101,             // ID du véhicule associé
-                description = "Changement des plaquettes de frein", // Description de la réparation
-                date = 1672531200000,        // Date de la réparation en timestamp (ex. 01/01/2023)
-                invoice = "INV-2023-001",    // Numéro de la facture
-                paid = true                  // La réparation est-elle payée ?
-            ),
-
-            Repair(
-                repairId = 2,                // ID de la réparation (auto-généré)
-                vehicleId = 102,             // ID du véhicule associé
-                description = "Remplacement de la batterie",  // Description de la réparation
-                date = 1675209600000,        // Date de la réparation en timestamp (ex. 02/02/2023)
-                invoice = "INV-2023-002",    // Numéro de la facture
-                paid = false                 // La réparation est-elle payée ?
-            ),
-            Repair(
-                repairId = 3,                // ID de la réparation (auto-généré)
-                vehicleId = 103,             // ID du véhicule associé
-                description = "Révision complète",   // Description de la réparation
-                date = 1677628800000,        // Date de la réparation en timestamp (ex. 01/03/2023)
-                invoice = "INV-2023-003",    // Numéro de la facture
-                paid = true                  // La réparation est-elle payée ?
-            )
-        )
-
-        VehicleProfile().VehiclePage(vehicle = vehicle, repairList = listeRepar)
 
     }
 }
