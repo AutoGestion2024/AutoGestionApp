@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,8 +35,10 @@ import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
+import com.example.autogestion.form.ClientFormUpdate
+import kotlinx.coroutines.launch
 
-class ClientProfile : ComponentActivity(){
+class ClientProfile : ComponentActivity() {
 
     private val clientViewModel: ClientViewModel by viewModels()
     private val vehicleViewModel: VehicleViewModel by viewModels()
@@ -52,15 +55,18 @@ class ClientProfile : ComponentActivity(){
     }
 
 
-
     @Composable
     fun ProfilPage(clientId: Int) {
         val context = LocalContext.current
 
+        val coroutineScope = rememberCoroutineScope()
+
         val client by clientViewModel.getClientById(clientId).observeAsState()
         val vehicleList by remember { mutableStateOf(vehicleViewModel.getVehiclesFromClient(clientId)) }
 
-        Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()) {
             NavBar(text = "Profile client : id $clientId") {
                 val intent = Intent(context, Home::class.java)
                 context.startActivity(intent)
@@ -81,13 +87,24 @@ class ClientProfile : ComponentActivity(){
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         // TODO: Add birthdate
-                        Text(text = "${currentClient.phone}", modifier = Modifier.padding(bottom = 8.dp))
-                        Text(text = "${currentClient.email}", modifier = Modifier.padding(bottom = 8.dp))
+                        Text(
+                            text = "${currentClient.phone}",
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(
+                            text = "${currentClient.email}",
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
                         Text(text = "${currentClient.address}")
                     }
 
                     Row {
-                        IconButton(onClick = { println("TODO") /* TODO: Bouton Supprimer */ }) {
+                        IconButton(onClick = {
+                            coroutineScope.launch {
+                                clientViewModel.deleteClient(client!!)
+                                redirectToHome()
+                            }
+                        }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.baseline_delete_24),
                                 contentDescription = "Supprimer",
@@ -95,7 +112,13 @@ class ClientProfile : ComponentActivity(){
                             )
                         }
 
-                        IconButton(onClick = { println("TODO") /* TODO: Bouton Modifier */ }) {
+                        IconButton(onClick = {
+                            //val context = LocalContext.current
+                            val intent = Intent(context, ClientFormUpdate::class.java).apply {
+                                putExtra("clientId", client!!.clientId) // Passez l'ID du client ici
+                            }
+                            context.startActivity(intent)
+                        }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.baseline_edit_24),
                                 contentDescription = "Modifier",
@@ -158,6 +181,12 @@ class ClientProfile : ComponentActivity(){
         }
     }
 
+    private fun redirectToHome() {
+        val intent = Intent(this, Home::class.java)
+        startActivity(intent)
+        finish() // Ferme l'activité actuelle pour éviter le retour avec le bouton "Back"
+    }
+
 
     // One Car
     @Composable
@@ -170,14 +199,17 @@ class ClientProfile : ComponentActivity(){
             .background(color = Color(0xFFF3EDF7))
             .padding(16.dp)
             .clickable {
-                val intent = Intent(context, VehicleProfile::class.java).apply{
+                val intent = Intent(context, VehicleProfile::class.java).apply {
                     putExtra("vehicleId", vehicle.vehicleId)
                 }
                 context.startActivity(intent)
                 /* TODO Ajouter les parametres */
             }
         ) {
-            Text(text = "Plaque: ${vehicle.registrationPlate}", modifier = Modifier.padding(bottom = 4.dp))
+            Text(
+                text = "Plaque: ${vehicle.registrationPlate}",
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
             Text(text = "Marque: ${vehicle.brand}", modifier = Modifier.padding(bottom = 4.dp))
             Text(text = "Modèle: ${vehicle.model}", modifier = Modifier.padding(bottom = 4.dp))
         }
