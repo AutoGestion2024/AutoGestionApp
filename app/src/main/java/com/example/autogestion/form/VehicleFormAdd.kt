@@ -23,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.autogestion.ClientProfile
 import com.example.autogestion.Home
 import com.example.autogestion.NavBar
+import com.example.autogestion.VehicleProfile
 import com.example.autogestion.data.Client
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.ClientViewModel
@@ -169,8 +170,14 @@ class VehicleFormAdd : ComponentActivity() {
                                     greyCard = greyCard,
                                     clientId = clientId
                                 )
-                                vehicleViewModel.addVehicle(vehicle)
-                                redirectToHome(context)
+
+                                coroutineScope.launch {
+                                    vehicleViewModel.addVehicle(vehicle)
+                                    val intent = Intent(context, ClientProfile::class.java).apply {
+                                        putExtra("clientId", vehicle.clientId)
+                                    }
+                                    context.startActivity(intent)
+                                }
                             }
                         }
                     },
