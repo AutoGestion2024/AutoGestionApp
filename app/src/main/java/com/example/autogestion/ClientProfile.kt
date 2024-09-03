@@ -80,7 +80,7 @@ class ClientProfile : ComponentActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(16.dp).width(250.dp)) {
                         Text(
                             text = "${currentClient.lastName} ${currentClient.firstName} ",
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -207,7 +207,6 @@ class ClientProfile : ComponentActivity() {
             Text(text = "Marque: ${vehicle.brand}", modifier = Modifier.padding(bottom = 4.dp))
             Text(text = "Modèle: ${vehicle.model}", modifier = Modifier.padding(bottom = 4.dp))
             Text(text = "Colour: ${vehicle.color}", modifier = Modifier.padding(bottom = 4.dp))
-            Text(text = "Carte grise: ${vehicle.greyCard}", modifier = Modifier.padding(bottom = 4.dp))
             Log.d("ClientProfile", "Client ID: ${vehicle.clientId}")
             Log.d("ClientProfile", "Vehicle ID: ${vehicle.vehicleId}")
         }

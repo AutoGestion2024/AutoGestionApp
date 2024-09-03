@@ -1,13 +1,12 @@
 package com.example.autogestion
 
 import android.content.Intent
-import android.os.Build
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TabRowDefaults.Divider
@@ -38,23 +38,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
-import com.example.autogestion.form.ClientFormUpdate
 import com.example.autogestion.form.RepairFormAdd
 import com.example.autogestion.form.RepairFormUpdate
-import com.example.autogestion.form.VehicleFormAdd
 import com.example.autogestion.form.VehicleFormUpdate
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class VehicleProfile : ComponentActivity() {
@@ -108,7 +100,7 @@ class VehicleProfile : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Car information
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(16.dp).width(250.dp)) {
                     Text(
                         text = "${vehicle?.brand}, ${vehicle?.model}",
                         modifier = Modifier.padding(bottom = 4.dp)
@@ -126,11 +118,26 @@ class VehicleProfile : ComponentActivity() {
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
 
-                    // TODO add link to grey card
-                    Text(
-                        text = "Carte grise: ${vehicle?.greyCard}",
+                    Button(
+                        onClick = {
+                            vehicle?.greyCard?.let { uriString ->
+                                try {
+                                    val uri = Uri.parse(uriString)
+                                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                                        setDataAndType(uri, "image/*")
+                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    }
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+                        },
                         modifier = Modifier.padding(bottom = 4.dp)
-                    )
+                    ) {
+                        Text(text = "Voir Carte Grise")
+                    }
+
                 }
 
                 Row {
@@ -190,11 +197,10 @@ class VehicleProfile : ComponentActivity() {
                 }
             }
 
-
             // Divide profile and car list
             Divider(
-                color = Color.Gray, // Couleur de la ligne
-                thickness = 2.dp,   // Épaisseur de la ligne
+                color = Color.Gray,
+                thickness = 2.dp,
             )
 
             // Repair List
