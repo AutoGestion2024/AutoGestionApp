@@ -45,7 +45,9 @@ import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
 import com.example.autogestion.form.ClientFormUpdate
+import com.example.autogestion.form.RepairFormAdd
 import com.example.autogestion.form.RepairFormUpdate
+import com.example.autogestion.form.VehicleFormAdd
 import com.example.autogestion.form.VehicleFormUpdate
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -98,6 +100,7 @@ class VehicleProfile : ComponentActivity() {
                 context.startActivity(intent)
             }
 
+            vehicle?.let { currentVehicle ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -173,9 +176,12 @@ class VehicleProfile : ComponentActivity() {
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
-                // TODO
-                IconButton(onClick = { println("TODO") })
-                {
+                IconButton(onClick = {
+                    val intent = Intent(context, RepairFormAdd::class.java).apply {
+                        putExtra("vehicleId", currentVehicle.vehicleId)
+                    }
+                    context.startActivity(intent)
+                }) {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_add_24),
                         contentDescription = "Ajouter",
@@ -203,6 +209,13 @@ class VehicleProfile : ComponentActivity() {
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
+            }
+            } ?: run {
+                Text(
+                    text = "Client non trouvé",
+                    modifier = Modifier.padding(16.dp),
+                    color = Color.Red
+                )
             }
         }
     }
