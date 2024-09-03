@@ -37,6 +37,7 @@ import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
 import com.example.autogestion.form.ClientFormUpdate
+import com.example.autogestion.form.VehicleFormAdd
 import kotlinx.coroutines.launch
 
 class ClientProfile : ComponentActivity() {
@@ -138,7 +139,12 @@ class ClientProfile : ComponentActivity() {
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
 
-                    IconButton(onClick = { println("TODO") }) {
+                    IconButton(onClick = {
+                        val intent = Intent(context, VehicleFormAdd::class.java).apply {
+                            putExtra("clientId", currentClient.clientId)
+                        }
+                        context.startActivity(intent)
+                    }) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_add_24),
                             contentDescription = "Ajouter",
