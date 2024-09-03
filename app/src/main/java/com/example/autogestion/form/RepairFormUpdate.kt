@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.autogestion.Home
 import com.example.autogestion.NavBar
+import com.example.autogestion.VehicleProfile
 import com.example.autogestion.data.Repair
 import com.example.autogestion.data.viewModels.RepairViewModel
 import kotlinx.coroutines.launch
@@ -98,7 +99,9 @@ class RepairFormUpdate : ComponentActivity() {
             NavBar(
                 text = "Modifier la Réparation",
                 onBackClick = {
-                    val intent = Intent(context, Home::class.java)
+                    val intent = Intent(context, VehicleProfile::class.java).apply {
+                        putExtra("vehicleId", repair.vehicleId)
+                    }
                     context.startActivity(intent)
                 }
             )
@@ -196,21 +199,16 @@ class RepairFormUpdate : ComponentActivity() {
 
                     coroutineScope.launch {
                         repairViewModel.updateRepair(updatedRepair)
-                        redirectToHome(context)
+                        val intent = Intent(context, VehicleProfile::class.java).apply {
+                            putExtra("vehicleId", repair.vehicleId)
+                        }
+                        context.startActivity(intent)
                     }
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text("Enregistrer les modifications")
             }
-        }
-    }
-
-    private fun redirectToHome(context: android.content.Context) {
-        val intent = Intent(context, Home::class.java)
-        context.startActivity(intent)
-        if (context is ComponentActivity) {
-            context.finish()
         }
     }
 
