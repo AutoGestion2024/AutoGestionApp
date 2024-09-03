@@ -52,6 +52,7 @@ class Home : ComponentActivity() {
     private val clientViewModel: ClientViewModel by viewModels()
     private val vehicleViewModel: VehicleViewModel by viewModels()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -61,9 +62,12 @@ class Home : ComponentActivity() {
         if (!hasRequiredPermissions()) {
             ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
         }
+
+        val search_text = intent.getStringExtra("search_text") ?: ""
+
         enableEdgeToEdge()
         setContent {
-            HomeApp()
+            HomeApp(search_text)
         }
     }
 
@@ -82,19 +86,21 @@ class Home : ComponentActivity() {
 
 
     @Composable
-    fun HomeApp() {
+    fun HomeApp(search_text: String ) {
         val context = LocalContext.current
 
         val clients by database.clientDao().getAllClients().observeAsState(initial = emptyList())
 
         var items by remember { mutableStateOf(clients) }
-        var searchText by remember { mutableStateOf(TextFieldValue("")) }
+//        var searchText by remember { mutableStateOf(TextFieldValue("")) }
+        var searchText by remember { mutableStateOf(if (search_text.isNotEmpty()) TextFieldValue(search_text) else TextFieldValue("")) }
+
+        println("Dans HomeApp: $searchText")
 
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
-                        // TODO: Redirect to the HomeForm page when it's ready
                         val intent = Intent(context, ClientForm::class.java)
                         context.startActivity(intent)
                     },
@@ -136,6 +142,8 @@ class Home : ComponentActivity() {
                             .padding(end = 8.dp),
                         textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
                     )
+
+
                     IconButton(
                         onClick = {
                             val intent = Intent(context, Camera::class.java)
@@ -161,6 +169,7 @@ class Home : ComponentActivity() {
                                 vehicle?.registrationPlate?.contains(searchText.text, ignoreCase = true) == true
                             } ?: false)
                 }
+
 
                 LazyColumn(
                     modifier = Modifier
@@ -235,6 +244,6 @@ class Home : ComponentActivity() {
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview() {
-        Home().HomeApp()
+        Home().HomeApp("")
     }
 }
