@@ -43,7 +43,7 @@ class VehicleFormUpdate : ComponentActivity() {
             vehicleViewModel.getVehicleById(vehicleId)
         }
 
-        val vehicle by vehicleViewModel.currentVehicle.observeAsState()
+        val vehicle by vehicleViewModel.getVehicleById(vehicleId).observeAsState()
 
         Scaffold { innerPadding ->
             vehicle?.let {
