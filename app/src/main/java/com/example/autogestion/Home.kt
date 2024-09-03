@@ -174,7 +174,8 @@ class Home : ComponentActivity() {
     @Composable
     fun ClientVehicleInfo(client: Client, searchText: String) {
         val context = LocalContext.current
-        val vehicles by vehicleViewModel.getVehiclesFromClient(client.clientId).observeAsState(initial = emptyList())
+        val vehicles by vehicleViewModel.getVehiclesFromClient(client.clientId)
+            .observeAsState(initial = emptyList())
 
         if (searchText.isEmpty() || clientMatchesSearch(client, vehicles, searchText)) {
             Column(
@@ -195,13 +196,32 @@ class Home : ComponentActivity() {
                     modifier = Modifier.padding(bottom = 4.dp),
                     fontSize = 20.sp
                 )
-                vehicles.joinToString(separator = "\n ") { "${it?.brand}, ${it?.model}" }
-                    .let {
+                if (vehicles.isEmpty()) {
+                    Text(
+                        text = "Aucun véhicule",
+                        modifier = Modifier.padding(bottom = 4.dp),
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                    )
+                } else {
+                    vehicles.joinToString(separator = "\n ") { vehicle ->
+                        buildString {
+                            append(vehicle?.registrationPlate ?: "")
+                            if (!vehicle?.brand.isNullOrEmpty() || !vehicle?.model.isNullOrEmpty()) {
+                                append(", ")
+                                append(vehicle?.brand ?: "")
+                                if (!vehicle?.model.isNullOrEmpty()) {
+                                    append(", ")
+                                    append(vehicle?.model ?: "")
+                                }
+                            }
+                        }
+                    }.let {
                         Text(
                             text = it,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                     }
+                }
             }
         }
     }
