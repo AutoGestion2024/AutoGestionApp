@@ -338,7 +338,11 @@ class VehicleProfile : ComponentActivity() {
                     Spacer(modifier = Modifier.width(55.dp))
                     Text(
                         //TODO fix invoice
-                        text = "Payée"
+                        text = when (repair.paid) {
+                            true -> "Payée"
+                            false -> "Pas payée"
+                            else -> "-"
+                        }
                     )
                 }
             }
