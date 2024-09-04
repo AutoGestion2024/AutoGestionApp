@@ -27,11 +27,14 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
+import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import com.example.autogestion.data.Repair
 import androidx.compose.ui.Modifier
@@ -83,12 +86,48 @@ class VehicleProfile : ComponentActivity() {
         val vehicle by vehicleViewModel.getVehicleById(vehicleId).observeAsState()
         val repairList by repairViewModel.getRepairsFromVehicle(vehicleId).observeAsState(emptyList())
 
+        var showDialogVehicle by remember { mutableStateOf(false) }
+
 
         val coroutineScope = rememberCoroutineScope()
 
         Column(modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()) {
+
+            if (showDialogVehicle) {
+                AlertDialog(
+                    onDismissRequest = { showDialogVehicle = false },
+                    title = {
+                        Text(text = "Confirmation de suppression")
+                    },
+                    text = {
+                        Text("Êtes-vous sûr de vouloir supprimer ce véhicule ?")
+                    },
+                    confirmButton = {
+                        Button(onClick = {
+                            coroutineScope.launch {
+                                val clientId = vehicle!!.clientId
+                                vehicleViewModel.deleteVehicle(vehicle!!)
+                                val intent = Intent(context, ClientProfile::class.java).apply {
+                                    putExtra("clientId", clientId)
+                                }
+                                context.startActivity(intent)
+                            }
+                        }) {
+                            Text("Supprimer")
+                        }
+                    },
+                    dismissButton = {
+                        Button(onClick = {
+                            showDialogVehicle = false
+                        }) {
+                            Text("Annuler")
+                        }
+                    }
+                )
+            }
+
 
             NavBar(text = "Profile Voiture") {
                 val intent = Intent(context, ClientProfile::class.java).apply {
@@ -141,14 +180,9 @@ class VehicleProfile : ComponentActivity() {
 
                 Row {
                     IconButton(onClick = {
-                        coroutineScope.launch {
-                            val clientId = vehicle!!.clientId
-                            vehicleViewModel.deleteVehicle(vehicle!!)
-                            val intent = Intent(context, ClientProfile::class.java).apply {
-                                putExtra("clientId", clientId)
-                            }
-                            context.startActivity(intent)
-                        }
+                        showDialogVehicle = true
+
+
                     }) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_delete_24),
@@ -235,6 +269,8 @@ class VehicleProfile : ComponentActivity() {
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
 
+        var showDialogRepair by remember { mutableStateOf(false) }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -253,14 +289,7 @@ class VehicleProfile : ComponentActivity() {
 
             Row {
                 IconButton(onClick = {
-                    coroutineScope.launch {
-                        val vehicleId = repair.vehicleId
-                        repairViewModel.deleteRepair(repair!!)
-                        val intent = Intent(context, VehicleProfile::class.java).apply {
-                            putExtra("vehicleId", vehicleId)
-                        }
-                        context.startActivity(intent)
-                    }
+                    showDialogRepair = true
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_delete_24),
@@ -298,6 +327,39 @@ class VehicleProfile : ComponentActivity() {
 
 
         }
+        if (showDialogRepair) {
+            AlertDialog(
+                onDismissRequest = { showDialogRepair = false },
+                title = {
+                    Text(text = "Confirmation de suppression")
+                },
+                text = {
+                    Text("Êtes-vous sûr de vouloir supprimer cette réparation ?")
+                },
+                confirmButton = {
+                    Button(onClick = {
+                    coroutineScope.launch {
+                        val vehicleId = repair.vehicleId
+                        repairViewModel.deleteRepair(repair!!)
+                        val intent = Intent(context, VehicleProfile::class.java).apply {
+                            putExtra("vehicleId", vehicleId)
+                        }
+                        context.startActivity(intent)
+                    }
+                    }) {
+                        Text("Supprimer")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = {
+                        showDialogRepair = false
+                    }) {
+                        Text("Annuler")
+                    }
+                }
+            )
+        }
+
 
     }
 
