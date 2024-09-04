@@ -68,7 +68,7 @@ class ClientProfile : ComponentActivity() {
             .fillMaxSize()
             .statusBarsPadding()) {
 
-            NavBar(text = "Profile client : id $clientId") {
+            NavBar(text = "${client?.lastName} ${client?.firstName}") {
                 val intent = Intent(context, Home::class.java)
                 context.startActivity(intent)
             }
