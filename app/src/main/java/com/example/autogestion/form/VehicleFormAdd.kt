@@ -105,7 +105,13 @@ class VehicleFormAdd : ComponentActivity() {
             ) {
 
                 NavBar(text = "Ajouter un véhicule",
-                    onBackClick = { context.startActivity(Intent(context, Home::class.java)) })
+                    onBackClick = {
+                        val intent = Intent(context, ClientProfile::class.java).apply {
+                            putExtra("clientId", clientId)
+                        }
+                        context.startActivity(intent)
+                    }
+                )
 
                 OutlinedTextField(
                     value = registrationPlate,

@@ -90,7 +90,13 @@ class RepairFormAdd : ComponentActivity() {
             ) {
 
                 NavBar(text = "Ajouter une réparation",
-                    onBackClick = { context.startActivity(Intent(context, Home::class.java)) })
+                    onBackClick = {
+                        val intent = Intent(context, VehicleProfile::class.java).apply {
+                            putExtra("vehicleId", vehicleId)
+                        }
+                        context.startActivity(intent)
+                    }
+                )
 
                 OutlinedTextField(
                     value = description,
