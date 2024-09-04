@@ -81,15 +81,48 @@ class ClientProfile : ComponentActivity() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.padding(16.dp).width(250.dp)) {
-                        Text(
-                            text = "Numéro de téléphone: ${currentClient.phone}",
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        Text(
-                            text = "Email: ${currentClient.email?.ifEmpty {"-"}}",
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        Text(text = "Adresse: ${currentClient.address?.ifEmpty {"-"}} ")
+                        Row(
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        ) {
+                            Text(
+                                text = "N° de téléphone : ",
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.width(2.dp))
+                            currentClient.phone.let {
+                                Text(
+                                    text = it
+                                )
+                            }
+                        }
+                        Row(
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        ) {
+                            Text(
+                                text = "Email : ",
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.width(67.dp))
+                            currentClient.email?.ifEmpty {"-"}?.let {
+                                Text(
+                                    text = it
+                                )
+                            }
+                        }
+                        Row(
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        ) {
+                            Text(
+                                text = "Adresse : ",
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.width(50.dp))
+                            currentClient.address?.ifEmpty {"-"}?.let {
+                                Text(
+                                    text = it
+                                )
+                            }
+                        }
                     }
 
                     Row {
@@ -101,7 +134,7 @@ class ClientProfile : ComponentActivity() {
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.baseline_delete_24),
-                                contentDescription = "Supprimer",
+                                contentDescription = "Delete",
                                 tint = Color.Black
                             )
                         }
@@ -114,7 +147,7 @@ class ClientProfile : ComponentActivity() {
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.baseline_edit_24),
-                                contentDescription = "Modifier",
+                                contentDescription = "Modify",
                                 tint = Color.Black
                             )
                         }
@@ -143,7 +176,7 @@ class ClientProfile : ComponentActivity() {
                     }) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_add_24),
-                            contentDescription = "Ajouter",
+                            contentDescription = "Add",
                             tint = Color.Black
                         )
                     }
@@ -198,13 +231,74 @@ class ClientProfile : ComponentActivity() {
                 context.startActivity(intent)
             }
         ) {
-            Text(text = "Plaque: ${vehicle.registrationPlate}", modifier = Modifier.padding(bottom = 4.dp))
-            Text(text = "Numéro chassis: ${vehicle.chassisNum}", modifier = Modifier.padding(bottom = 4.dp))
-            Text(text = "Marque: ${vehicle.brand}", modifier = Modifier.padding(bottom = 4.dp))
-            Text(text = "Modèle: ${vehicle.model}", modifier = Modifier.padding(bottom = 4.dp))
-            Text(text = "Couleur: ${vehicle.color}", modifier = Modifier.padding(bottom = 4.dp))
-            Log.d("ClientProfile", "Client ID: ${vehicle.clientId}")
-            Log.d("ClientProfile", "Vehicle ID: ${vehicle.vehicleId}")
+            Row(
+                modifier = Modifier.padding(bottom = 4.dp)
+            ) {
+                Text(
+                    text = "Marque : ",
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+                vehicle.brand?.ifEmpty {"-"}?.let {
+                    Text(
+                        text = it
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.padding(bottom = 4.dp)
+            ) {
+                Text(
+                    text = "Modèle : ",
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+                vehicle.model?.ifEmpty {"-"}?.let {
+                    Text(
+                        text = it
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.padding(bottom = 4.dp)
+            ) {
+                Text(
+                    text = "Couleur : ",
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+                vehicle.color?.ifEmpty {"-"}?.let {
+                    Text(
+                        text = it
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.padding(bottom = 4.dp)
+            ) {
+                Text(
+                    text = "N° chassis : ",
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                vehicle.chassisNum?.ifEmpty {"-"}?.let {
+                    Text(
+                        text = it
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.padding(bottom = 4.dp)
+            ) {
+                Text(
+                    text = "Plaque : ",
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(25.dp))
+                Text(
+                    text = vehicle.registrationPlate
+                )
+            }
         }
     }
 }
