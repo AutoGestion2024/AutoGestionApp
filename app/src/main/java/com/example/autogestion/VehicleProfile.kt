@@ -1,8 +1,9 @@
 package com.example.autogestion
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -26,6 +27,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -40,12 +42,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
 import com.example.autogestion.form.RepairFormAdd
 import com.example.autogestion.form.RepairFormUpdate
 import com.example.autogestion.form.VehicleFormUpdate
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -100,7 +104,9 @@ class VehicleProfile : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Car information
-                Column(modifier = Modifier.padding(16.dp).width(250.dp)) {
+                Column(modifier = Modifier
+                    .padding(16.dp)
+                    .width(250.dp)) {
                     Text(
                         text = "${vehicle?.brand}, ${vehicle?.model}",
                         modifier = Modifier.padding(bottom = 4.dp)
@@ -120,20 +126,12 @@ class VehicleProfile : ComponentActivity() {
 
                     Button(
                         onClick = {
-                            vehicle?.greyCard?.let { uriString ->
-                                try {
-                                    val uri = Uri.parse(uriString)
-                                    val intent = Intent(Intent.ACTION_VIEW).apply {
-                                        setDataAndType(uri, "image/*")
-                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                    }
-                                    context.startActivity(intent)
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
+                            vehicle?.let { currentVehicle ->
+                                val filePath = currentVehicle.greyCard
+                                filePath?.let { openFile(it) }
                             }
-                        },
-                        modifier = Modifier.padding(bottom = 4.dp)
+
+                        }
                     ) {
                         Text(text = "Voir Carte Grise")
                     }
@@ -281,9 +279,57 @@ class VehicleProfile : ComponentActivity() {
                         tint = Color.Black
                     )
                 }
+
             }
+
+            IconButton(onClick = {
+                repair.let { currentRepair ->
+                    val filePath = currentRepair.invoice
+                    filePath?.let { openFile(it) }
+                }
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_attach_file_24),
+                    contentDescription = "Fichier Facture Joint",
+                    tint = Color.Black
+                )
+            }
+
 
         }
 
     }
+
+    private fun openFile(filePath: String) {
+        // Create a File object with the given file path
+        val file = File(filesDir, filePath)
+        Log.d("VehicleProfile", "File path: ${file.absolutePath}")
+
+        if (file.exists()) {
+            // Obtain the URI for the file using FileProvider
+            val uri = FileProvider.getUriForFile(this, "com.example.autogestion.fileprovider", file)
+
+            // Determine the MIME type of the file
+            val mimeType = when {
+                filePath.endsWith(".jpg", ignoreCase = true) || filePath.endsWith(".jpeg", ignoreCase = true) -> "image/jpeg"
+                filePath.endsWith(".png", ignoreCase = true) -> "image/png"
+                filePath.endsWith(".pdf", ignoreCase = true) -> "application/pdf"
+                else -> "*/*" // For other types of files
+            }
+
+            // Create an Intent to open the file
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, mimeType)
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+
+            // Start the activity to display the file
+            startActivity(intent)
+        } else {
+            // Show an error message if the file does not exist
+            Toast.makeText(this, "The file does not exist", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
 }

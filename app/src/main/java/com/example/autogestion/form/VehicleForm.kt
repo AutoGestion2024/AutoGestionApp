@@ -32,6 +32,7 @@ import java.io.File
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
+import com.example.autogestion.getFilePathFromUri
 
 
 class VehicleForm : ComponentActivity() {
@@ -94,7 +95,7 @@ class VehicleForm : ComponentActivity() {
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
             uri?.let {
-                val path = getFilePathFromUri(context, it)
+                val path = getFilePathFromUri(context, it, "carteGrise")
                 greyCard = path
             }
         }
@@ -270,23 +271,6 @@ class VehicleForm : ComponentActivity() {
         }
     }
 
-    // Helper function to convert URI to file path
-    private fun getFilePathFromUri(context: android.content.Context, uri: Uri): String? {
-        val cursor = context.contentResolver.query(uri, null, null, null, null)
-        cursor?.use {
-            val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
-            cursor.moveToFirst()
-            val fileName = cursor.getString(nameIndex)
-            val file = File(context.filesDir, fileName)
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                file.outputStream().use { outputStream ->
-                    inputStream.copyTo(outputStream)
-                }
-            }
-            return file.absolutePath
-        }
-        return null
-    }
 
     @Preview(showBackground = true)
     @Composable
