@@ -252,7 +252,7 @@ class ClientProfile : ComponentActivity() {
                     text = "Modèle : ",
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.width(20.dp))
+                Spacer(modifier = Modifier.width(22.dp))
                 vehicle.model?.ifEmpty {"-"}?.let {
                     Text(
                         text = it
