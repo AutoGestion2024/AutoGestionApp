@@ -324,8 +324,10 @@ class VehicleProfile : ComponentActivity() {
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
-                        //TODO : Fix date format
-                        text =  dateFormat.format(repair.date)
+                        text =  when(repair.date){
+                            null -> "-"
+                            else -> dateFormat.format(repair.date)
+                        }
                     )
                 }
                 Row(
