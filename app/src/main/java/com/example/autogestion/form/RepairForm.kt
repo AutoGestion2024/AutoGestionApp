@@ -137,6 +137,7 @@ class RepairForm : ComponentActivity() {
                             putExtra("address", address)
                             putExtra("registrationPlate", registrationPlate)
                             putExtra("chassisNum", chassisNum)
+                            putExtra("greyCard", greyCard)
                             putExtra("brand", brand)
                             putExtra("model", model)
                             putExtra("color", color)
