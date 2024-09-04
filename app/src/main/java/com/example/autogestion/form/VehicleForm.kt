@@ -93,11 +93,16 @@ class VehicleForm : ComponentActivity() {
         val greyCardLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
-            uri?.let {
-                val path = getFilePathFromUri(context, it)
-                greyCard = path
-            }
+            greyCard = uri.toString()
         }
+
+        /*
+           val selectImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+            ) { uri: Uri? ->
+                imageUri = uri
+            }
+         */
 
         Scaffold(
         ) { padding ->
@@ -162,7 +167,7 @@ class VehicleForm : ComponentActivity() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = { greyCardLauncher.launch("*/*") },
+                    onClick = { greyCardLauncher.launch("image/*") },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(if (greyCard.isNullOrEmpty()) "Télécharger la carte grise" else "Carte grise sélectionnée")
