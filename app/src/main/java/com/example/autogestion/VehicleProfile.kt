@@ -325,7 +325,7 @@ class VehicleProfile : ComponentActivity() {
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         //TODO : Fix date format
-                        text =  "24/05/10"
+                        text =  dateFormat.format(repair.date)
                     )
                 }
                 Row(
@@ -337,7 +337,6 @@ class VehicleProfile : ComponentActivity() {
                     )
                     Spacer(modifier = Modifier.width(55.dp))
                     Text(
-                        //TODO fix invoice
                         text = when (repair.paid) {
                             true -> "Payée"
                             false -> "Pas payée"
