@@ -239,29 +239,36 @@ class Home : ComponentActivity() {
                 fontSize = 20.sp
             )
             if (vehicles.isEmpty()) {
-                Text(
-                    text = "Aucun véhicule",
-                    modifier = Modifier.padding(bottom = 4.dp),
-                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Aucun véhicule",
+                        modifier = Modifier.padding(bottom = 4.dp),
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                    )
+                }
             } else {
-                vehicles.joinToString(separator = "\n ") { vehicle ->
-                    buildString {
-                        append(vehicle?.registrationPlate ?: "")
+                vehicles.forEach { vehicle ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         if (!vehicle?.brand.isNullOrEmpty() || !vehicle?.model.isNullOrEmpty()) {
-                            append(", ")
-                            append(vehicle?.brand ?: "")
-                            if (!vehicle?.model.isNullOrEmpty()) {
-                                append(", ")
-                                append(vehicle?.model ?: "")
-                            }
+                            Text(
+                                text = listOfNotNull(
+                                    vehicle?.registrationPlate,
+                                    vehicle?.brand,
+                                    vehicle?.model
+                                ).joinToString(", "),
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
+                        } else {
+                            Text(
+                                text = vehicle?.registrationPlate ?: "",
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
                         }
                     }
-                }.let {
-                    Text(
-                        text = it,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
                 }
             }
         }
