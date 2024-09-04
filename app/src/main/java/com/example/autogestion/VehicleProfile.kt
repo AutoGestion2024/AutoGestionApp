@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
@@ -244,7 +245,7 @@ class VehicleProfile : ComponentActivity() {
             verticalAlignment = Alignment.CenterVertically
         ){
 
-            Column(modifier = Modifier.width(250.dp)) {
+            Column(modifier = Modifier.width(200.dp)) {
                 Text(text = "${repair.description}", modifier = Modifier.padding(bottom = 4.dp))
                 Text(text = "Date reparation : ", modifier = Modifier.padding(bottom = 4.dp))
                 Text(text = "Facture" , modifier = Modifier.padding(bottom = 4.dp))
@@ -331,5 +332,19 @@ class VehicleProfile : ComponentActivity() {
         }
     }
 
+    @Preview(showBackground = true)
+    @Composable
+    fun PreviewRepairItemPreview() {
+
+        val exampleRepair = Repair(
+            repairId = 1,                   // Remarquez que repairId est un entier et auto-généré par la base de données.
+            vehicleId = 123,                // ID du véhicule (clé étrangère).
+            description = "Remplacement des freins aaaaaaaaaaaaaaaaaaaaaa", // Description de la réparation.
+            date = System.currentTimeMillis(),       // Utilisation du timestamp actuel pour la date.
+            invoice = "Facture-2024-001",             // Numéro de facture.
+            paid = true                           // Statut de paiement.
+        )
+        RepairItem(exampleRepair)
+    }
 
 }
