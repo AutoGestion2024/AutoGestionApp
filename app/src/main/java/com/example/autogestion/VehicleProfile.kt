@@ -85,7 +85,7 @@ class VehicleProfile : ComponentActivity() {
             .fillMaxSize()
             .statusBarsPadding()) {
 
-            NavBar(text = "Profile Voiture") {
+            NavBar(text = "${vehicle?.brand?.ifEmpty {"-"}} ${vehicle?.model?.ifEmpty {"-"}} ${vehicle?.color?.ifEmpty {"-"}}") {
                 val intent = Intent(context, ClientProfile::class.java).apply {
                     putExtra("clientId", vehicle?.clientId)
                 }
@@ -101,22 +101,76 @@ class VehicleProfile : ComponentActivity() {
             ) {
                 // Car information
                 Column(modifier = Modifier.padding(16.dp).width(250.dp)) {
-                    Text(
-                        text = "${vehicle?.brand}, ${vehicle?.model}",
+                    Row(
                         modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    Text(
-                        text = "Couleur : ${vehicle?.color}",
+                    ) {
+                        Text(
+                            text = "Marque : ",
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(38.dp))
+                        vehicle?.brand?.ifEmpty {"-"}?.let {
+                            Text(
+                                text = it
+                            )
+                        }
+                    }
+                    Row(
                         modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    Text(
-                        text = "Num. de chassis : ${vehicle?.chassisNum}",
+                    ) {
+                        Text(
+                            text = "Modèle : ",
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(38.dp))
+                        vehicle?.model?.ifEmpty {"-"}?.let {
+                            Text(
+                                text = it
+                            )
+                        }
+                    }
+                    Row(
                         modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    Text(
-                        text = "Plaque: ${vehicle?.registrationPlate}",
+                    ) {
+                        Text(
+                            text = "Couleur : ",
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(38.dp))
+                        vehicle?.color?.ifEmpty {"-"}?.let {
+                            Text(
+                                text = it
+                            )
+                        }
+                    }
+                    Row(
                         modifier = Modifier.padding(bottom = 4.dp)
-                    )
+                    ) {
+                        Text(
+                            text = "N° de chassis : ",
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        vehicle?.chassisNum?.ifEmpty {"-"}?.let {
+                            Text(
+                                text = it
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    ) {
+                        Text(
+                            text = "Plaque: ",
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(48.dp))
+                        vehicle?.registrationPlate?.let {
+                            Text(
+                                text = it
+                            )
+                        }
+                    }
 
                     Button(
                         onClick = {
@@ -182,7 +236,7 @@ class VehicleProfile : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Liste Pannes",
+                    text = "Réparations",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 16.dp)
@@ -247,9 +301,46 @@ class VehicleProfile : ComponentActivity() {
         ){
 
             Column(modifier = Modifier.width(250.dp)) {
-                Text(text = "${repair.description}", modifier = Modifier.padding(bottom = 4.dp))
-                Text(text = "Date reparation : ", modifier = Modifier.padding(bottom = 4.dp))
-                Text(text = "Facture" , modifier = Modifier.padding(bottom = 4.dp))
+                Row(
+                    modifier = Modifier.padding(bottom = 4.dp)
+                ) {
+                    Text(
+                        text = "Description : ",
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.width(25.dp))
+                    repair.description?.ifEmpty { "-" }?.let {
+                        Text(
+                            text = it
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.padding(bottom = 4.dp)
+                ) {
+                    Text(
+                        text = "Date réparation : ",
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.width(2.dp))
+                    Text(
+                        //TODO : Fix date format
+                        text =  "24/05/10"
+                    )
+                }
+                Row(
+                    modifier = Modifier.padding(bottom = 4.dp)
+                ) {
+                    Text(
+                        text =  "Facture: ",
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.width(55.dp))
+                    Text(
+                        //TODO fix invoice
+                        text = "Payée"
+                    )
+                }
             }
 
             Row {
