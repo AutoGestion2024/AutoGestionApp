@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -90,13 +91,16 @@ class Home : ComponentActivity() {
         }
     }
 
-    private fun hasRequiredPermissions(): Boolean{
+    private fun hasRequiredPermissions(): Boolean {
         return CAMERAX_PERMISSIONS.all {
-            ContextCompat.checkSelfPermission(applicationContext, it) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(
+                applicationContext,
+                it
+            ) == PackageManager.PERMISSION_GRANTED
         }
     }
 
-    companion object{
+    companion object {
         private val CAMERAX_PERMISSIONS = arrayOf(
             Manifest.permission.CAMERA,
             Manifest.permission.INTERNET
@@ -108,19 +112,30 @@ class Home : ComponentActivity() {
     fun HomeApp(textSearch: String) {
         val context = LocalContext.current
         val clients by getClients().observeAsState(initial = emptyList())
-        var searchText by remember { mutableStateOf(if (textSearch.isNotEmpty()) TextFieldValue(textSearch) else TextFieldValue("")) }
-
+        var searchText by remember {
+            mutableStateOf(
+                if (textSearch.isNotEmpty()) TextFieldValue(
+                    textSearch
+                ) else TextFieldValue("")
+            )
+        }
         val sortedClients = clients.sortedBy { it.lastName }
+        val vehicleCache = remember { mutableStateMapOf<Int, List<Vehicle>>() }
 
-        /*val filteredItems = sortedClients.filter { client ->
-            val vehicles = vehicleViewModel.getVehiclesFromClient(client.clientId)
+        sortedClients.forEach { client ->
+            val vehicles by vehicleViewModel.getVehiclesFromClient(client.clientId)
+                .observeAsState(initial = emptyList())
+            vehicleCache[client.clientId] = vehicles
+        }
 
-            client.firstName.contains(searchText.text, ignoreCase = true) ||
-                    client.lastName.contains(searchText.text, ignoreCase = true) ||
-                    vehicles.any { vehicle ->
-                        vehicle?.registrationPlate?.contains(searchText.text, ignoreCase = true) == true
-                    }
-        }*/
+        val filteredClients = if (searchText.text.isEmpty()) {
+            sortedClients
+        } else {
+            sortedClients.filter { client ->
+                val vehicles = vehicleCache[client.clientId] ?: emptyList()
+                clientMatchesSearch(client, vehicles, searchText.text)
+            }
+        }
 
         Scaffold(
             floatingActionButton = {
@@ -129,8 +144,7 @@ class Home : ComponentActivity() {
                         val intent = Intent(context, ClientForm::class.java)
                         context.startActivity(intent)
                     },
-                    modifier = Modifier
-                        .padding(16.dp)
+                    modifier = Modifier.padding(16.dp)
                 ) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                 }
@@ -143,21 +157,20 @@ class Home : ComponentActivity() {
             ) {
                 HomeTitle(text = "AutoGestion") {}
 
-                Row (
-                    horizontalArrangement = Arrangement.Start, // Align items horizontally
-                    verticalAlignment = Alignment.CenterVertically, // Center vertically
+                // Barre de recherche
+                Row(
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                ){
+                ) {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = null,
-                        modifier = Modifier
-                            .padding(end = 8.dp)
+                        modifier = Modifier.padding(end = 8.dp)
                     )
 
-                    // Search Bar
                     BasicTextField(
                         value = searchText,
                         onValueChange = { searchText = it },
@@ -167,18 +180,17 @@ class Home : ComponentActivity() {
                             .padding(end = 8.dp),
                         textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
                     )
+
                     IconButton(
                         onClick = {
                             val intent = Intent(context, Camera::class.java)
                             context.startActivity(intent)
-
                         }
                     ) {
                         Icon(
                             imageVector = Icons.Default.CameraAlt,
                             contentDescription = null,
-                            modifier = Modifier
-                                .padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp)
                         )
                     }
                 }
@@ -188,9 +200,8 @@ class Home : ComponentActivity() {
                         .padding(16.dp)
                         .wrapContentSize()
                 ) {
-                    // Passez la liste directement à la fonction items
-                    items(sortedClients) { client ->
-                        ClientVehicleInfo(client, searchText.toString())
+                    items(filteredClients) { client ->
+                        ClientVehicleInfo(client, searchText.text)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
@@ -199,61 +210,69 @@ class Home : ComponentActivity() {
     }
 
     @Composable
-    fun ClientVehicleInfo(client : Client, searchText: String, vehicleViewModel: VehicleViewModel = viewModel()) {
+    fun ClientVehicleInfo(
+        client: Client,
+        searchText: String,
+        vehicleViewModel: VehicleViewModel = viewModel()
+    ) {
         val context = LocalContext.current
         val vehicles by vehicleViewModel.getVehiclesFromClient(client.clientId)
             .observeAsState(initial = emptyList())
 
-        if (searchText.isEmpty() || clientMatchesSearch(client, vehicles, searchText)) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(color = Color(0xFFF3EDF7))
-                    .padding(15.dp)
-                    .clickable {
-                        val intent = Intent(context, ClientProfile::class.java).apply {
-                            putExtra("clientId", client.clientId)
-                        }
-                        context.startActivity(intent)
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(color = Color(0xFFF3EDF7))
+                .padding(15.dp)
+                .clickable {
+                    val intent = Intent(context, ClientProfile::class.java).apply {
+                        putExtra("clientId", client.clientId)
                     }
-            ) {
+                    context.startActivity(intent)
+                }
+        ) {
+            Text(
+                text = "${client.lastName} ${client.firstName}",
+                modifier = Modifier.padding(bottom = 4.dp),
+                fontSize = 20.sp
+            )
+            if (vehicles.isEmpty()) {
                 Text(
-                    text = "${client.lastName} ${client.firstName}",
+                    text = "Aucun véhicule",
                     modifier = Modifier.padding(bottom = 4.dp),
-                    fontSize = 20.sp
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                 )
-                if (vehicles.isEmpty()) {
-                    Text(
-                        text = "Aucun véhicule",
-                        modifier = Modifier.padding(bottom = 4.dp),
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                    )
-                } else {
-                    vehicles.joinToString(separator = "\n ") { vehicle ->
-                        buildString {
-                            append(vehicle?.registrationPlate ?: "")
-                            if (!vehicle?.brand.isNullOrEmpty() || !vehicle?.model.isNullOrEmpty()) {
+            } else {
+                vehicles.joinToString(separator = "\n ") { vehicle ->
+                    buildString {
+                        append(vehicle?.registrationPlate ?: "")
+                        if (!vehicle?.brand.isNullOrEmpty() || !vehicle?.model.isNullOrEmpty()) {
+                            append(", ")
+                            append(vehicle?.brand ?: "")
+                            if (!vehicle?.model.isNullOrEmpty()) {
                                 append(", ")
-                                append(vehicle?.brand ?: "")
-                                if (!vehicle?.model.isNullOrEmpty()) {
-                                    append(", ")
-                                    append(vehicle?.model ?: "")
-                                }
+                                append(vehicle?.model ?: "")
                             }
                         }
-                    }.let {
-                        Text(
-                            text = it,
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
                     }
+                }.let {
+                    Text(
+                        text = it,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
                 }
             }
         }
+
     }
 
-    private fun clientMatchesSearch(client: Client, vehicles: List<Vehicle>, searchText: String): Boolean {
+    private fun clientMatchesSearch(
+        client: Client,
+        vehicles: List<Vehicle>,
+        searchText: String
+    ): Boolean {
         return client.firstName.contains(searchText, ignoreCase = true) ||
                 client.lastName.contains(searchText, ignoreCase = true) ||
                 vehicles.any { vehicle ->
@@ -262,12 +281,13 @@ class Home : ComponentActivity() {
     }
 
     @Composable
-    fun HomeTitle(text : String,onBackClick: () -> Unit){
+    fun HomeTitle(text: String, onBackClick: () -> Unit) {
         // Up Bar
-        Row(modifier = Modifier
-            .height(56.dp)
-            .fillMaxWidth()
-            .background(Color(0xFFF3EDF7)) ,
+        Row(
+            modifier = Modifier
+                .height(56.dp)
+                .fillMaxWidth()
+                .background(Color(0xFFF3EDF7)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
