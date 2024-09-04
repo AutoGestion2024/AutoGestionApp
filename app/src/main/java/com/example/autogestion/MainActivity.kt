@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Home().HomeApp()
+            Home().HomeApp("")
         }
     }
 
@@ -26,5 +26,5 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    Home().HomeApp()
+    Home().HomeApp("")
 }

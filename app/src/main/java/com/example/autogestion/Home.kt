@@ -11,7 +11,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,9 +28,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +66,9 @@ import com.example.autogestion.form.ClientForm
 
 class Home : ComponentActivity() {
 
+    // Create an instance of the database
     private lateinit var database: AppDatabase
+
     private val clientViewModel: ClientViewModel by viewModels()
     private val vehicleViewModel: VehicleViewModel by viewModels()
 
@@ -62,30 +81,34 @@ class Home : ComponentActivity() {
         if (!hasRequiredPermissions()) {
             ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
         }
+
+        val textSearch = intent.getStringExtra("search_text") ?: ""
+
         enableEdgeToEdge()
         setContent {
-            HomeApp()
+            HomeApp(textSearch)
         }
     }
 
-    private fun hasRequiredPermissions(): Boolean {
+    private fun hasRequiredPermissions(): Boolean{
         return CAMERAX_PERMISSIONS.all {
             ContextCompat.checkSelfPermission(applicationContext, it) == PackageManager.PERMISSION_GRANTED
         }
     }
 
-    companion object {
+    companion object{
         private val CAMERAX_PERMISSIONS = arrayOf(
             Manifest.permission.CAMERA,
             Manifest.permission.INTERNET
         )
     }
 
+
     @Composable
-    fun HomeApp() {
+    fun HomeApp(textSearch: String) {
         val context = LocalContext.current
         val clients by getClients().observeAsState(initial = emptyList())
-        var searchText by remember { mutableStateOf(TextFieldValue("")) }
+        var searchText by remember { mutableStateOf(if (textSearch.isNotEmpty()) TextFieldValue(textSearch) else TextFieldValue("")) }
 
         val sortedClients = clients.sortedBy { it.lastName }
 
@@ -106,7 +129,8 @@ class Home : ComponentActivity() {
                         val intent = Intent(context, ClientForm::class.java)
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier
+                        .padding(16.dp)
                 ) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                 }
@@ -117,21 +141,23 @@ class Home : ComponentActivity() {
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                HomeTitle(text = "AutoGestion"){}
+                HomeTitle(text = "AutoGestion") {}
 
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
+                Row (
+                    horizontalArrangement = Arrangement.Start, // Align items horizontally
+                    verticalAlignment = Alignment.CenterVertically, // Center vertically
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                ) {
+                ){
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier
+                            .padding(end = 8.dp)
                     )
 
+                    // Search Bar
                     BasicTextField(
                         value = searchText,
                         onValueChange = { searchText = it },
@@ -141,17 +167,18 @@ class Home : ComponentActivity() {
                             .padding(end = 8.dp),
                         textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
                     )
-
                     IconButton(
                         onClick = {
                             val intent = Intent(context, Camera::class.java)
                             context.startActivity(intent)
+
                         }
                     ) {
                         Icon(
                             imageVector = Icons.Default.CameraAlt,
                             contentDescription = null,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier
+                                .padding(end = 8.dp)
                         )
                     }
                 }
@@ -163,7 +190,7 @@ class Home : ComponentActivity() {
                 ) {
                     // Passez la liste directement à la fonction items
                     items(sortedClients) { client ->
-                        ClientVehicleInfo(client, searchText.text)
+                        ClientVehicleInfo(client, searchText.toString())
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
@@ -172,7 +199,7 @@ class Home : ComponentActivity() {
     }
 
     @Composable
-    fun ClientVehicleInfo(client: Client, searchText: String) {
+    fun ClientVehicleInfo(client : Client, searchText: String, vehicleViewModel: VehicleViewModel = viewModel()) {
         val context = LocalContext.current
         val vehicles by vehicleViewModel.getVehiclesFromClient(client.clientId)
             .observeAsState(initial = emptyList())
@@ -235,7 +262,7 @@ class Home : ComponentActivity() {
     }
 
     @Composable
-    private fun HomeTitle(text : String,onBackClick: () -> Unit){
+    fun HomeTitle(text : String,onBackClick: () -> Unit){
         // Up Bar
         Row(modifier = Modifier
             .height(56.dp)
@@ -257,7 +284,7 @@ class Home : ComponentActivity() {
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview() {
-        Home().HomeApp()
+        Home().HomeApp("")
     }
 
 

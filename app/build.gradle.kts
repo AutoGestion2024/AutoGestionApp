@@ -56,15 +56,20 @@ android {
 }
 
 dependencies {
-    implementation (libs.coil.compose)
-    implementation (libs.androidx.camera.core)
-    implementation (libs.androidx.camera.camera2)
-    implementation (libs.androidx.camera.lifecycle)
-    implementation (libs.androidx.camera.view)
 
-    implementation (libs.retrofit)
-    implementation (libs.converter.gson)
-    implementation (libs.okhttp)
+    implementation("libs.compressor")
+
+    implementation(libs.coil.compose)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+
+
+    implementation(libs.retrofit)
+    // GSON
+    implementation(libs.converter.gson)
+    implementation(libs.okhttp)
 
     implementation(libs.androidx.material.icons.extended)
 
@@ -104,8 +109,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-   /* // Kotlin standard library
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")*/
+    /* // Kotlin standard library
+     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")*/
 
     // Core ktx - pour des fonctionnalités Kotlin dans Android
     implementation(libs.androidx.core.ktx.v1120)
@@ -127,6 +132,5 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-
-
 }
+
