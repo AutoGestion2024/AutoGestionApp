@@ -82,18 +82,14 @@ class ClientProfile : ComponentActivity() {
                 ) {
                     Column(modifier = Modifier.padding(16.dp).width(250.dp)) {
                         Text(
-                            text = "${currentClient.lastName} ${currentClient.firstName} ",
+                            text = "Numéro de téléphone: ${currentClient.phone}",
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         Text(
-                            text = currentClient.phone,
+                            text = "Email: ${currentClient.email?.ifEmpty {"-"}}",
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
-                        Text(
-                            text = currentClient.email ?: "",
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        Text(text = currentClient.address ?: "")
+                        Text(text = "Adresse: ${currentClient.address?.ifEmpty {"-"}} ")
                     }
 
                     Row {
@@ -133,7 +129,7 @@ class ClientProfile : ComponentActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Liste Voitures",
+                        text = "Voitures",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 16.dp)
@@ -206,7 +202,7 @@ class ClientProfile : ComponentActivity() {
             Text(text = "Numéro chassis: ${vehicle.chassisNum}", modifier = Modifier.padding(bottom = 4.dp))
             Text(text = "Marque: ${vehicle.brand}", modifier = Modifier.padding(bottom = 4.dp))
             Text(text = "Modèle: ${vehicle.model}", modifier = Modifier.padding(bottom = 4.dp))
-            Text(text = "Colour: ${vehicle.color}", modifier = Modifier.padding(bottom = 4.dp))
+            Text(text = "Couleur: ${vehicle.color}", modifier = Modifier.padding(bottom = 4.dp))
             Log.d("ClientProfile", "Client ID: ${vehicle.clientId}")
             Log.d("ClientProfile", "Vehicle ID: ${vehicle.vehicleId}")
         }
