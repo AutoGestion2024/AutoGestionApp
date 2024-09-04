@@ -108,7 +108,7 @@ class VehicleProfile : ComponentActivity() {
                             text = "Marque : ",
                             fontWeight = FontWeight.Bold
                         )
-                        Spacer(modifier = Modifier.width(38.dp))
+                        Spacer(modifier = Modifier.width(39.dp))
                         vehicle?.brand?.ifEmpty {"-"}?.let {
                             Text(
                                 text = it
@@ -122,7 +122,7 @@ class VehicleProfile : ComponentActivity() {
                             text = "Modèle : ",
                             fontWeight = FontWeight.Bold
                         )
-                        Spacer(modifier = Modifier.width(38.dp))
+                        Spacer(modifier = Modifier.width(40.dp))
                         vehicle?.model?.ifEmpty {"-"}?.let {
                             Text(
                                 text = it
@@ -308,7 +308,7 @@ class VehicleProfile : ComponentActivity() {
                         text = "Description : ",
                         fontWeight = FontWeight.Bold
                     )
-                    Spacer(modifier = Modifier.width(25.dp))
+                    Spacer(modifier = Modifier.width(28.dp))
                     repair.description?.ifEmpty { "-" }?.let {
                         Text(
                             text = it

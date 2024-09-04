@@ -92,7 +92,7 @@ class ClientProfile : ComponentActivity() {
                                 text = "N° de téléphone : ",
                                 fontWeight = FontWeight.Bold
                             )
-                            Spacer(modifier = Modifier.width(15.dp))
+                            Spacer(modifier = Modifier.width(16.dp))
                             currentClient.phone.let {
                                 Text(
                                     text = it
@@ -121,7 +121,7 @@ class ClientProfile : ComponentActivity() {
                                 text = "Email : ",
                                 fontWeight = FontWeight.Bold
                             )
-                            Spacer(modifier = Modifier.width(80.dp))
+                            Spacer(modifier = Modifier.width(82.dp))
                             currentClient.email?.ifEmpty {"-"}?.let {
                                 Text(
                                     text = it
@@ -135,7 +135,7 @@ class ClientProfile : ComponentActivity() {
                                 text = "Adresse : ",
                                 fontWeight = FontWeight.Bold
                             )
-                            Spacer(modifier = Modifier.width(63.dp))
+                            Spacer(modifier = Modifier.width(65.dp))
                             currentClient.address?.ifEmpty {"-"}?.let {
                                 Text(
                                     text = it
