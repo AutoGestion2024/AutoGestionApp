@@ -184,7 +184,7 @@ class ClientFormUpdate : ComponentActivity() {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Center
             ) {
                 Button(
                     onClick = {
