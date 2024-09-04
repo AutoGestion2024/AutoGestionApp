@@ -57,23 +57,34 @@ android {
 
 dependencies {
 
-    implementation("libs.compressor")
+    implementation (libs.coil.compose)
+    implementation (libs.androidx.camera.core)
+    implementation (libs.androidx.camera.camera2)
+    implementation (libs.androidx.camera.lifecycle)
+    implementation (libs.androidx.camera.view)
 
-    implementation(libs.coil.compose)
-    implementation(libs.androidx.camera.core)
-    implementation(libs.androidx.camera.camera2)
-    implementation(libs.androidx.camera.lifecycle)
-    implementation(libs.androidx.camera.view)
-
-
-    implementation(libs.retrofit)
-    // GSON
-    implementation(libs.converter.gson)
-    implementation(libs.okhttp)
+    implementation (libs.retrofit)
+    implementation (libs.okhttp)
 
     implementation(libs.androidx.material.icons.extended)
 
-// AndroidX Core
+    // GSON
+    implementation (libs.converter.gson)
+
+    // coroutine
+    implementation(libs.kotlinx.coroutines.core)
+    implementation (libs.kotlinx.coroutines.android)
+
+    implementation (libs.compressor)
+
+    implementation (libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx.v220)
+
+    implementation (libs.picasso)
+    implementation (libs.picasso2.okhttp3.downloader)
+
+
+    // AndroidX Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -87,7 +98,7 @@ dependencies {
     // AndroidX Testing dependencies
     testImplementation(libs.junit)
     testImplementation(libs.androidx.junit.v115)
-    androidTestImplementation(libs.androidx.junit.v115)
+    androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core.v350)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
@@ -103,14 +114,14 @@ dependencies {
     // Android Room
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)
-    kapt(libs.androidx.room.compiler)
+    kapt("androidx.room:room-compiler:2.6.1")
 
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     /* // Kotlin standard library
-     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")*/
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")*/
 
     // Core ktx - pour des fonctionnalités Kotlin dans Android
     implementation(libs.androidx.core.ktx.v1120)
@@ -133,4 +144,3 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
 }
-
