@@ -111,7 +111,7 @@ class Home : ComponentActivity() {
     @Composable
     fun HomeApp(textSearch: String) {
         val context = LocalContext.current
-        val clients by getClients().observeAsState(initial = emptyList())
+        val clients by clientViewModel.getAllClients().observeAsState(initial = emptyList())
         var searchText by remember {
             mutableStateOf(
                 if (textSearch.isNotEmpty()) TextFieldValue(
@@ -306,10 +306,4 @@ class Home : ComponentActivity() {
     fun DefaultPreview() {
         Home().HomeApp("")
     }
-
-
-    private fun getClients(): LiveData<List<Client>> {
-        return database.clientDao().getAllClients()
-    }
-
 }
