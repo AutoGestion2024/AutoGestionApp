@@ -32,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.autogestion.Utils.DateUtils
 import com.example.autogestion.Utils.NavigationUtils.navigateToClientFormUpdate
 import com.example.autogestion.Utils.NavigationUtils.navigateToHome
 import com.example.autogestion.Utils.NavigationUtils.navigateToVehicleFormAdd
@@ -94,7 +95,7 @@ class ClientProfile : ComponentActivity() {
 
                         // Formatting client's birthday for display
                         val formattedDate = currentClient.birthDate?.let {
-                            dateFormat.format(it)
+                            DateUtils.dateFormat.format(it)
                         } ?: "-"
 
                         // Display clients info
