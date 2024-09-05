@@ -1,8 +1,9 @@
 package com.example.autogestion
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -26,10 +27,14 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
+import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import com.example.autogestion.data.Repair
 import androidx.compose.ui.Modifier
@@ -38,14 +43,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
 import com.example.autogestion.form.RepairFormAdd
 import com.example.autogestion.form.RepairFormUpdate
 import com.example.autogestion.form.VehicleFormUpdate
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -78,12 +86,48 @@ class VehicleProfile : ComponentActivity() {
         val vehicle by vehicleViewModel.getVehicleById(vehicleId).observeAsState()
         val repairList by repairViewModel.getRepairsFromVehicle(vehicleId).observeAsState(emptyList())
 
+        var showDialogVehicle by remember { mutableStateOf(false) }
+
 
         val coroutineScope = rememberCoroutineScope()
 
         Column(modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()) {
+
+            if (showDialogVehicle) {
+                AlertDialog(
+                    onDismissRequest = { showDialogVehicle = false },
+                    title = {
+                        Text(text = "Confirmation de suppression")
+                    },
+                    text = {
+                        Text("Êtes-vous sûr de vouloir supprimer ce véhicule ?")
+                    },
+                    confirmButton = {
+                        Button(onClick = {
+                            coroutineScope.launch {
+                                val clientId = vehicle!!.clientId
+                                vehicleViewModel.deleteVehicle(vehicle!!)
+                                val intent = Intent(context, ClientProfile::class.java).apply {
+                                    putExtra("clientId", clientId)
+                                }
+                                context.startActivity(intent)
+                            }
+                        }) {
+                            Text("Supprimer")
+                        }
+                    },
+                    dismissButton = {
+                        Button(onClick = {
+                            showDialogVehicle = false
+                        }) {
+                            Text("Annuler")
+                        }
+                    }
+                )
+            }
+
 
             NavBar(text = "Profile Voiture") {
                 val intent = Intent(context, ClientProfile::class.java).apply {
@@ -100,7 +144,9 @@ class VehicleProfile : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Car information
-                Column(modifier = Modifier.padding(16.dp).width(250.dp)) {
+                Column(modifier = Modifier
+                    .padding(16.dp)
+                    .width(250.dp)) {
                     Text(
                         text = "${vehicle?.brand}, ${vehicle?.model}",
                         modifier = Modifier.padding(bottom = 4.dp)
@@ -120,20 +166,12 @@ class VehicleProfile : ComponentActivity() {
 
                     Button(
                         onClick = {
-                            vehicle?.greyCard?.let { uriString ->
-                                try {
-                                    val uri = Uri.parse(uriString)
-                                    val intent = Intent(Intent.ACTION_VIEW).apply {
-                                        setDataAndType(uri, "image/*")
-                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                    }
-                                    context.startActivity(intent)
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
+                            vehicle?.let { currentVehicle ->
+                                val filePath = currentVehicle.greyCard
+                                filePath?.let { openFile(it) }
                             }
-                        },
-                        modifier = Modifier.padding(bottom = 4.dp)
+
+                        }
                     ) {
                         Text(text = "Voir Carte Grise")
                     }
@@ -142,14 +180,9 @@ class VehicleProfile : ComponentActivity() {
 
                 Row {
                     IconButton(onClick = {
-                        coroutineScope.launch {
-                            val clientId = vehicle!!.clientId
-                            vehicleViewModel.deleteVehicle(vehicle!!)
-                            val intent = Intent(context, ClientProfile::class.java).apply {
-                                putExtra("clientId", clientId)
-                            }
-                            context.startActivity(intent)
-                        }
+                        showDialogVehicle = true
+
+
                     }) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_delete_24),
@@ -236,6 +269,8 @@ class VehicleProfile : ComponentActivity() {
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
 
+        var showDialogRepair by remember { mutableStateOf(false) }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -246,7 +281,7 @@ class VehicleProfile : ComponentActivity() {
             verticalAlignment = Alignment.CenterVertically
         ){
 
-            Column(modifier = Modifier.width(250.dp)) {
+            Column(modifier = Modifier.width(200.dp)) {
                 Text(text = "${repair.description}", modifier = Modifier.padding(bottom = 4.dp))
                 Text(text = "Date reparation : ", modifier = Modifier.padding(bottom = 4.dp))
                 Text(text = "Facture" , modifier = Modifier.padding(bottom = 4.dp))
@@ -254,14 +289,7 @@ class VehicleProfile : ComponentActivity() {
 
             Row {
                 IconButton(onClick = {
-                    coroutineScope.launch {
-                        val vehicleId = repair.vehicleId
-                        repairViewModel.deleteRepair(repair!!)
-                        val intent = Intent(context, VehicleProfile::class.java).apply {
-                            putExtra("vehicleId", vehicleId)
-                        }
-                        context.startActivity(intent)
-                    }
+                    showDialogRepair = true
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_delete_24),
@@ -281,9 +309,104 @@ class VehicleProfile : ComponentActivity() {
                         tint = Color.Black
                     )
                 }
+
             }
 
+            IconButton(onClick = {
+                repair.let { currentRepair ->
+                    val filePath = currentRepair.invoice
+                    filePath?.let { openFile(it) }
+                }
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_attach_file_24),
+                    contentDescription = "Fichier Facture Joint",
+                    tint = Color.Black
+                )
+            }
+
+
+        }
+        if (showDialogRepair) {
+            AlertDialog(
+                onDismissRequest = { showDialogRepair = false },
+                title = {
+                    Text(text = "Confirmation de suppression")
+                },
+                text = {
+                    Text("Êtes-vous sûr de vouloir supprimer cette réparation ?")
+                },
+                confirmButton = {
+                    Button(onClick = {
+                    coroutineScope.launch {
+                        val vehicleId = repair.vehicleId
+                        repairViewModel.deleteRepair(repair!!)
+                        val intent = Intent(context, VehicleProfile::class.java).apply {
+                            putExtra("vehicleId", vehicleId)
+                        }
+                        context.startActivity(intent)
+                    }
+                    }) {
+                        Text("Supprimer")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = {
+                        showDialogRepair = false
+                    }) {
+                        Text("Annuler")
+                    }
+                }
+            )
         }
 
+
     }
+
+    private fun openFile(filePath: String) {
+        // Create a File object with the given file path
+        val file = File(filesDir, filePath)
+        Log.d("VehicleProfile", "File path: ${file.absolutePath}")
+
+        if (file.exists()) {
+            // Obtain the URI for the file using FileProvider
+            val uri = FileProvider.getUriForFile(this, "com.example.autogestion.fileprovider", file)
+
+            // Determine the MIME type of the file
+            val mimeType = when {
+                filePath.endsWith(".jpg", ignoreCase = true) || filePath.endsWith(".jpeg", ignoreCase = true) -> "image/jpeg"
+                filePath.endsWith(".png", ignoreCase = true) -> "image/png"
+                filePath.endsWith(".pdf", ignoreCase = true) -> "application/pdf"
+                else -> "*/*" // For other types of files
+            }
+
+            // Create an Intent to open the file
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, mimeType)
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+
+            // Start the activity to display the file
+            startActivity(intent)
+        } else {
+            // Show an error message if the file does not exist
+            Toast.makeText(this, "The file does not exist", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun PreviewRepairItemPreview() {
+
+        val exampleRepair = Repair(
+            repairId = 1,                   // Remarquez que repairId est un entier et auto-généré par la base de données.
+            vehicleId = 123,                // ID du véhicule (clé étrangère).
+            description = "Remplacement des freins aaaaaaaaaaaaaaaaaaaaaa", // Description de la réparation.
+            date = System.currentTimeMillis(),       // Utilisation du timestamp actuel pour la date.
+            invoice = "Facture-2024-001",             // Numéro de facture.
+            paid = true                           // Statut de paiement.
+        )
+        RepairItem(exampleRepair)
+    }
+
 }
