@@ -1,4 +1,4 @@
-package com.example.autogestion.form
+package com.example.autogestion.ui.form
 
 import android.content.Intent
 import android.net.Uri
@@ -17,12 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.autogestion.NavBar
-import com.example.autogestion.VehicleProfile
+import com.example.autogestion.ui.profiles.VehicleProfile
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.VehicleViewModel
 import kotlinx.coroutines.launch
-import com.example.autogestion.Utils.getFilePathFromUri
+import com.example.autogestion.ui.utils.getFilePathFromUri
+import com.example.autogestion.ui.components.NavBar
 
 class VehicleFormUpdate : ComponentActivity() {
 

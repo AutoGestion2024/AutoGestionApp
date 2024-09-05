@@ -1,11 +1,8 @@
-package com.example.autogestion
+package com.example.autogestion.ui
 
 import android.graphics.Bitmap
-import android.net.Uri
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class CameraViewModel: ViewModel() {

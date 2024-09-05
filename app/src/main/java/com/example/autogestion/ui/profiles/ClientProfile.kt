@@ -1,4 +1,4 @@
-package com.example.autogestion
+package com.example.autogestion.ui.profiles
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -32,14 +32,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.autogestion.Utils.DateUtils
-import com.example.autogestion.Utils.NavigationUtils.navigateToClientFormUpdate
-import com.example.autogestion.Utils.NavigationUtils.navigateToHome
-import com.example.autogestion.Utils.NavigationUtils.navigateToVehicleFormAdd
-import com.example.autogestion.Utils.NavigationUtils.navigateToVehicleProfile
+import com.example.autogestion.R
+import com.example.autogestion.ui.utils.DateUtils
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToClientFormUpdate
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToHome
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToVehicleFormAdd
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToVehicleProfile
+import com.example.autogestion.data.Client
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
+import com.example.autogestion.ui.components.NavBar
+import com.example.autogestion.ui.components.SharedComposables.DisplayEntityInfoRow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -78,10 +82,11 @@ class ClientProfile : ComponentActivity() {
             .statusBarsPadding()) {
 
             // Display client name and redirect to Home on GoBack button
-            NavBar(text = "${client?.lastName} ${client?.firstName}") {
+            NavBar(text = clientProfileTitle(client)) {
                 navigateToHome(context)
             }
 
+            // Display clients info
             client?.let { currentClient ->
                 Row(
                     modifier = Modifier
@@ -98,7 +103,7 @@ class ClientProfile : ComponentActivity() {
                             DateUtils.dateFormat.format(it)
                         } ?: "-"
 
-                        // Display clients info
+                        // Display clients information
                         DisplayEntityInfoRow("N° de téléphone : ", currentClient.phone, 16)
                         DisplayEntityInfoRow("Date de naissance : ", formattedDate, 2)
                         DisplayEntityInfoRow("Email : ", currentClient.email, 82)
@@ -106,6 +111,7 @@ class ClientProfile : ComponentActivity() {
                     }
 
                     // Row for delete and modify buttons.
+                    // TODO refactor buttons
                     Row {
                         // Button to trigger a deletion confirmation dialog.
                         IconButton(onClick = {
@@ -206,6 +212,14 @@ class ClientProfile : ComponentActivity() {
 
     }
 
+    private fun clientProfileTitle(client: Client?): String {
+        return if (client != null) {
+            "${client.lastName} ${client.firstName}"
+        } else {
+            "Client Unknown"
+        }
+    }
+
     @Composable
     fun DisplayVehicleList(vehicleList: List<Vehicle?>) {
         LazyColumn(
@@ -243,21 +257,4 @@ class ClientProfile : ComponentActivity() {
         }
     }
 
-    @Composable
-    fun DisplayEntityInfoRow(rowContentName: String, rowContentValue: String?, spacerWidth: Int){
-        Row(
-            modifier = Modifier.padding(bottom = 4.dp)
-        ) {
-            Text(
-                text = rowContentName,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.width(spacerWidth.dp))
-            rowContentValue?.ifEmpty {"-"}?.let {
-                Text(
-                    text = it
-                )
-            }
-        }
-    }
 }

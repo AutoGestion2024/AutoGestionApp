@@ -1,4 +1,4 @@
-package com.example.autogestion.ui.theme.components
+package com.example.autogestion.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-class SharedComposables {
+object SharedComposables {
     @Composable
     fun DisplayEntityInfoRow(rowContentName: String, rowContentValue: String?, spacerWidth: Int){
         Row(

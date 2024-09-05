@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.autogestion
+package com.example.autogestion.ui.components
 
 import com.example.autogestion.webService.RetrofitCallClass
 import android.Manifest
@@ -55,6 +55,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.autogestion.ui.CameraViewModel
+import com.example.autogestion.ui.Home
 import java.io.File
 
 
@@ -66,7 +68,7 @@ class Camera : ComponentActivity(){
         super.onCreate(savedInstanceState)
         // Check for necessary permissions and request if not granted
         if (!hasRequiredPermissions(this)) {
-            ActivityCompat.requestPermissions(this, Camera.CAMERAX_PERMISSIONS, 0)
+            ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
         }
         enableEdgeToEdge()
         setContent {

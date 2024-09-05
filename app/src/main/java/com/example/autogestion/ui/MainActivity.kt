@@ -1,15 +1,11 @@
-package com.example.autogestion
+package com.example.autogestion.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.autogestion.data.AppDatabase
-import com.example.autogestion.data.viewModels.ClientViewModel
 
 
 class MainActivity : ComponentActivity() {

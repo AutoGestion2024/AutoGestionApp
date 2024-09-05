@@ -1,15 +1,14 @@
-package com.example.autogestion.Utils
+package com.example.autogestion.ui.utils
 
 import android.app.Activity
-import androidx.activity.ComponentActivity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import com.example.autogestion.ClientProfile
-import com.example.autogestion.Home
-import com.example.autogestion.VehicleProfile
-import com.example.autogestion.form.ClientFormUpdate
-import com.example.autogestion.form.VehicleFormAdd
+import com.example.autogestion.ui.profiles.ClientProfile
+import com.example.autogestion.ui.Home
+import com.example.autogestion.ui.profiles.VehicleProfile
+import com.example.autogestion.ui.form.ClientFormUpdate
+import com.example.autogestion.ui.form.VehicleFormAdd
 
 object NavigationUtils {
     fun navigateTo(context: Context, destination: Class<*>, shouldFinish: Boolean = false, extras: Bundle? = null) {

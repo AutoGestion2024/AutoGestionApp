@@ -1,7 +1,6 @@
-package com.example.autogestion
+package com.example.autogestion.ui.profiles
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -44,20 +43,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import com.example.autogestion.Utils.DateUtils
+import com.example.autogestion.R
+import com.example.autogestion.ui.components.NavBar
+import com.example.autogestion.ui.components.SharedComposables.DisplayEntityInfoRow
+import com.example.autogestion.ui.utils.DateUtils
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToClientProfile
+import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
-import com.example.autogestion.form.RepairFormAdd
-import com.example.autogestion.form.RepairFormUpdate
-import com.example.autogestion.form.VehicleFormUpdate
+import com.example.autogestion.ui.form.RepairFormAdd
+import com.example.autogestion.ui.form.RepairFormUpdate
+import com.example.autogestion.ui.form.VehicleFormUpdate
 import kotlinx.coroutines.launch
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class VehicleProfile : ComponentActivity() {
 
@@ -124,13 +125,11 @@ class VehicleProfile : ComponentActivity() {
                 )
             }
 
-            NavBar(text = "${vehicle?.brand?.ifEmpty {"-"}} ${vehicle?.model?.ifEmpty {"-"}} ${vehicle?.color?.ifEmpty {"-"}}") {
-                val intent = Intent(context, ClientProfile::class.java).apply {
-                    putExtra("clientId", vehicle?.clientId)
-                }
-                context.startActivity(intent)
+            NavBar(text = vehicleProfileTitle(vehicle)) {
+                vehicle?.let { navigateToClientProfile(context, it.clientId) }
             }
 
+            // Display vehicle information
             vehicle?.let { currentVehicle ->
             Row(
                 modifier = Modifier
@@ -138,78 +137,14 @@ class VehicleProfile : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Car information
-                Column(modifier = Modifier.padding(16.dp).width(250.dp)) {
-                    Row(
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    ) {
-                        Text(
-                            text = "Marque : ",
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.width(39.dp))
-                        vehicle?.brand?.ifEmpty {"-"}?.let {
-                            Text(
-                                text = it
-                            )
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    ) {
-                        Text(
-                            text = "Modèle : ",
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.width(40.dp))
-                        vehicle?.model?.ifEmpty {"-"}?.let {
-                            Text(
-                                text = it
-                            )
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    ) {
-                        Text(
-                            text = "Couleur : ",
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.width(38.dp))
-                        vehicle?.color?.ifEmpty {"-"}?.let {
-                            Text(
-                                text = it
-                            )
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    ) {
-                        Text(
-                            text = "N° de chassis : ",
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.width(2.dp))
-                        vehicle?.chassisNum?.ifEmpty {"-"}?.let {
-                            Text(
-                                text = it
-                            )
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    ) {
-                        Text(
-                            text = "Plaque: ",
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.width(48.dp))
-                        vehicle?.registrationPlate?.let {
-                            Text(
-                                text = it
-                            )
-                        }
-                    }
+                Column(modifier = Modifier
+                    .padding(16.dp)
+                    .width(250.dp)) {
+                    DisplayEntityInfoRow("Marque : ", vehicle?.brand, 39)
+                    DisplayEntityInfoRow("Modèle : ", vehicle?.model, 40)
+                    DisplayEntityInfoRow("Couleur : ", vehicle?.color, 38)
+                    DisplayEntityInfoRow("N° de chassis : ", vehicle?.chassisNum, 2)
+                    DisplayEntityInfoRow("Plaque: ", vehicle?.registrationPlate, 48)
 
                     Button(
                         onClick = {
@@ -225,6 +160,8 @@ class VehicleProfile : ComponentActivity() {
 
                 }
 
+                // Editing and deleting buttons
+                // TODO rfr buttons
                 Row {
                     IconButton(onClick = {
                         showDialogVehicle = true
@@ -253,7 +190,8 @@ class VehicleProfile : ComponentActivity() {
                 }
             }
 
-            // Header add button + text
+            // Header Repair list and add button
+                // TODO rfr buttons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -288,19 +226,10 @@ class VehicleProfile : ComponentActivity() {
             )
 
             // Repair List
-            LazyColumn(modifier = Modifier
-                .padding(16.dp)
-                .wrapContentSize()) {
+           DisplayRepairList(repairList)
 
-                items(repairList.size) { index ->
-                    repairList[index]?.let { RepairItem(it) }
-                    if (index < repairList.size - 1) {
-
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                }
-            }
             } ?: run {
+                // Text displayed if vehicle is not found
                 Text(
                     text = "Véhicule non trouvé",
                     modifier = Modifier.padding(16.dp),
@@ -310,9 +239,24 @@ class VehicleProfile : ComponentActivity() {
         }
     }
 
+    @Composable
+    fun DisplayRepairList(repairList: List<Repair?>) {
+        LazyColumn(modifier = Modifier
+            .padding(16.dp)
+            .wrapContentSize()) {
+
+            items(repairList.size) { index ->
+                repairList[index]?.let { DisplayRepairItem(it) }
+                if (index < repairList.size - 1) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+
     // One Car
     @Composable
-    fun RepairItem(repair: Repair) {
+    fun DisplayRepairItem(repair: Repair) {
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
 
@@ -329,60 +273,33 @@ class VehicleProfile : ComponentActivity() {
         ){
 
             Column(modifier = Modifier.width(200.dp)) {
-                Row(
-                    modifier = Modifier.padding(bottom = 4.dp)
-                ) {
-                    Text(
-                        text = "Description : ",
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.width(28.dp))
-                    repair.description?.ifEmpty { "-" }?.let {
-                        Text(
-                            text = it
-                        )
-                    }
+
+                // Formatting repair date and invoice status for display
+                val formattedDate = repair.date?.let{
+                    DateUtils.dateFormat.format(it)
+                } ?: "-"
+
+                val invoiceStatus = when (repair.paid) {
+                    true -> "Payée"
+                    false -> "Pas payée"
+                    else -> "-"
                 }
-                Row(
-                    modifier = Modifier.padding(bottom = 4.dp)
-                ) {
-                    Text(
-                        text = "Date réparation : ",
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.width(2.dp))
-                    Text(
-                        text =  when(repair.date){
-                            null -> "-"
-                            else -> DateUtils.dateFormat.format(repair.date)
-                        }
-                    )
-                }
-                Row(
-                    modifier = Modifier.padding(bottom = 4.dp)
-                ) {
-                    Text(
-                        text =  "Facture: ",
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.width(55.dp))
-                    Text(
-                        text = when (repair.paid) {
-                            true -> "Payée"
-                            false -> "Pas payée"
-                            else -> "-"
-                        }
-                    )
-                }
+
+                // Display repair information
+                DisplayEntityInfoRow("Description : ", repair.description, 28)
+                DisplayEntityInfoRow("Date réparation : ", formattedDate, 2)
+                DisplayEntityInfoRow("Facture: ", invoiceStatus, 55)
             }
 
+            // Row for delete and modify buttons.
+            // TODO rfr buttons
             Row {
                 IconButton(onClick = {
                     showDialogRepair = true
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_delete_24),
-                        contentDescription = "Supprimer",
+                        contentDescription = "Delete",
                         tint = Color.Black
                     )
                 }
@@ -394,7 +311,7 @@ class VehicleProfile : ComponentActivity() {
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_edit_24),
-                        contentDescription = "Modifier",
+                        contentDescription = "Modify",
                         tint = Color.Black
                     )
                 }
@@ -416,6 +333,8 @@ class VehicleProfile : ComponentActivity() {
 
 
         }
+
+        // TODO rfr dialog
         if (showDialogRepair) {
             AlertDialog(
                 onDismissRequest = { showDialogRepair = false },
@@ -452,6 +371,18 @@ class VehicleProfile : ComponentActivity() {
 
     }
 
+    fun vehicleProfileTitle(vehicle: Vehicle?): String {
+        if (vehicle == null) {
+            return "Unavailable"
+        }
+        return listOfNotNull(
+            vehicle.brand?.ifEmpty { "-" },
+            vehicle.model?.ifEmpty { "-" },
+            vehicle.color?.ifEmpty { "-" }
+        ).joinToString(" ")
+    }
+
+    // TODO move
     private fun openFile(filePath: String) {
         // Create a File object with the given file path
         val file = File(filesDir, filePath)
