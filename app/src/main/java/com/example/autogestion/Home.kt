@@ -137,13 +137,6 @@ class Home : ComponentActivity() {
             }
         }
 
-        if (filteredClients.size == 1) {
-            val intent = Intent(context, ClientProfile::class.java).apply {
-                putExtra("clientId", filteredClients[0].clientId)
-            }
-            context.startActivity(intent)
-        }
-
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(
