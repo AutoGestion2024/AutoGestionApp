@@ -4,6 +4,7 @@ package com.example.autogestion
 
 import com.example.autogestion.webService.RetrofitCallClass
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -64,7 +65,7 @@ class Camera : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Check for necessary permissions and request if not granted
-        if (!hasRequiredPermissions()) {
+        if (!hasRequiredPermissions(this)) {
             ActivityCompat.requestPermissions(this, Camera.CAMERAX_PERMISSIONS, 0)
         }
         enableEdgeToEdge()
@@ -173,19 +174,18 @@ class Camera : ComponentActivity(){
     }
 
 
-
-    private fun hasRequiredPermissions(): Boolean{
-        // Check if all required permissions are granted
-        return CAMERAX_PERMISSIONS.all {
-            ContextCompat.checkSelfPermission(applicationContext, it) == PackageManager.PERMISSION_GRANTED
-        }
-    }
-
     companion object{
-        private val CAMERAX_PERMISSIONS = arrayOf(
+        val CAMERAX_PERMISSIONS = arrayOf(
             Manifest.permission.CAMERA,
             Manifest.permission.INTERNET
         )
+
+        fun hasRequiredPermissions(applicationContext: Context): Boolean{
+            // Check if all required permissions are granted
+            return CAMERAX_PERMISSIONS.all {
+                ContextCompat.checkSelfPermission(applicationContext, it) == PackageManager.PERMISSION_GRANTED
+            }
+        }
     }
 }
 
