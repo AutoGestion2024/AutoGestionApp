@@ -40,14 +40,14 @@
         <activity android:name=".ui.components.Camera" />
         <activity android:name=".ui.profiles.ClientProfile" />
         <activity android:name=".ui.profiles.VehicleProfile" />
-        <activity android:name=".ui.form.ClientForm" />
-        <activity android:name=".ui.form.VehicleForm" />
-        <activity android:name=".ui.form.RepairForm" />
-        <activity android:name=".ui.form.ClientFormUpdate" />
-        <activity android:name=".ui.form.VehicleFormUpdate" />
-        <activity android:name=".ui.form.RepairFormUpdate" />
-        <activity android:name=".ui.form.VehicleFormAdd" />
-        <activity android:name=".ui.form.RepairFormAdd" />
+        <activity android:name=".ui.forms.ClientForm" />
+        <activity android:name=".ui.forms.VehicleForm" />
+        <activity android:name=".ui.forms.RepairForm" />
+        <activity android:name=".ui.forms.ClientFormUpdate" />
+        <activity android:name=".ui.forms.VehicleFormUpdate" />
+        <activity android:name=".ui.forms.RepairFormUpdate" />
+        <activity android:name=".ui.forms.VehicleFormAdd" />
+        <activity android:name=".ui.forms.RepairFormAdd" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

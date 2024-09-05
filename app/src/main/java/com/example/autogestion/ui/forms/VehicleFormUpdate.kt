@@ -1,4 +1,4 @@
-package com.example.autogestion.ui.form
+package com.example.autogestion.ui.forms
 
 import android.content.Intent
 import android.net.Uri

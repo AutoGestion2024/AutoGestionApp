@@ -1,4 +1,4 @@
-package com.example.autogestion.ui.form
+package com.example.autogestion.ui.forms
 
 import android.content.Intent
 import android.net.Uri
@@ -27,6 +27,9 @@ import com.example.autogestion.ui.components.NavBar
 import com.example.autogestion.ui.profiles.VehicleProfile
 import com.example.autogestion.data.Repair
 import com.example.autogestion.data.viewModels.RepairViewModel
+import com.example.autogestion.ui.utils.DateUtils.dateFormat
+import com.example.autogestion.ui.utils.DateUtils.showDatePicker
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToVehicleProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.ParseException
@@ -60,13 +63,13 @@ class RepairFormAdd : ComponentActivity() {
     ) {
         val context = LocalContext.current
 
+        // State management for input fields with initial values if provided
         var description by remember { mutableStateOf(TextFieldValue(initDescription)) }
         var date by remember { mutableStateOf(TextFieldValue(initDate)) }
         var invoice by remember { mutableStateOf<String?>(initInvoice) }
         val calendar = Calendar.getInstance()
         var paid by remember { mutableStateOf(initPaid) }
 
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         var isDateError by remember { mutableStateOf(false) }
 
         val coroutineScope = rememberCoroutineScope()
@@ -80,6 +83,9 @@ class RepairFormAdd : ComponentActivity() {
             }
         }
 
+        // Form display and user input handling.
+        // Each field is bound to a specific part of the repair's data.
+        // Validators are set to trigger visual indicators of errors (isError).
         Scaffold { padding ->
             Column(
                 modifier = Modifier
@@ -87,12 +93,9 @@ class RepairFormAdd : ComponentActivity() {
                     .padding(padding)
             ) {
 
-                NavBar(text = "Ajouter une réparation",
+                NavBar(text = "Formulaire réparation",
                     onBackClick = {
-                        val intent = Intent(context, VehicleProfile::class.java).apply {
-                            putExtra("vehicleId", vehicleId)
-                        }
-                        context.startActivity(intent)
+                        navigateToVehicleProfile(context, vehicleId)
                     }
                 )
 
@@ -114,7 +117,7 @@ class RepairFormAdd : ComponentActivity() {
                     isError = isDateError,
                     trailingIcon = {
                         IconButton(onClick = {
-                            val datePickerDialog = android.app.DatePickerDialog(
+                            /*val datePickerDialog = android.app.DatePickerDialog(
                                 context,
                                 { _, year, month, dayOfMonth ->
                                     calendar.set(year, month, dayOfMonth)
@@ -126,6 +129,11 @@ class RepairFormAdd : ComponentActivity() {
                                 calendar.get(Calendar.DAY_OF_MONTH)
                             )
                             datePickerDialog.show()
+                            */
+                            showDatePicker(context, calendar) { newDate ->
+                            date = TextFieldValue(newDate)
+                            isDateError = false
+                            }
                         }) {
                             Icon(Icons.Default.CalendarToday, contentDescription = "Select Date")
                         }
@@ -168,6 +176,7 @@ class RepairFormAdd : ComponentActivity() {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Button to submit form and create repair
                 Button(
                     onClick = {
                         coroutineScope.launch(Dispatchers.IO) {
@@ -190,29 +199,17 @@ class RepairFormAdd : ComponentActivity() {
 
                             coroutineScope.launch {
                                 repairViewModel.addRepair(repair)
-                                val intent = Intent(context, VehicleProfile::class.java).apply {
-                                    putExtra("vehicleId", repair.vehicleId)
-                                }
-                                context.startActivity(intent)
+                                navigateToVehicleProfile(context, repair.vehicleId)
                             }
                         }
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                 ) {
-                    Text("Enregistrer la réparation")
+                    Text("Enregistrer")
                 }
             }
         }
     }
-
-    private fun redirectToHome(context: android.content.Context) {
-        val intent = Intent(context, Home::class.java)
-        context.startActivity(intent)
-        if (context is ComponentActivity) {
-            context.finish()
-        }
-    }
-
 
     @Preview(showBackground = true)
     @Composable

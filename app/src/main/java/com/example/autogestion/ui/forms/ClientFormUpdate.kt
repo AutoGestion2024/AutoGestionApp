@@ -1,4 +1,4 @@
-package com.example.autogestion.ui.form
+package com.example.autogestion.ui.forms
 
 import android.app.DatePickerDialog
 import android.content.Intent
@@ -24,6 +24,8 @@ import com.example.autogestion.ui.Home
 import com.example.autogestion.ui.components.NavBar
 import com.example.autogestion.data.Client
 import com.example.autogestion.data.viewModels.ClientViewModel
+import com.example.autogestion.ui.utils.DateUtils.dateFormat
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToClientProfile
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -64,23 +66,27 @@ class ClientFormUpdate : ComponentActivity() {
     ) {
         val context = LocalContext.current
 
+        // State management for form fields, with initial values set from the client object.
         var firstName by rememberSaveable { mutableStateOf(client.firstName) }
         var lastName by rememberSaveable { mutableStateOf(client.lastName) }
         var phoneNumber by rememberSaveable { mutableStateOf(client.phone) }
         var email by rememberSaveable { mutableStateOf(client.email ?: "") }
-        var birthDate by rememberSaveable { mutableStateOf(formatDate(client.birthDate)) }
+        var birthDate by rememberSaveable { mutableStateOf(dateFormat.format(client.birthDate)) }
         var address by rememberSaveable { mutableStateOf(client.address ?: "") }
 
+        // Error state management for form validation.
         var isFirstNameError by remember { mutableStateOf(false) }
         var isLastNameError by remember { mutableStateOf(false) }
         var isPhoneError by remember { mutableStateOf(false) }
         var isBirthDateError by remember { mutableStateOf(false) }
         var phoneExistsError by remember { mutableStateOf(false) }
 
-        val coroutineScope = rememberCoroutineScope()
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        // Instance for managing dates
         val calendar = Calendar.getInstance()
 
+        val coroutineScope = rememberCoroutineScope()
+
+        // Form display and user input handling
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -88,15 +94,15 @@ class ClientFormUpdate : ComponentActivity() {
         ) {
 
             NavBar(
-                text = "Modifier le Client",
+                text = "Modifier Client",
                 onBackClick = {
-                    val intent = Intent(context, ClientProfile::class.java).apply {
-                        putExtra("clientId", client.clientId)
-                    }
-                    context.startActivity(intent)
+                    navigateToClientProfile(context, client.clientId)
                 }
             )
 
+            // Form display and user input handling.
+            // Each field is bound to a specific part of the client's data, and updates are managed by state variables.
+            // Validators are set to trigger visual indicators of errors (isError).
             OutlinedTextField(
                 value = firstName,
                 onValueChange = { firstName = it },
@@ -180,6 +186,7 @@ class ClientFormUpdate : ComponentActivity() {
             )
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Form submission button with validation logic.
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
@@ -229,22 +236,6 @@ class ClientFormUpdate : ComponentActivity() {
                     Text("Enregistrer les modifications")
                 }
             }
-        }
-    }
-
-    private fun redirectToHome(context: android.content.Context) {
-        val intent = Intent(context, Home::class.java)
-        context.startActivity(intent)
-        if (context is ComponentActivity) {
-            context.finish()
-        }
-    }
-
-    private fun formatDate(timestamp: Long?): String {
-        return if (timestamp != null && timestamp > 0) {
-            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(timestamp))
-        } else {
-            ""
         }
     }
 }

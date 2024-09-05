@@ -1,4 +1,4 @@
-package com.example.autogestion.ui.form
+package com.example.autogestion.ui.forms
 
 import android.content.Intent
 import android.net.Uri
@@ -19,12 +19,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.autogestion.ui.components.NavBar
 import com.example.autogestion.ui.profiles.VehicleProfile
 import com.example.autogestion.data.Repair
 import com.example.autogestion.data.viewModels.RepairViewModel
+import com.example.autogestion.ui.utils.DateUtils.dateFormat
+import com.example.autogestion.ui.utils.DateUtils.showDatePicker
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToVehicleProfile
 import kotlinx.coroutines.launch
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -68,18 +72,21 @@ class RepairFormUpdate : ComponentActivity() {
     ) {
         val context = LocalContext.current
 
+        // State management for form fields, with initial values set from the client object.
         var description by remember { mutableStateOf(repair.description ?: "") }
-        var date by remember { mutableStateOf(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(repair.date ?: 0L)) }
+        var date by remember { mutableStateOf(dateFormat.format(repair.date)) }
         var invoice by remember { mutableStateOf(repair.invoice ?: "") }
         var paid by remember { mutableStateOf(repair.paid ?: false) }
 
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        // Error state management for form validation.
         var isDateError by remember { mutableStateOf(false) }
 
-        val coroutineScope = rememberCoroutineScope()
+        // Instance for managing dates
         val calendar = Calendar.getInstance()
 
-        // Launcher for quote document
+        val coroutineScope = rememberCoroutineScope()
+
+        // Launcher for selecting a document file for invoice
         val invoiceLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
@@ -89,6 +96,9 @@ class RepairFormUpdate : ComponentActivity() {
             }
         }
 
+        // Form display and user input handling.
+        // Each field is bound to a specific part of the repair's data.
+        // Validators are set to trigger visual indicators of errors (isError).
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -98,10 +108,8 @@ class RepairFormUpdate : ComponentActivity() {
             NavBar(
                 text = "Modifier la Réparation",
                 onBackClick = {
-                    val intent = Intent(context, VehicleProfile::class.java).apply {
-                        putExtra("vehicleId", repair.vehicleId)
-                    }
-                    context.startActivity(intent)
+                    navigateToVehicleProfile(context, repair.vehicleId)
+
                 }
             )
 
@@ -123,7 +131,7 @@ class RepairFormUpdate : ComponentActivity() {
                 isError = isDateError,
                 trailingIcon = {
                     IconButton(onClick = {
-                        val datePickerDialog = android.app.DatePickerDialog(
+                        /*val datePickerDialog = android.app.DatePickerDialog(
                             context,
                             { _, year, month, dayOfMonth ->
                                 calendar.set(year, month, dayOfMonth)
@@ -134,7 +142,11 @@ class RepairFormUpdate : ComponentActivity() {
                             calendar.get(Calendar.MONTH),
                             calendar.get(Calendar.DAY_OF_MONTH)
                         )
-                        datePickerDialog.show()
+                        datePickerDialog.show()*/
+                        showDatePicker(context, calendar) { newDate ->
+                            date = TextFieldValue(newDate).toString()
+                            isDateError = false
+                        }
                     }) {
                         Icon(Icons.Default.CalendarToday, contentDescription = "Select Date")
                     }
@@ -181,6 +193,7 @@ class RepairFormUpdate : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Button to submit repair update form
             Button(
                 onClick = {
                     val updatedRepair = Repair(
@@ -198,10 +211,7 @@ class RepairFormUpdate : ComponentActivity() {
 
                     coroutineScope.launch {
                         repairViewModel.updateRepair(updatedRepair)
-                        val intent = Intent(context, VehicleProfile::class.java).apply {
-                            putExtra("vehicleId", repair.vehicleId)
-                        }
-                        context.startActivity(intent)
+                        navigateToVehicleProfile(context, repair.vehicleId)
                     }
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)

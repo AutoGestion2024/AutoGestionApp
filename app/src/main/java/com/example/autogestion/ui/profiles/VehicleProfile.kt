@@ -54,9 +54,9 @@ import com.example.autogestion.ui.utils.NavigationUtils.navigateToClientProfile
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
-import com.example.autogestion.ui.form.RepairFormAdd
-import com.example.autogestion.ui.form.RepairFormUpdate
-import com.example.autogestion.ui.form.VehicleFormUpdate
+import com.example.autogestion.ui.forms.RepairFormAdd
+import com.example.autogestion.ui.forms.RepairFormUpdate
+import com.example.autogestion.ui.forms.VehicleFormUpdate
 import kotlinx.coroutines.launch
 import java.io.File
 

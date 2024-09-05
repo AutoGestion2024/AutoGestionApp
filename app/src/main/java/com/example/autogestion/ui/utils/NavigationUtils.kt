@@ -7,8 +7,9 @@ import android.os.Bundle
 import com.example.autogestion.ui.profiles.ClientProfile
 import com.example.autogestion.ui.Home
 import com.example.autogestion.ui.profiles.VehicleProfile
-import com.example.autogestion.ui.form.ClientFormUpdate
-import com.example.autogestion.ui.form.VehicleFormAdd
+import com.example.autogestion.ui.forms.ClientFormUpdate
+import com.example.autogestion.ui.forms.VehicleForm
+import com.example.autogestion.ui.forms.VehicleFormAdd
 
 object NavigationUtils {
     fun navigateTo(context: Context, destination: Class<*>, shouldFinish: Boolean = false, extras: Bundle? = null) {
@@ -46,6 +47,27 @@ object NavigationUtils {
 
     fun navigateToVehicleFormAdd(context: Context, clientId: Int){
         navigateTo(context, VehicleFormAdd::class.java, false, Bundle().apply{
+            putInt("clientId", clientId)
+        })
+    }
+
+    fun navigateToVehicleForm(context: Context, firstName: String, lastName: String, phoneNumber: String, birthDate: String, address: String, email: String, registrationPlate: String = "",
+                              greyCard: String = "", chassisNum: String = "", brand: String = "", model: String = "", color: String = "", clientId: Int = 0){
+
+        navigateTo(context, VehicleForm::class.java, false, Bundle().apply {
+            putString("firstName", firstName)
+            putString("lastName", lastName)
+            putString("phoneNumber", phoneNumber)
+            putString("birthDate", birthDate)
+            putString("address", address)
+            putString("email", email)
+
+            putString("registrationPlate", registrationPlate)
+            putString("greyCard", greyCard)
+            putString("chassisNum", chassisNum)
+            putString("brand", brand)
+            putString("model", model)
+            putString("color", color)
             putInt("clientId", clientId)
         })
     }

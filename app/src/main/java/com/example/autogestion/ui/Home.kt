@@ -58,7 +58,7 @@ import com.example.autogestion.data.Client
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
-import com.example.autogestion.ui.form.ClientForm
+import com.example.autogestion.ui.forms.ClientForm
 import com.example.autogestion.ui.components.Camera
 
 

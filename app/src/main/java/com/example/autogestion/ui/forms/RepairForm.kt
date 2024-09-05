@@ -1,4 +1,4 @@
-package com.example.autogestion.ui.form
+package com.example.autogestion.ui.forms
 
 import android.content.Intent
 import android.net.Uri
@@ -31,6 +31,10 @@ import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
+import com.example.autogestion.ui.utils.DateUtils.dateFormat
+import com.example.autogestion.ui.utils.DateUtils.showDatePicker
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToHome
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToVehicleForm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.ParseException
@@ -45,6 +49,8 @@ class RepairForm : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+
+        // Extracting data from Intent that started this activity
         val firstName = intent.getStringExtra("firstName") ?: ""
         val lastName = intent.getStringExtra("lastName") ?: ""
         val phoneNumber = intent.getStringExtra("phoneNumber") ?: ""
@@ -96,18 +102,18 @@ class RepairForm : ComponentActivity() {
     ) {
         val context = LocalContext.current
 
+        // State management for input fields with initial values if provided
         var description by remember { mutableStateOf(TextFieldValue("")) }
         var date by remember { mutableStateOf(TextFieldValue("")) }
         var invoice by remember { mutableStateOf<String?>(null) }
         val calendar = Calendar.getInstance()
         var paid by remember { mutableStateOf(false) }
 
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         var isDateError by remember { mutableStateOf(false) }
 
         val coroutineScope = rememberCoroutineScope()
 
-        // Launcher for quote document
+        // Launcher for selecting a document file for invoice
         val invoiceLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
@@ -117,6 +123,9 @@ class RepairForm : ComponentActivity() {
             }
         }
 
+        // Form display and user input handling.
+        // Each field is bound to a specific part of the repair's data.
+        // Validators are set to trigger visual indicators of errors (isError).
         Scaffold { padding ->
             Column(
                 modifier = Modifier
@@ -127,23 +136,7 @@ class RepairForm : ComponentActivity() {
                 NavBar(
                     text = "Formulaire Réparation",
                     onBackClick = {
-                        val intent = Intent(context, VehicleForm::class.java).apply {
-                            putExtra("firstName", firstName)
-                            putExtra("lastName", lastName)
-                            putExtra("phoneNumber", phoneNumber)
-                            putExtra("birthDate", birthDate)
-                            putExtra("email", email)
-                            putExtra("address", address)
-                            putExtra("registrationPlate", registrationPlate)
-                            putExtra("chassisNum", chassisNum)
-                            putExtra("greyCard", greyCard)
-                            putExtra("brand", brand)
-                            putExtra("model", model)
-                            putExtra("color", color)
-                            putExtra("clientId", clientId)
-                            putExtra("vehicleId", vehicleId)
-                        }
-                        context.startActivity(intent)
+                        navigateToVehicleForm(context, firstName, lastName, phoneNumber, birthDate, email, address, registrationPlate, chassisNum, greyCard, brand, model, color, clientId)
                     }
                 )
 
@@ -165,7 +158,7 @@ class RepairForm : ComponentActivity() {
                     isError = isDateError,
                     trailingIcon = {
                         IconButton(onClick = {
-                            val datePickerDialog = android.app.DatePickerDialog(
+                            /*val datePickerDialog = android.app.DatePickerDialog(
                                 context,
                                 { _, year, month, dayOfMonth ->
                                     calendar.set(year, month, dayOfMonth)
@@ -177,6 +170,11 @@ class RepairForm : ComponentActivity() {
                                 calendar.get(Calendar.DAY_OF_MONTH)
                             )
                             datePickerDialog.show()
+                            */
+                            showDatePicker(context, calendar) { newDate ->
+                                date = TextFieldValue(newDate)
+                                isDateError = false
+                            }
                         }) {
                             Icon(Icons.Default.CalendarToday, contentDescription = "Select Date")
                         }
@@ -217,6 +215,8 @@ class RepairForm : ComponentActivity() {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
+
+                // Button to submit the form, create client, vehicle and repair in the database
                 Button(
                     onClick = {
                         coroutineScope.launch(Dispatchers.IO) {
@@ -279,8 +279,7 @@ class RepairForm : ComponentActivity() {
                                     )
 
                                     repairViewModel.addRepair(newRepair)
-
-                                    redirectToHome(context)
+                                    navigateToHome(context)
                                 } else {
                                     Log.e("RepairForm", "Failed to retrieve vehicleId")
                                 }
@@ -295,14 +294,6 @@ class RepairForm : ComponentActivity() {
                     Text("Enregistrer")
                 }
             }
-        }
-    }
-
-    private fun redirectToHome(context: android.content.Context) {
-        val intent = Intent(context, Home::class.java)
-        context.startActivity(intent)
-        if (context is ComponentActivity) {
-            context.finish()
         }
     }
 
