@@ -1,6 +1,7 @@
 package com.example.autogestion
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -128,8 +129,7 @@ class VehicleProfile : ComponentActivity() {
                 )
             }
 
-
-            NavBar(text = "Profile Voiture") {
+            NavBar(text = "${vehicle?.brand?.ifEmpty {"-"}} ${vehicle?.model?.ifEmpty {"-"}} ${vehicle?.color?.ifEmpty {"-"}}") {
                 val intent = Intent(context, ClientProfile::class.java).apply {
                     putExtra("clientId", vehicle?.clientId)
                 }
@@ -144,25 +144,77 @@ class VehicleProfile : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Car information
-                Column(modifier = Modifier
-                    .padding(16.dp)
-                    .width(250.dp)) {
-                    Text(
-                        text = "${vehicle?.brand}, ${vehicle?.model}",
+                Column(modifier = Modifier.padding(16.dp).width(250.dp)) {
+                    Row(
                         modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    Text(
-                        text = "Couleur : ${vehicle?.color}",
+                    ) {
+                        Text(
+                            text = "Marque : ",
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(39.dp))
+                        vehicle?.brand?.ifEmpty {"-"}?.let {
+                            Text(
+                                text = it
+                            )
+                        }
+                    }
+                    Row(
                         modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    Text(
-                        text = "Num. de chassis : ${vehicle?.chassisNum}",
+                    ) {
+                        Text(
+                            text = "Modèle : ",
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(40.dp))
+                        vehicle?.model?.ifEmpty {"-"}?.let {
+                            Text(
+                                text = it
+                            )
+                        }
+                    }
+                    Row(
                         modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    Text(
-                        text = "Plaque: ${vehicle?.registrationPlate}",
+                    ) {
+                        Text(
+                            text = "Couleur : ",
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(38.dp))
+                        vehicle?.color?.ifEmpty {"-"}?.let {
+                            Text(
+                                text = it
+                            )
+                        }
+                    }
+                    Row(
                         modifier = Modifier.padding(bottom = 4.dp)
-                    )
+                    ) {
+                        Text(
+                            text = "N° de chassis : ",
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        vehicle?.chassisNum?.ifEmpty {"-"}?.let {
+                            Text(
+                                text = it
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    ) {
+                        Text(
+                            text = "Plaque: ",
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(48.dp))
+                        vehicle?.registrationPlate?.let {
+                            Text(
+                                text = it
+                            )
+                        }
+                    }
 
                     Button(
                         onClick = {
@@ -215,7 +267,7 @@ class VehicleProfile : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Liste Pannes",
+                    text = "Réparations",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 16.dp)
@@ -282,9 +334,51 @@ class VehicleProfile : ComponentActivity() {
         ){
 
             Column(modifier = Modifier.width(200.dp)) {
-                Text(text = "${repair.description}", modifier = Modifier.padding(bottom = 4.dp))
-                Text(text = "Date reparation : ", modifier = Modifier.padding(bottom = 4.dp))
-                Text(text = "Facture" , modifier = Modifier.padding(bottom = 4.dp))
+                Row(
+                    modifier = Modifier.padding(bottom = 4.dp)
+                ) {
+                    Text(
+                        text = "Description : ",
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.width(28.dp))
+                    repair.description?.ifEmpty { "-" }?.let {
+                        Text(
+                            text = it
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.padding(bottom = 4.dp)
+                ) {
+                    Text(
+                        text = "Date réparation : ",
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.width(2.dp))
+                    Text(
+                        text =  when(repair.date){
+                            null -> "-"
+                            else -> dateFormat.format(repair.date)
+                        }
+                    )
+                }
+                Row(
+                    modifier = Modifier.padding(bottom = 4.dp)
+                ) {
+                    Text(
+                        text =  "Facture: ",
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.width(55.dp))
+                    Text(
+                        text = when (repair.paid) {
+                            true -> "Payée"
+                            false -> "Pas payée"
+                            else -> "-"
+                        }
+                    )
+                }
             }
 
             Row {
@@ -393,20 +487,4 @@ class VehicleProfile : ComponentActivity() {
             Toast.makeText(this, "The file does not exist", Toast.LENGTH_SHORT).show()
         }
     }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun PreviewRepairItemPreview() {
-
-        val exampleRepair = Repair(
-            repairId = 1,                   // Remarquez que repairId est un entier et auto-généré par la base de données.
-            vehicleId = 123,                // ID du véhicule (clé étrangère).
-            description = "Remplacement des freins aaaaaaaaaaaaaaaaaaaaaa", // Description de la réparation.
-            date = System.currentTimeMillis(),       // Utilisation du timestamp actuel pour la date.
-            invoice = "Facture-2024-001",             // Numéro de facture.
-            paid = true                           // Statut de paiement.
-        )
-        RepairItem(exampleRepair)
-    }
-
 }

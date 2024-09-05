@@ -92,7 +92,9 @@ class ClientFormUpdate : ComponentActivity() {
             NavBar(
                 text = "Modifier le Client",
                 onBackClick = {
-                    val intent = Intent(context, Home::class.java)
+                    val intent = Intent(context, ClientProfile::class.java).apply {
+                        putExtra("clientId", client.clientId)
+                    }
                     context.startActivity(intent)
                 }
             )
@@ -182,7 +184,7 @@ class ClientFormUpdate : ComponentActivity() {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Center
             ) {
                 Button(
                     onClick = {
