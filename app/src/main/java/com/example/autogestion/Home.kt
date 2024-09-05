@@ -1,8 +1,7 @@
 package com.example.autogestion
 
-import android.Manifest
+import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -53,14 +52,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.data.Client
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.ClientViewModel
-import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
 import com.example.autogestion.form.ClientForm
 
@@ -79,8 +75,8 @@ class Home : ComponentActivity() {
         database = AppDatabase.getDatabase(this)
         Log.d("AppDatabase", "Database instance: ${database.isOpen}")
 
-        if (!hasRequiredPermissions()) {
-            ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
+        if (!Camera.hasRequiredPermissions(this)) {
+            ActivityCompat.requestPermissions(this, Camera.CAMERAX_PERMISSIONS, 0)
         }
 
         val textSearch = intent.getStringExtra("search_text") ?: ""
@@ -90,23 +86,6 @@ class Home : ComponentActivity() {
             HomeApp(textSearch)
         }
     }
-
-    private fun hasRequiredPermissions(): Boolean {
-        return CAMERAX_PERMISSIONS.all {
-            ContextCompat.checkSelfPermission(
-                applicationContext,
-                it
-            ) == PackageManager.PERMISSION_GRANTED
-        }
-    }
-
-    companion object {
-        private val CAMERAX_PERMISSIONS = arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.INTERNET
-        )
-    }
-
 
     @Composable
     fun HomeApp(textSearch: String) {
@@ -119,28 +98,19 @@ class Home : ComponentActivity() {
                 ) else TextFieldValue("")
             )
         }
+
+        // Sorting clients and caching their vehicles for display
         val sortedClients = clients.sortedBy { it.lastName }
-        val vehicleCache = remember { mutableStateMapOf<Int, List<Vehicle>>() }
+        val vehicleCache = cacheVehiclesForClients(sortedClients = sortedClients, vehicleViewModel = vehicleViewModel)
 
-        sortedClients.forEach { client ->
-            val vehicles by vehicleViewModel.getVehiclesFromClient(client.clientId)
-                .observeAsState(initial = emptyList())
-            vehicleCache[client.clientId] = vehicles
-        }
-
-        val filteredClients = if (searchText.text.isEmpty()) {
-            sortedClients
-        } else {
-            sortedClients.filter { client ->
-                val vehicles = vehicleCache[client.clientId] ?: emptyList()
-                clientMatchesSearch(client, vehicles, searchText.text)
-            }
-        }
+        // Client filtering based on search text
+        val filteredClients = filterClients(sortedClients, searchText.text,vehicleCache)
 
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
+                        // Add new client
                         val intent = Intent(context, ClientForm::class.java)
                         context.startActivity(intent)
                     },
@@ -157,7 +127,7 @@ class Home : ComponentActivity() {
             ) {
                 HomeTitle(text = "AutoGestion") {}
 
-                // Barre de recherche
+                // Search bar
                 Row(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
@@ -195,6 +165,7 @@ class Home : ComponentActivity() {
                     }
                 }
 
+                // Client and vehicles display
                 LazyColumn(
                     modifier = Modifier
                         .padding(16.dp)
@@ -227,52 +198,56 @@ class Home : ComponentActivity() {
                 .background(color = Color(0xFFF3EDF7))
                 .padding(15.dp)
                 .clickable {
-                    val intent = Intent(context, ClientProfile::class.java).apply {
-                        putExtra("clientId", client.clientId)
-                    }
-                    context.startActivity(intent)
+                    navigateToClientProfile(context, client.clientId)
                 }
         ) {
-            Text(
-                text = "${client.lastName} ${client.firstName}",
-                modifier = Modifier.padding(bottom = 4.dp),
-                fontSize = 20.sp
-            )
-            if (vehicles.isEmpty()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Aucun véhicule",
-                        modifier = Modifier.padding(bottom = 4.dp),
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                    )
-                }
-            } else {
-                vehicles.forEach { vehicle ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (!vehicle?.brand.isNullOrEmpty() || !vehicle?.model.isNullOrEmpty()) {
-                            Text(
-                                text = listOfNotNull(
-                                    vehicle?.registrationPlate,
-                                    vehicle?.brand,
-                                    vehicle?.model
-                                ).joinToString(", "),
-                                modifier = Modifier.padding(start = 0.dp)
-                            )
-                        } else {
-                            Text(
-                                text = vehicle?.registrationPlate ?: "",
-                                modifier = Modifier.padding(start = 0.dp)
-                            )
-                        }
-                    }
+            DisplayClientName(client)
+            DisplayVehicleListInfo(vehicles)
+        }
+
+    }
+
+    @Composable
+    fun DisplayClientName(client: Client) {
+        Text(
+            text = "${client.lastName} ${client.firstName}",
+            modifier = Modifier.padding(bottom = 4.dp),
+            fontSize = 20.sp
+        )
+    }
+
+    @Composable
+    fun DisplayVehicleListInfo(vehicles: List<Vehicle?>) {
+        if (vehicles.isEmpty()) {
+            DisplayNoVehiclesText()
+        } else {
+            vehicles.forEach { vehicle ->
+                if (vehicle != null) {
+                    DisplayVehicleInfo(vehicle)
                 }
             }
         }
+    }
 
+    @Composable
+    fun DisplayNoVehiclesText() {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "Aucun véhicule",
+                modifier = Modifier.padding(bottom = 4.dp),
+                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+            )
+        }
+    }
+
+    @Composable
+    fun DisplayVehicleInfo(vehicle: Vehicle) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = vehicleDetailsToString(vehicle),
+                modifier = Modifier.padding(start = 0.dp)
+            )
+        }
     }
 
     private fun clientMatchesSearch(
@@ -285,6 +260,52 @@ class Home : ComponentActivity() {
                 vehicles.any { vehicle ->
                     vehicle.registrationPlate.contains(searchText, ignoreCase = true)
                 }
+    }
+
+    fun filterClients(
+        sortedClients: List<Client>,
+        searchText: String,
+        vehicleCache: Map<Int, List<Vehicle>>
+    ): List<Client> {
+        return if (searchText.isEmpty()) {
+            sortedClients
+        } else {
+            sortedClients.filter { client ->
+                val vehicles = vehicleCache[client.clientId] ?: emptyList()
+                clientMatchesSearch(client, vehicles, searchText)
+            }
+        }
+    }
+
+    @Composable
+    fun cacheVehiclesForClients(
+        sortedClients: List<Client>,
+        vehicleViewModel: VehicleViewModel
+    ): MutableMap<Int, List<Vehicle>> {
+        val vehicleCache = remember { mutableStateMapOf<Int, List<Vehicle>>() }
+
+        sortedClients.forEach { client ->
+            val vehicles by vehicleViewModel.getVehiclesFromClient(client.clientId)
+                .observeAsState(initial = emptyList())
+            vehicleCache[client.clientId] = vehicles
+        }
+
+        return vehicleCache
+    }
+
+    fun navigateToClientProfile(context: Context, clientId: Int) {
+        val intent = Intent(context, ClientProfile::class.java).apply {
+            putExtra("clientId", clientId)
+        }
+        context.startActivity(intent)
+    }
+
+    fun vehicleDetailsToString(vehicle: Vehicle): String {
+        return listOfNotNull(
+                vehicle.registrationPlate,
+                vehicle.brand,
+                vehicle.model
+            ).joinToString(", ")
     }
 
     @Composable
