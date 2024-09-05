@@ -1,8 +1,6 @@
 package com.example.autogestion
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -34,13 +32,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.autogestion.Utils.NavigationUtils.navigateToClientFormUpdate
+import com.example.autogestion.Utils.NavigationUtils.navigateToHome
+import com.example.autogestion.Utils.NavigationUtils.navigateToVehicleFormAdd
+import com.example.autogestion.Utils.NavigationUtils.navigateToVehicleProfile
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.ClientViewModel
-import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
-import com.example.autogestion.form.ClientFormUpdate
-import com.example.autogestion.form.VehicleFormAdd
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -68,6 +66,7 @@ class ClientProfile : ComponentActivity() {
         val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
 
+        // State to control visibility of a dialog
         var showDialog by remember { mutableStateOf(false) }
 
         val client by clientViewModel.getClientById(clientId).observeAsState()
@@ -77,9 +76,9 @@ class ClientProfile : ComponentActivity() {
             .fillMaxSize()
             .statusBarsPadding()) {
 
+            // Display client name and redirect to Home on GoBack button
             NavBar(text = "${client?.lastName} ${client?.firstName}") {
-                val intent = Intent(context, Home::class.java)
-                context.startActivity(intent)
+                navigateToHome(context)
             }
 
             client?.let { currentClient ->
@@ -89,67 +88,25 @@ class ClientProfile : ComponentActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.padding(16.dp).width(250.dp)) {
-                        Row(
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        ) {
-                            Text(
-                                text = "N° de téléphone : ",
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.width(16.dp))
-                            currentClient.phone.let {
-                                Text(
-                                    text = it
-                                )
-                            }
-                        }
-                        Row(
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        ) {
-                            Text(
-                                text = "Date de naissance : ",
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Text(
-                                text =  when(currentClient.birthDate){
-                                    null -> "-"
-                                    else -> dateFormat.format(currentClient.birthDate)
-                                }
-                            )
-                        }
-                        Row(
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        ) {
-                            Text(
-                                text = "Email : ",
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.width(82.dp))
-                            currentClient.email?.ifEmpty {"-"}?.let {
-                                Text(
-                                    text = it
-                                )
-                            }
-                        }
-                        Row(
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        ) {
-                            Text(
-                                text = "Adresse : ",
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.width(65.dp))
-                            currentClient.address?.ifEmpty {"-"}?.let {
-                                Text(
-                                    text = it
-                                )
-                            }
-                        }
+                    Column(modifier = Modifier
+                        .padding(16.dp)
+                        .width(250.dp)) {
+
+                        // Formatting client's birthday for display
+                        val formattedDate = currentClient.birthDate?.let {
+                            dateFormat.format(it)
+                        } ?: "-"
+
+                        // Display clients info
+                        DisplayEntityInfoRow("N° de téléphone : ", currentClient.phone, 16)
+                        DisplayEntityInfoRow("Date de naissance : ", formattedDate, 2)
+                        DisplayEntityInfoRow("Email : ", currentClient.email, 82)
+                        DisplayEntityInfoRow("Adresse : ", currentClient.address, 65)
                     }
 
+                    // Row for delete and modify buttons.
                     Row {
+                        // Button to trigger a deletion confirmation dialog.
                         IconButton(onClick = {
                             showDialog = true
                         }) {
@@ -160,11 +117,9 @@ class ClientProfile : ComponentActivity() {
                             )
                         }
 
+                        // Button to navigate to a form for modifying the client's details.
                         IconButton(onClick = {
-                            val intent = Intent(context, ClientFormUpdate::class.java).apply {
-                                putExtra("clientId", currentClient.clientId)
-                            }
-                            context.startActivity(intent)
+                            navigateToClientFormUpdate(context, currentClient.clientId)
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.baseline_edit_24),
@@ -175,6 +130,7 @@ class ClientProfile : ComponentActivity() {
                     }
                 }
 
+                // Row for displaying the title "Voitures" and an add button.
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -190,10 +146,7 @@ class ClientProfile : ComponentActivity() {
                     )
 
                     IconButton(onClick = {
-                        val intent = Intent(context, VehicleFormAdd::class.java).apply {
-                            putExtra("clientId", currentClient.clientId)
-                        }
-                        context.startActivity(intent)
+                        navigateToVehicleFormAdd(context, currentClient.clientId)
                     }) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_add_24),
@@ -208,19 +161,10 @@ class ClientProfile : ComponentActivity() {
                     thickness = 2.dp
                 )
 
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .wrapContentSize()
-                ) {
-                    items(vehicleList.size) { index ->
-                        vehicleList[index]?.let { VoitureItem(it) }
-                        if (index < vehicleList.size - 1) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                    }
-                }
+                // Display list of vehicles
+                DisplayVehicleList(vehicleList)
             } ?: run {
+                // Text displayed if no client is found.
                 Text(
                     text = "Client non trouvé",
                     modifier = Modifier.padding(16.dp),
@@ -229,6 +173,8 @@ class ClientProfile : ComponentActivity() {
             }
         }
 
+        // AlertDialog for confirming the deletion of a client.
+        // TODO refactor
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = { showDialog = false },
@@ -240,7 +186,7 @@ class ClientProfile : ComponentActivity() {
                             coroutineScope.launch {
                                 client?.let { currentClient ->
                                     clientViewModel.deleteClient(currentClient)
-                                    redirectToHome()
+                                    navigateToHome(context)
                                 }
                             }
                             showDialog = false
@@ -259,16 +205,24 @@ class ClientProfile : ComponentActivity() {
 
     }
 
-
-
-    private fun redirectToHome() {
-        val intent = Intent(this, Home::class.java)
-        startActivity(intent)
-        finish()
+    @Composable
+    fun DisplayVehicleList(vehicleList: List<Vehicle?>) {
+        LazyColumn(
+            modifier = Modifier
+                .padding(16.dp)
+                .wrapContentSize()
+        ) {
+            items(vehicleList.size) { index ->
+                vehicleList[index]?.let { DisplayVehicleItem(it) }
+                if (index < vehicleList.size - 1) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
     }
 
     @Composable
-    fun VoitureItem(vehicle: Vehicle) {
+    fun DisplayVehicleItem(vehicle: Vehicle) {
         val context = LocalContext.current
 
         Column(modifier = Modifier
@@ -277,78 +231,30 @@ class ClientProfile : ComponentActivity() {
             .background(color = Color(0xFFF3EDF7))
             .padding(16.dp)
             .clickable {
-                val intent = Intent(context, VehicleProfile::class.java).apply {
-                    putExtra("vehicleId", vehicle.vehicleId)
-                }
-                context.startActivity(intent)
+                navigateToVehicleProfile(context, vehicle.vehicleId)
             }
         ) {
-            Row(
-                modifier = Modifier.padding(bottom = 4.dp)
-            ) {
+            DisplayEntityInfoRow("Marque : ", vehicle.brand, 20)
+            DisplayEntityInfoRow(rowContentName = "Modèle : ", vehicle.model, 22)
+            DisplayEntityInfoRow("Couleur : ", vehicle.color, 20)
+            DisplayEntityInfoRow(rowContentName = "N° chassis : ", vehicle.chassisNum , 2)
+            DisplayEntityInfoRow("Plaque : ", vehicle.registrationPlate, 25)
+        }
+    }
+
+    @Composable
+    fun DisplayEntityInfoRow(rowContentName: String, rowContentValue: String?, spacerWidth: Int){
+        Row(
+            modifier = Modifier.padding(bottom = 4.dp)
+        ) {
+            Text(
+                text = rowContentName,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.width(spacerWidth.dp))
+            rowContentValue?.ifEmpty {"-"}?.let {
                 Text(
-                    text = "Marque : ",
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.width(20.dp))
-                vehicle.brand?.ifEmpty {"-"}?.let {
-                    Text(
-                        text = it
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier.padding(bottom = 4.dp)
-            ) {
-                Text(
-                    text = "Modèle : ",
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.width(22.dp))
-                vehicle.model?.ifEmpty {"-"}?.let {
-                    Text(
-                        text = it
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier.padding(bottom = 4.dp)
-            ) {
-                Text(
-                    text = "Couleur : ",
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.width(20.dp))
-                vehicle.color?.ifEmpty {"-"}?.let {
-                    Text(
-                        text = it
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier.padding(bottom = 4.dp)
-            ) {
-                Text(
-                    text = "N° chassis : ",
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.width(2.dp))
-                vehicle.chassisNum?.ifEmpty {"-"}?.let {
-                    Text(
-                        text = it
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier.padding(bottom = 4.dp)
-            ) {
-                Text(
-                    text = "Plaque : ",
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.width(25.dp))
-                Text(
-                    text = vehicle.registrationPlate
+                    text = it
                 )
             }
         }
