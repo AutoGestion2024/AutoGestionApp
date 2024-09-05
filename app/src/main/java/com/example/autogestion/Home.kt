@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.autogestion.Utils.NavigationUtils.navigateToClientProfile
 import com.example.autogestion.data.AppDatabase
 import com.example.autogestion.data.Client
 import com.example.autogestion.data.Vehicle
@@ -291,13 +292,6 @@ class Home : ComponentActivity() {
         }
 
         return vehicleCache
-    }
-
-    fun navigateToClientProfile(context: Context, clientId: Int) {
-        val intent = Intent(context, ClientProfile::class.java).apply {
-            putExtra("clientId", clientId)
-        }
-        context.startActivity(intent)
     }
 
     fun vehicleDetailsToString(vehicle: Vehicle): String {
