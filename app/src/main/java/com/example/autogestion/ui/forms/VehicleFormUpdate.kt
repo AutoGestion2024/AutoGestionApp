@@ -60,6 +60,7 @@ class VehicleFormUpdate : ComponentActivity() {
     ) {
         val context = LocalContext.current
 
+        // State management for form fields, with initial values set.
         var registrationPlate by remember { mutableStateOf(vehicle.registrationPlate) }
         var chassisNum by remember { mutableStateOf(vehicle.chassisNum ?: "") }
         var greyCard by remember { mutableStateOf(vehicle.greyCard ?: "") }
@@ -71,6 +72,7 @@ class VehicleFormUpdate : ComponentActivity() {
 
         val coroutineScope = rememberCoroutineScope()
 
+        // Launcher for selecting a document file for invoice
         val greyCardLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
@@ -80,6 +82,9 @@ class VehicleFormUpdate : ComponentActivity() {
             }
         }
 
+        // Form display and user input handling.
+        // Each field is bound to a specific part of the vehicle's data.
+        // Validators are set to trigger visual indicators of errors (isError).
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -145,19 +150,20 @@ class VehicleFormUpdate : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Button to submit vehicle update form
             Button(
                 onClick = {
                     isRegistrationPlateError = registrationPlate.isEmpty()
                     if (!isRegistrationPlateError) {
                         val updatedVehicle = Vehicle(
-                            vehicleId = vehicle.vehicleId,  // Conserver l'ID existant
+                            vehicleId = vehicle.vehicleId,
                             registrationPlate = registrationPlate,
                             chassisNum = chassisNum,
                             brand = brand,
                             model = model,
                             color = color,
                             greyCard = greyCard,
-                            clientId = vehicle.clientId  // Conserver l'ID du client associé
+                            clientId = vehicle.clientId
                         )
                         coroutineScope.launch {
                             vehicleViewModel.updateVehicle(updatedVehicle)

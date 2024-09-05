@@ -72,7 +72,7 @@ class RepairFormUpdate : ComponentActivity() {
     ) {
         val context = LocalContext.current
 
-        // State management for form fields, with initial values set from the client object.
+        // State management for form fields, with initial values set.
         var description by remember { mutableStateOf(repair.description ?: "") }
         var date by remember { mutableStateOf(dateFormat.format(repair.date)) }
         var invoice by remember { mutableStateOf(repair.invoice ?: "") }

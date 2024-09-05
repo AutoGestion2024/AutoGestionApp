@@ -65,15 +65,9 @@ class RepairForm : ComponentActivity() {
         val color = intent.getStringExtra("color") ?: ""
         val greyCard = intent.getStringExtra("greyCard") ?: ""
         val clientId = intent.getIntExtra("clientId", 0)
-        val vehicleId = intent.getIntExtra("vehicleId", 0)
-
-        val initDescription = intent.getStringExtra("description") ?: ""
-        val initDate = intent.getStringExtra("date") ?: ""
-        val initInvoice = intent.getStringExtra("invoice") ?: ""
-        val initPaid = intent.getBooleanExtra("paid", false)
 
         setContent {
-            RepairFormApp(firstName, lastName, phoneNumber, birthDate, email, address, registrationPlate, chassisNum, brand, model, color, greyCard, clientId, vehicleId, initDescription, initDate, initInvoice, initPaid)
+            RepairFormApp(firstName, lastName, phoneNumber, birthDate, email, address, registrationPlate, chassisNum, brand, model, color, greyCard, clientId)
         }
     }
 
@@ -91,11 +85,6 @@ class RepairForm : ComponentActivity() {
                       color: String,
                       greyCard: String,
                       clientId: Int,
-                      vehicleId: Int,
-                      initDescription: String,
-                      initDate: String,
-                      initInvoice: String,
-                      initPaid: Boolean,
                       clientViewModel: ClientViewModel = viewModel(),
                       vehicleViewModel: VehicleViewModel = viewModel(),
                       repairViewModel: RepairViewModel = viewModel()
@@ -158,19 +147,6 @@ class RepairForm : ComponentActivity() {
                     isError = isDateError,
                     trailingIcon = {
                         IconButton(onClick = {
-                            /*val datePickerDialog = android.app.DatePickerDialog(
-                                context,
-                                { _, year, month, dayOfMonth ->
-                                    calendar.set(year, month, dayOfMonth)
-                                    date = TextFieldValue(dateFormat.format(calendar.time))
-                                    isDateError = false
-                                },
-                                calendar.get(Calendar.YEAR),
-                                calendar.get(Calendar.MONTH),
-                                calendar.get(Calendar.DAY_OF_MONTH)
-                            )
-                            datePickerDialog.show()
-                            */
                             showDatePicker(context, calendar) { newDate ->
                                 date = TextFieldValue(newDate)
                                 isDateError = false
@@ -300,6 +276,6 @@ class RepairForm : ComponentActivity() {
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview2() {
-        RepairFormApp("","","","","","","","","","","","",0,0, "", "", "", false)
+        RepairFormApp("","","","","","","","","","","","",0)
     }
 }

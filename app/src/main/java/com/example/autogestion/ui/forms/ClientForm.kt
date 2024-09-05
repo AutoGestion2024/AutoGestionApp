@@ -249,7 +249,7 @@ class ClientForm : ComponentActivity() {
                         Text("Enregistrer le client")
                     }
 
-                    // Button for saving data and navigation to next form
+                    // Button for saving data and navigate to next form
                     Button(
                         onClick = {
                             isFirstNameError = firstName.text.isEmpty()
