@@ -3,7 +3,6 @@ package com.example.autogestion.form
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,7 +22,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.autogestion.ClientProfile
 import com.example.autogestion.Home
 import com.example.autogestion.NavBar
 import com.example.autogestion.VehicleProfile
@@ -31,12 +29,11 @@ import com.example.autogestion.data.Repair
 import com.example.autogestion.data.viewModels.RepairViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import com.example.autogestion.getFilePathFromUri
+import com.example.autogestion.Utils.getFilePathFromUri
 
 class RepairFormAdd : ComponentActivity() {
 

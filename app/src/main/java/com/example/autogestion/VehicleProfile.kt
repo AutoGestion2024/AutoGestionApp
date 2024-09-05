@@ -48,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import com.example.autogestion.Utils.DateUtils
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
 import com.example.autogestion.form.RepairFormAdd
@@ -62,7 +63,6 @@ class VehicleProfile : ComponentActivity() {
 
     private val vehicleViewModel: VehicleViewModel by viewModels()
     private val repairViewModel: RepairViewModel by viewModels()
-    private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,12 +73,6 @@ class VehicleProfile : ComponentActivity() {
         setContent {
             VehiclePage(vehicleId)
         }
-    }
-
-    private fun redirectToHome() {
-        val intent = Intent(this, Home::class.java)
-        startActivity(intent)
-        finish() // Ferme l'activité actuelle pour éviter le retour avec le bouton "Back"
     }
 
     @Composable
@@ -96,6 +90,7 @@ class VehicleProfile : ComponentActivity() {
             .fillMaxSize()
             .statusBarsPadding()) {
 
+            // TODO refactor
             if (showDialogVehicle) {
                 AlertDialog(
                     onDismissRequest = { showDialogVehicle = false },
@@ -359,7 +354,7 @@ class VehicleProfile : ComponentActivity() {
                     Text(
                         text =  when(repair.date){
                             null -> "-"
-                            else -> dateFormat.format(repair.date)
+                            else -> DateUtils.dateFormat.format(repair.date)
                         }
                     )
                 }

@@ -33,12 +33,11 @@ import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import com.example.autogestion.getFilePathFromUri
+import com.example.autogestion.Utils.getFilePathFromUri
 
 class RepairForm : ComponentActivity() {
 

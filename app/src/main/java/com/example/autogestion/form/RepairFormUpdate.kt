@@ -21,18 +21,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.autogestion.Home
 import com.example.autogestion.NavBar
 import com.example.autogestion.VehicleProfile
 import com.example.autogestion.data.Repair
 import com.example.autogestion.data.viewModels.RepairViewModel
 import kotlinx.coroutines.launch
-import java.io.File
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import com.example.autogestion.getFilePathFromUri
+import com.example.autogestion.Utils.getFilePathFromUri
 
 class RepairFormUpdate : ComponentActivity() {
 
