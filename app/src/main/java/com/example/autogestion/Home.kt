@@ -260,12 +260,12 @@ class Home : ComponentActivity() {
                                     vehicle?.brand,
                                     vehicle?.model
                                 ).joinToString(", "),
-                                modifier = Modifier.padding(start = 4.dp)
+                                modifier = Modifier.padding(start = 0.dp)
                             )
                         } else {
                             Text(
                                 text = vehicle?.registrationPlate ?: "",
-                                modifier = Modifier.padding(start = 4.dp)
+                                modifier = Modifier.padding(start = 0.dp)
                             )
                         }
                     }
