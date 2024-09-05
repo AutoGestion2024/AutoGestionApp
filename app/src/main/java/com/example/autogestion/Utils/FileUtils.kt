@@ -1,4 +1,4 @@
-package com.example.autogestion
+package com.example.autogestion.Utils
 
 import android.content.Context
 import android.net.Uri
