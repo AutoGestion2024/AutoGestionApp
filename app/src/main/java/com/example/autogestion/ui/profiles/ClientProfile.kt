@@ -45,12 +45,8 @@ import com.example.autogestion.data.viewModels.VehicleViewModel
 import com.example.autogestion.ui.components.NavBar
 import com.example.autogestion.ui.components.SharedComposables.DisplayEntityInfoRow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class ClientProfile : ComponentActivity() {
-
-    private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
     private val clientViewModel: ClientViewModel by viewModels()
     private val vehicleViewModel: VehicleViewModel by viewModels()
@@ -111,7 +107,6 @@ class ClientProfile : ComponentActivity() {
                     }
 
                     // Row for delete and modify buttons.
-                    // TODO refactor buttons
                     Row {
                         // Button to trigger a deletion confirmation dialog.
                         IconButton(onClick = {
@@ -181,7 +176,6 @@ class ClientProfile : ComponentActivity() {
         }
 
         // AlertDialog for confirming the deletion of a client.
-        // TODO refactor
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = { showDialog = false },

@@ -47,7 +47,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
@@ -126,7 +125,7 @@ class Home : ComponentActivity() {
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                HomeTitle(text = "AutoGestion") {}
+                HomeTitle(text = "AutoGestion")
 
                 // Search bar
                 Row(
@@ -263,7 +262,7 @@ class Home : ComponentActivity() {
                 }
     }
 
-    fun filterClients(
+    private fun filterClients(
         sortedClients: List<Client>,
         searchText: String,
         vehicleCache: Map<Int, List<Vehicle>>
@@ -294,7 +293,7 @@ class Home : ComponentActivity() {
         return vehicleCache
     }
 
-    fun vehicleDetailsToString(vehicle: Vehicle): String {
+    private fun vehicleDetailsToString(vehicle: Vehicle): String {
         return listOfNotNull(
                 vehicle.registrationPlate,
                 vehicle.brand,
@@ -303,7 +302,7 @@ class Home : ComponentActivity() {
     }
 
     @Composable
-    fun HomeTitle(text: String, onBackClick: () -> Unit) {
+    fun HomeTitle(text: String) {
         // Up Bar
         Row(
             modifier = Modifier
@@ -323,9 +322,4 @@ class Home : ComponentActivity() {
         }
     }
 
-    @Preview(showBackground = true)
-    @Composable
-    fun DefaultPreview() {
-        Home().HomeApp("")
-    }
 }

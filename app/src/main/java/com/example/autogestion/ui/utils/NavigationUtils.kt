@@ -13,7 +13,21 @@ import com.example.autogestion.ui.forms.RepairForm
 import com.example.autogestion.ui.forms.VehicleForm
 import com.example.autogestion.ui.forms.VehicleFormAdd
 
+
+/**
+ * NavigationUtils is a utility object that simplifies navigation between different screens (activities) in an Android app.
+ * It provides various methods to navigate to specific screens and pass additional data (via extras) when needed.
+ */
 object NavigationUtils {
+
+    /**
+     * General function to handle navigation between activities.
+     *
+     * @param context The context from which the navigation is initiated.
+     * @param destination The target activity class to which we are navigating.
+     * @param shouldFinish A boolean flag indicating whether the current activity should be finished after navigation (default is false).
+     * @param extras Optional Bundle of additional data to be passed to the target activity (default is null).
+     */
     fun navigateTo(context: Context, destination: Class<*>, shouldFinish: Boolean = false, extras: Bundle? = null) {
         val intent = Intent(context, destination)
         extras?.let {
@@ -25,16 +39,33 @@ object NavigationUtils {
         }
     }
 
+    /**
+     * Navigates to the Home screen and finishes the current activity.
+     *
+     * @param context The context from which navigation is initiated.
+     */
     fun navigateToHome(context: Context) {
         navigateTo(context, Home::class.java,true)
     }
 
+    /**
+     * Navigates to the Client Profile screen for a specific client.
+     *
+     * @param context The context from which navigation is initiated.
+     * @param clientId The ID of the client whose profile will be displayed.
+     */
     fun navigateToClientProfile(context: Context, clientId: Int) {
         navigateTo(context, ClientProfile::class.java, false, Bundle().apply {
             putInt("clientId", clientId)
         })
     }
 
+    /**
+     * Navigates to the Client Form Update screen for a specific client.
+     *
+     * @param context The context from which navigation is initiated.
+     * @param clientId The ID of the client whose information will be updated.
+     */
     fun navigateToClientFormUpdate(context: Context, clientId: Int ){
         navigateTo(context, ClientFormUpdate::class.java, false, Bundle().apply {
             putInt("clientId", clientId)
@@ -52,12 +83,24 @@ object NavigationUtils {
         })
     }
 
+    /**
+     * Navigates to the Vehicle Profile screen for a specific vehicle.
+     *
+     * @param context The context from which navigation is initiated.
+     * @param vehicleId The ID of the vehicle whose profile will be displayed.
+     */
     fun navigateToVehicleProfile(context: Context, vehicleId: Int) {
         navigateTo(context, VehicleProfile::class.java, false, Bundle().apply{
             putInt("vehicleId", vehicleId)
         })
     }
 
+    /**
+     * Navigates to the Vehicle Form Add screen for adding a new vehicle for a specific client.
+     *
+     * @param context The context from which navigation is initiated.
+     * @param clientId The ID of the client for whom the new vehicle will be added.
+     */
     fun navigateToVehicleFormAdd(context: Context, clientId: Int){
         navigateTo(context, VehicleFormAdd::class.java, false, Bundle().apply{
             putInt("clientId", clientId)

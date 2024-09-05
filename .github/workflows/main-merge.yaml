@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.6
         with:
           name: AutoGestion.apk
-          path: app/build/outputs/apk/release/
+          path: app/build/outputs/apk/debug/
 
   test:
     name: Tests
@@ -60,11 +60,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: AutoGestion.apk
+
       - name: Display struct
         run: ls -R
 
       - name: Rename file
-        run: mv app-release-unsigned.apk AutoGestion.apk
+        run: mv app-debug.apk AutoGestion.apk
 
       - name: Create Release
         uses: softprops/action-gh-release@v2

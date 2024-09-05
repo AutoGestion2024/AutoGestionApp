@@ -36,7 +36,6 @@
             </intent-filter>
         </activity>
 
-        <!-- <activity android:name=".Home"/> -->
         <activity android:name=".ui.components.Camera" />
         <activity android:name=".ui.profiles.ClientProfile" />
         <activity android:name=".ui.profiles.VehicleProfile" />

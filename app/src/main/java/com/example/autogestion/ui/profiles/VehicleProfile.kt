@@ -91,7 +91,6 @@ class VehicleProfile : ComponentActivity() {
             .fillMaxSize()
             .statusBarsPadding()) {
 
-            // TODO refactor
             if (showDialogVehicle) {
                 AlertDialog(
                     onDismissRequest = { showDialogVehicle = false },
@@ -161,7 +160,6 @@ class VehicleProfile : ComponentActivity() {
                 }
 
                 // Editing and deleting buttons
-                // TODO rfr buttons
                 Row {
                     IconButton(onClick = {
                         showDialogVehicle = true
@@ -191,7 +189,6 @@ class VehicleProfile : ComponentActivity() {
             }
 
             // Header Repair list and add button
-                // TODO rfr buttons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -292,7 +289,6 @@ class VehicleProfile : ComponentActivity() {
             }
 
             // Row for delete and modify buttons.
-            // TODO rfr buttons
             Row {
                 IconButton(onClick = {
                     showDialogRepair = true
@@ -334,7 +330,6 @@ class VehicleProfile : ComponentActivity() {
 
         }
 
-        // TODO rfr dialog
         if (showDialogRepair) {
             AlertDialog(
                 onDismissRequest = { showDialogRepair = false },
@@ -382,7 +377,6 @@ class VehicleProfile : ComponentActivity() {
         ).joinToString(" ")
     }
 
-    // TODO move
     private fun openFile(filePath: String) {
         // Create a File object with the given file path
         val file = File(filesDir, filePath)
