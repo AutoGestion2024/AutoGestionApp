@@ -32,6 +32,7 @@ import java.io.File
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
+import com.example.autogestion.getFilePathFromUri
 
 
 class VehicleForm : ComponentActivity() {
@@ -47,15 +48,16 @@ class VehicleForm : ComponentActivity() {
         val address = intent.getStringExtra("address") ?: ""
         val email = intent.getStringExtra("email") ?: ""
 
-        val initRegistrationPlate = intent.getStringExtra("RegistrationPlate") ?: ""
-        val initChassisNum = intent.getStringExtra("RegistrationPlate") ?: ""
+        val initRegistrationPlate = intent.getStringExtra("registrationPlate") ?: ""
+        val initGreyCard = intent.getStringExtra("greyCard") ?: ""
+        val initChassisNum = intent.getStringExtra("chassisNum") ?: ""
         val initBrand = intent.getStringExtra("brand") ?: ""
         val initModel = intent.getStringExtra("model") ?: ""
-        val initColor = intent.getStringExtra("model") ?: ""
+        val initColor = intent.getStringExtra("color") ?: ""
         val initClientId = intent.getIntExtra("clientId", 0)
 
         setContent {
-            CarFormApp(firstName, lastName, phoneNumber, birthDate, email, address, initRegistrationPlate, initChassisNum, initBrand, initModel, initColor, initClientId)
+            CarFormApp(firstName, lastName, phoneNumber, birthDate, email, address, initRegistrationPlate, initChassisNum, initGreyCard, initBrand, initModel, initColor, initClientId)
         }
     }
 
@@ -69,6 +71,7 @@ class VehicleForm : ComponentActivity() {
         address: String,
         initRegistrationPlate: String,
         initChassisNum: String,
+        initGreyCard: String,
         initBrand: String,
         initModel: String,
         initColor: String,
@@ -80,7 +83,7 @@ class VehicleForm : ComponentActivity() {
 
         var registrationPlate by remember { mutableStateOf(TextFieldValue(initRegistrationPlate)) }
         var chassisNum by remember { mutableStateOf(TextFieldValue(initChassisNum)) }
-        var greyCard by remember { mutableStateOf<String?>(null) }
+        var greyCard by remember { mutableStateOf(initGreyCard)}
         var brand by remember { mutableStateOf(TextFieldValue(initBrand)) }
         var model by remember { mutableStateOf(TextFieldValue(initModel)) }
         var color by remember { mutableStateOf(TextFieldValue(initColor)) }
@@ -94,8 +97,8 @@ class VehicleForm : ComponentActivity() {
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
             uri?.let {
-                val path = getFilePathFromUri(context, it)
-                greyCard = path
+                val path = getFilePathFromUri(context, it, "carteGrise")
+                greyCard = path.toString()
             }
         }
 
@@ -165,7 +168,7 @@ class VehicleForm : ComponentActivity() {
                     onClick = { greyCardLauncher.launch("*/*") },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(if (greyCard.isNullOrEmpty()) "Télécharger la carte grise" else "Carte grise sélectionnée")
+                    Text(if (greyCard.isEmpty()) "Télécharger la carte grise" else "Carte grise sélectionnée")
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -270,27 +273,10 @@ class VehicleForm : ComponentActivity() {
         }
     }
 
-    // Helper function to convert URI to file path
-    private fun getFilePathFromUri(context: android.content.Context, uri: Uri): String? {
-        val cursor = context.contentResolver.query(uri, null, null, null, null)
-        cursor?.use {
-            val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
-            cursor.moveToFirst()
-            val fileName = cursor.getString(nameIndex)
-            val file = File(context.filesDir, fileName)
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                file.outputStream().use { outputStream ->
-                    inputStream.copyTo(outputStream)
-                }
-            }
-            return file.absolutePath
-        }
-        return null
-    }
 
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview2() {
-        CarFormApp("","","","","","", "","","","","",0)
+        CarFormApp("","","","","","", "","","","","","",0)
     }
 }

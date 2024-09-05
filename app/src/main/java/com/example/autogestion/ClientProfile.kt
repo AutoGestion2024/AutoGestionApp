@@ -16,12 +16,15 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,6 +67,8 @@ class ClientProfile : ComponentActivity() {
     fun ProfilPage(clientId: Int) {
         val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
+
+        var showDialog by remember { mutableStateOf(false) }
 
         val client by clientViewModel.getClientById(clientId).observeAsState()
         val vehicleList by vehicleViewModel.getVehiclesFromClient(clientId).observeAsState(emptyList())
@@ -146,10 +151,7 @@ class ClientProfile : ComponentActivity() {
 
                     Row {
                         IconButton(onClick = {
-                            coroutineScope.launch {
-                                clientViewModel.deleteClient(currentClient)
-                                redirectToHome()
-                            }
+                            showDialog = true
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.baseline_delete_24),
@@ -226,7 +228,38 @@ class ClientProfile : ComponentActivity() {
                 )
             }
         }
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text(text = "Confirmation de suppression") },
+                text = { Text(text = "Êtes-vous sûr de vouloir supprimer ce client ? Cette action est irréversible.") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                client?.let { currentClient ->
+                                    clientViewModel.deleteClient(currentClient)
+                                    redirectToHome()
+                                }
+                            }
+                            showDialog = false
+                        }
+                    ) {
+                        Text("Supprimer")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showDialog = false }) {
+                        Text("Annuler")
+                    }
+                }
+            )
+        }
+
     }
+
+
 
     private fun redirectToHome() {
         val intent = Intent(this, Home::class.java)
