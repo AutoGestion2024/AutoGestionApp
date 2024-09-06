@@ -12,6 +12,7 @@ import com.example.autogestion.ui.forms.ClientFormUpdate
 import com.example.autogestion.ui.forms.RepairForm
 import com.example.autogestion.ui.forms.VehicleForm
 import com.example.autogestion.ui.forms.VehicleFormAdd
+import com.example.autogestion.ui.forms.VehicleFormUpdate
 
 
 /**
@@ -125,6 +126,12 @@ object NavigationUtils {
             putString("model", model)
             putString("color", color)
             putInt("clientId", clientId)
+        })
+    }
+
+    fun navigateToVehicleUpdateForm(context: Context, vehicleId: Int){
+        navigateTo(context, VehicleFormUpdate::class.java, false, Bundle().apply {
+            putInt("vehicleId", vehicleId)
         })
     }
 

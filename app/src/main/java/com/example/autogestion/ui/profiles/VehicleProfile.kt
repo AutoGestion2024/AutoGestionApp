@@ -54,6 +54,8 @@ import com.example.autogestion.ui.utils.NavigationUtils.navigateToClientProfile
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
+import com.example.autogestion.ui.components.SharedComposables.DeleteButton
+import com.example.autogestion.ui.components.SharedComposables.ModifyButton
 import com.example.autogestion.ui.forms.RepairFormAdd
 import com.example.autogestion.ui.forms.RepairFormUpdate
 import com.example.autogestion.ui.forms.VehicleFormUpdate
@@ -159,31 +161,16 @@ class VehicleProfile : ComponentActivity() {
 
                 }
 
-                // Editing and deleting buttons
+                // Modify and delete buttons
                 Row {
-                    IconButton(onClick = {
+                    DeleteButton{
                         showDialogVehicle = true
-
-
-                    }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_delete_24),
-                            contentDescription = "Supprimer",
-                            tint = Color.Black
-                        )
                     }
-
-                    IconButton(onClick = {
+                    ModifyButton{
                         val intent = Intent(context, VehicleFormUpdate::class.java).apply {
                             putExtra("vehicleId", vehicle!!.vehicleId)
                         }
                         context.startActivity(intent)
-                    }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_edit_24),
-                            contentDescription = "Modifier",
-                            tint = Color.Black
-                        )
                     }
                 }
             }

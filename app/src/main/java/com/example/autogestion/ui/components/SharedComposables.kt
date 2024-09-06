@@ -1,5 +1,6 @@
 package com.example.autogestion.ui.components
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,9 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.autogestion.R
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToHome
 
 object SharedComposables {
     @Composable
@@ -61,4 +65,27 @@ object SharedComposables {
 
         }
     }
+
+    @Composable
+    fun ModifyButton(onMofidyClick: () -> Unit){
+        IconButton(onClick = onMofidyClick) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_edit_24),
+                contentDescription = "Modify",
+                tint = Color.Black
+            )
+        }
+    }
+
+    @Composable
+    fun DeleteButton(onDeleteClick: () -> Unit){
+        IconButton(onClick = onDeleteClick) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_delete_24),
+                contentDescription = "Delete",
+                tint = Color.Black
+            )
+        }
+    }
+
 }

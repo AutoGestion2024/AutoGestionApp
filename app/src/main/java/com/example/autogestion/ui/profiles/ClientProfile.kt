@@ -42,8 +42,10 @@ import com.example.autogestion.data.Client
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
+import com.example.autogestion.ui.components.SharedComposables.DeleteButton
 import com.example.autogestion.ui.components.SharedComposables.NavBar
 import com.example.autogestion.ui.components.SharedComposables.DisplayEntityInfoRow
+import com.example.autogestion.ui.components.SharedComposables.ModifyButton
 import kotlinx.coroutines.launch
 
 class ClientProfile : ComponentActivity() {
@@ -107,27 +109,16 @@ class ClientProfile : ComponentActivity() {
                     }
 
                     // Row for delete and modify buttons.
+
                     Row {
                         // Button to trigger a deletion confirmation dialog.
-                        IconButton(onClick = {
+                        DeleteButton {
                             showDialog = true
-                        }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_delete_24),
-                                contentDescription = "Delete",
-                                tint = Color.Black
-                            )
                         }
 
                         // Button to navigate to a form for modifying the client's details.
-                        IconButton(onClick = {
+                        ModifyButton {
                             navigateToClientFormUpdate(context, currentClient.clientId)
-                        }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_edit_24),
-                                contentDescription = "Modify",
-                                tint = Color.Black
-                            )
                         }
                     }
                 }
