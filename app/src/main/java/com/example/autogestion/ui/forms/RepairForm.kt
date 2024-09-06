@@ -1,4 +1,4 @@
-package com.example.autogestion.form
+package com.example.autogestion.ui.forms
 
 import android.content.Intent
 import android.net.Uri
@@ -23,22 +23,25 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.autogestion.Home
-import com.example.autogestion.NavBar
+import com.example.autogestion.ui.Home
+import com.example.autogestion.ui.components.NavBar
 import com.example.autogestion.data.Client
 import com.example.autogestion.data.Repair
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.RepairViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
+import com.example.autogestion.ui.utils.DateUtils.dateFormat
+import com.example.autogestion.ui.utils.DateUtils.showDatePicker
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToHome
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToVehicleForm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import com.example.autogestion.getFilePathFromUri
+import com.example.autogestion.ui.utils.getFilePathFromUri
 
 class RepairForm : ComponentActivity() {
 
@@ -46,6 +49,8 @@ class RepairForm : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+
+        // Extracting data from Intent that started this activity
         val firstName = intent.getStringExtra("firstName") ?: ""
         val lastName = intent.getStringExtra("lastName") ?: ""
         val phoneNumber = intent.getStringExtra("phoneNumber") ?: ""
@@ -60,15 +65,9 @@ class RepairForm : ComponentActivity() {
         val color = intent.getStringExtra("color") ?: ""
         val greyCard = intent.getStringExtra("greyCard") ?: ""
         val clientId = intent.getIntExtra("clientId", 0)
-        val vehicleId = intent.getIntExtra("vehicleId", 0)
-
-        val initDescription = intent.getStringExtra("description") ?: ""
-        val initDate = intent.getStringExtra("date") ?: ""
-        val initInvoice = intent.getStringExtra("invoice") ?: ""
-        val initPaid = intent.getBooleanExtra("paid", false)
 
         setContent {
-            RepairFormApp(firstName, lastName, phoneNumber, birthDate, email, address, registrationPlate, chassisNum, brand, model, color, greyCard, clientId, vehicleId, initDescription, initDate, initInvoice, initPaid)
+            RepairFormApp(firstName, lastName, phoneNumber, birthDate, email, address, registrationPlate, chassisNum, brand, model, color, greyCard, clientId)
         }
     }
 
@@ -86,29 +85,24 @@ class RepairForm : ComponentActivity() {
                       color: String,
                       greyCard: String,
                       clientId: Int,
-                      vehicleId: Int,
-                      initDescription: String,
-                      initDate: String,
-                      initInvoice: String,
-                      initPaid: Boolean,
                       clientViewModel: ClientViewModel = viewModel(),
                       vehicleViewModel: VehicleViewModel = viewModel(),
                       repairViewModel: RepairViewModel = viewModel()
     ) {
         val context = LocalContext.current
 
+        // State management for input fields with initial values if provided
         var description by remember { mutableStateOf(TextFieldValue("")) }
         var date by remember { mutableStateOf(TextFieldValue("")) }
         var invoice by remember { mutableStateOf<String?>(null) }
         val calendar = Calendar.getInstance()
         var paid by remember { mutableStateOf(false) }
 
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         var isDateError by remember { mutableStateOf(false) }
 
         val coroutineScope = rememberCoroutineScope()
 
-        // Launcher for quote document
+        // Launcher for selecting a document file for invoice
         val invoiceLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
@@ -118,6 +112,9 @@ class RepairForm : ComponentActivity() {
             }
         }
 
+        // Form display and user input handling.
+        // Each field is bound to a specific part of the repair's data.
+        // Validators are set to trigger visual indicators of errors (isError).
         Scaffold { padding ->
             Column(
                 modifier = Modifier
@@ -128,23 +125,7 @@ class RepairForm : ComponentActivity() {
                 NavBar(
                     text = "Formulaire Réparation",
                     onBackClick = {
-                        val intent = Intent(context, VehicleForm::class.java).apply {
-                            putExtra("firstName", firstName)
-                            putExtra("lastName", lastName)
-                            putExtra("phoneNumber", phoneNumber)
-                            putExtra("birthDate", birthDate)
-                            putExtra("email", email)
-                            putExtra("address", address)
-                            putExtra("registrationPlate", registrationPlate)
-                            putExtra("chassisNum", chassisNum)
-                            putExtra("greyCard", greyCard)
-                            putExtra("brand", brand)
-                            putExtra("model", model)
-                            putExtra("color", color)
-                            putExtra("clientId", clientId)
-                            putExtra("vehicleId", vehicleId)
-                        }
-                        context.startActivity(intent)
+                        navigateToVehicleForm(context, firstName, lastName, phoneNumber, birthDate, email, address, registrationPlate, chassisNum, greyCard, brand, model, color, clientId)
                     }
                 )
 
@@ -166,18 +147,10 @@ class RepairForm : ComponentActivity() {
                     isError = isDateError,
                     trailingIcon = {
                         IconButton(onClick = {
-                            val datePickerDialog = android.app.DatePickerDialog(
-                                context,
-                                { _, year, month, dayOfMonth ->
-                                    calendar.set(year, month, dayOfMonth)
-                                    date = TextFieldValue(dateFormat.format(calendar.time))
-                                    isDateError = false
-                                },
-                                calendar.get(Calendar.YEAR),
-                                calendar.get(Calendar.MONTH),
-                                calendar.get(Calendar.DAY_OF_MONTH)
-                            )
-                            datePickerDialog.show()
+                            showDatePicker(context, calendar) { newDate ->
+                                date = TextFieldValue(newDate)
+                                isDateError = false
+                            }
                         }) {
                             Icon(Icons.Default.CalendarToday, contentDescription = "Select Date")
                         }
@@ -218,6 +191,8 @@ class RepairForm : ComponentActivity() {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
+
+                // Button to submit the form, create client, vehicle and repair in the database
                 Button(
                     onClick = {
                         coroutineScope.launch(Dispatchers.IO) {
@@ -280,8 +255,7 @@ class RepairForm : ComponentActivity() {
                                     )
 
                                     repairViewModel.addRepair(newRepair)
-
-                                    redirectToHome(context)
+                                    navigateToHome(context)
                                 } else {
                                     Log.e("RepairForm", "Failed to retrieve vehicleId")
                                 }
@@ -299,17 +273,9 @@ class RepairForm : ComponentActivity() {
         }
     }
 
-    private fun redirectToHome(context: android.content.Context) {
-        val intent = Intent(context, Home::class.java)
-        context.startActivity(intent)
-        if (context is ComponentActivity) {
-            context.finish()
-        }
-    }
-
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview2() {
-        RepairFormApp("","","","","","","","","","","","",0,0, "", "", "", false)
+        RepairFormApp("","","","","","","","","","","","",0)
     }
 }

@@ -26,7 +26,7 @@
         android:theme="@style/Theme.AutoGestion"
         tools:targetApi="31">
         <activity
-            android:name=".Home"
+            android:name=".ui.Home"
             android:exported="true"
             android:theme="@style/Theme.AutoGestion">
             <intent-filter>
@@ -36,18 +36,17 @@
             </intent-filter>
         </activity>
 
-        <!-- <activity android:name=".Home"/> -->
-        <activity android:name=".Camera" />
-        <activity android:name=".ClientProfile" />
-        <activity android:name=".VehicleProfile" />
-        <activity android:name=".form.ClientForm" />
-        <activity android:name=".form.VehicleForm" />
-        <activity android:name=".form.RepairForm" />
-        <activity android:name=".form.ClientFormUpdate" />
-        <activity android:name=".form.VehicleFormUpdate" />
-        <activity android:name=".form.RepairFormUpdate" />
-        <activity android:name=".form.VehicleFormAdd" />
-        <activity android:name=".form.RepairFormAdd" />
+        <activity android:name=".ui.components.Camera" />
+        <activity android:name=".ui.profiles.ClientProfile" />
+        <activity android:name=".ui.profiles.VehicleProfile" />
+        <activity android:name=".ui.forms.ClientForm" />
+        <activity android:name=".ui.forms.VehicleForm" />
+        <activity android:name=".ui.forms.RepairForm" />
+        <activity android:name=".ui.forms.ClientFormUpdate" />
+        <activity android:name=".ui.forms.VehicleFormUpdate" />
+        <activity android:name=".ui.forms.RepairFormUpdate" />
+        <activity android:name=".ui.forms.VehicleFormAdd" />
+        <activity android:name=".ui.forms.RepairFormAdd" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

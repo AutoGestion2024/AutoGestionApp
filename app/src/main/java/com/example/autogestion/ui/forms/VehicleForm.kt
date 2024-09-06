@@ -1,4 +1,4 @@
-package com.example.autogestion.form
+package com.example.autogestion.ui.forms
 
 import android.content.Intent
 import android.net.Uri
@@ -10,29 +10,29 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.autogestion.Home
-import com.example.autogestion.NavBar
+import com.example.autogestion.ui.Home
+import com.example.autogestion.ui.components.NavBar
 import com.example.autogestion.data.Client
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToClientForm
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToHome
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToRepairForm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
-import com.example.autogestion.getFilePathFromUri
+import com.example.autogestion.ui.utils.getFilePathFromUri
 
 
 class VehicleForm : ComponentActivity() {
@@ -41,6 +41,8 @@ class VehicleForm : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+        
+        // Extracting data from Intent that started this activity
         val firstName = intent.getStringExtra("firstName") ?: ""
         val lastName = intent.getStringExtra("lastName") ?: ""
         val phoneNumber = intent.getStringExtra("phoneNumber") ?: ""
@@ -57,12 +59,12 @@ class VehicleForm : ComponentActivity() {
         val initClientId = intent.getIntExtra("clientId", 0)
 
         setContent {
-            CarFormApp(firstName, lastName, phoneNumber, birthDate, email, address, initRegistrationPlate, initChassisNum, initGreyCard, initBrand, initModel, initColor, initClientId)
+            VehicleFormApp(firstName, lastName, phoneNumber, birthDate, email, address, initRegistrationPlate, initChassisNum, initGreyCard, initBrand, initModel, initColor, initClientId)
         }
     }
 
     @Composable
-    fun CarFormApp(
+    fun VehicleFormApp(
         firstName: String,
         lastName: String,
         phoneNumber: String,
@@ -81,18 +83,19 @@ class VehicleForm : ComponentActivity() {
     ) {
         val context = LocalContext.current
 
+        // State management for input fields with initial values if provided
         var registrationPlate by remember { mutableStateOf(TextFieldValue(initRegistrationPlate)) }
         var chassisNum by remember { mutableStateOf(TextFieldValue(initChassisNum)) }
         var greyCard by remember { mutableStateOf(initGreyCard)}
         var brand by remember { mutableStateOf(TextFieldValue(initBrand)) }
         var model by remember { mutableStateOf(TextFieldValue(initModel)) }
         var color by remember { mutableStateOf(TextFieldValue(initColor)) }
-        var clientId by remember { mutableStateOf(initClientId) }
 
         var isRegistrationPlateError by remember { mutableStateOf(false) }
 
         val coroutineScope = rememberCoroutineScope()
 
+        // Launcher for selecting a document file for grey card
         val greyCardLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
@@ -102,6 +105,9 @@ class VehicleForm : ComponentActivity() {
             }
         }
 
+        // Form display and user input handling.
+        // Each field is bound to a specific part of the vehicle's data.
+        // Validators are set to trigger visual indicators of errors (isError).
         Scaffold(
         ) { padding ->
             Column(
@@ -112,6 +118,7 @@ class VehicleForm : ComponentActivity() {
 
                 NavBar(text = "Formulaire Voiture",
                     onBackClick = {
+                        navigateToClientForm(context, firstName, lastName, phoneNumber, birthDate, email, address)
                         val intent = Intent(context, ClientForm::class.java).apply {
                             putExtra("firstName", firstName)
                             putExtra("lastName", lastName)
@@ -176,8 +183,8 @@ class VehicleForm : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    var clientId by remember { mutableStateOf(initClientId) }
 
+                    // Button to submit form, create client and vehicle.
                     Button(
                         onClick = {
                             isRegistrationPlateError = registrationPlate.text.isEmpty()
@@ -221,8 +228,7 @@ class VehicleForm : ComponentActivity() {
                                                 clientId = newClientId
                                             )
                                             vehicleViewModel.addVehicle(vehicle)
-
-                                            redirectToHome(context)
+                                            navigateToHome(context)
                                         } else {
                                             Log.e("VehicleForm", "Failed to retrieve clientId")
                                         }
@@ -235,25 +241,12 @@ class VehicleForm : ComponentActivity() {
                         Text("Enregistrer le véhicule")
                     }
 
+                    // Button for saving data and navigate to next form
                     Button(
                         onClick = {
                             isRegistrationPlateError = registrationPlate.text.isEmpty()
                             if (!isRegistrationPlateError) {
-                                val intent = Intent(context, RepairForm::class.java).apply {
-                                    putExtra("firstName", firstName)
-                                    putExtra("lastName", lastName)
-                                    putExtra("phoneNumber", phoneNumber)
-                                    putExtra("birthDate", birthDate)
-                                    putExtra("email", email)
-                                    putExtra("address", address)
-                                    putExtra("registrationPlate", registrationPlate.text)
-                                    putExtra("chassisNum", chassisNum.text)
-                                    putExtra("greyCard", greyCard)
-                                    putExtra("brand", brand.text)
-                                    putExtra("model", model.text)
-                                    putExtra("color", color.text)
-                                }
-                                context.startActivity(intent)
+                                navigateToRepairForm(context, firstName, lastName, phoneNumber, birthDate, address, email, registrationPlate.text, greyCard, chassisNum.text, brand.text, model.text, color.text)
                             }
                         },
                         enabled = registrationPlate.text.isNotEmpty()
@@ -265,18 +258,9 @@ class VehicleForm : ComponentActivity() {
         }
     }
 
-    private fun redirectToHome(context: android.content.Context) {
-        val intent = Intent(context, Home::class.java)
-        context.startActivity(intent)
-        if (context is ComponentActivity) {
-            context.finish()
-        }
-    }
-
-
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview2() {
-        CarFormApp("","","","","","", "","","","","","",0)
+        VehicleFormApp("","","","","","", "","","","","","",0)
     }
 }

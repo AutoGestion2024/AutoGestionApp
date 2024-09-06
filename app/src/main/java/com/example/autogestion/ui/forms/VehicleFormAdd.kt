@@ -1,41 +1,32 @@
-package com.example.autogestion.form
+package com.example.autogestion.ui.forms
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.autogestion.ClientProfile
-import com.example.autogestion.Home
-import com.example.autogestion.NavBar
-import com.example.autogestion.VehicleProfile
-import com.example.autogestion.data.Client
+import com.example.autogestion.ui.profiles.ClientProfile
+import com.example.autogestion.ui.Home
+import com.example.autogestion.ui.components.NavBar
 import com.example.autogestion.data.Vehicle
-import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
+import com.example.autogestion.ui.utils.NavigationUtils.navigateToClientProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.Locale
-import com.example.autogestion.getFilePathFromUri
+import com.example.autogestion.ui.utils.getFilePathFromUri
 
 
 class VehicleFormAdd : ComponentActivity() {
@@ -78,6 +69,7 @@ class VehicleFormAdd : ComponentActivity() {
     ) {
         val context = LocalContext.current
 
+        // State management for input fields with initial values if provided
         var registrationPlate by remember { mutableStateOf(TextFieldValue(initRegistrationPlate)) }
         var chassisNum by remember { mutableStateOf(TextFieldValue(initChassisNum)) }
         var greyCard by remember { mutableStateOf<String?>(null) }
@@ -89,6 +81,7 @@ class VehicleFormAdd : ComponentActivity() {
 
         val coroutineScope = rememberCoroutineScope()
 
+        // Launcher for selecting a document file for grey card
         val greyCardLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
@@ -98,6 +91,9 @@ class VehicleFormAdd : ComponentActivity() {
             }
         }
 
+        // Form display and user input handling.
+        // Each field is bound to a specific part of the vehicle's data.
+        // Validators are set to trigger visual indicators of errors (isError).
         Scaffold { padding ->
             Column(
                 modifier = Modifier
@@ -105,12 +101,9 @@ class VehicleFormAdd : ComponentActivity() {
                     .padding(padding)
             ) {
 
-                NavBar(text = "Ajouter un véhicule",
+                NavBar(text = "Formulaire Véhicule",
                     onBackClick = {
-                        val intent = Intent(context, ClientProfile::class.java).apply {
-                            putExtra("clientId", clientId)
-                        }
-                        context.startActivity(intent)
+                        navigateToClientProfile(context, clientId)
                     }
                 )
 
@@ -163,6 +156,7 @@ class VehicleFormAdd : ComponentActivity() {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Button to submit the form and create a vehicle.
                 Button(
                     onClick = {
                         isRegistrationPlateError = registrationPlate.text.isEmpty()
@@ -181,10 +175,7 @@ class VehicleFormAdd : ComponentActivity() {
 
                                 coroutineScope.launch {
                                     vehicleViewModel.addVehicle(vehicle)
-                                    val intent = Intent(context, ClientProfile::class.java).apply {
-                                        putExtra("clientId", vehicle.clientId)
-                                    }
-                                    context.startActivity(intent)
+                                    navigateToClientProfile(context, vehicle.clientId)
                                 }
                             }
                         }
@@ -195,14 +186,6 @@ class VehicleFormAdd : ComponentActivity() {
                     Text("Enregistrer le véhicule")
                 }
             }
-        }
-    }
-
-    private fun redirectToHome(context: android.content.Context) {
-        val intent = Intent(context, Home::class.java)
-        context.startActivity(intent)
-        if (context is ComponentActivity) {
-            context.finish()
         }
     }
 
