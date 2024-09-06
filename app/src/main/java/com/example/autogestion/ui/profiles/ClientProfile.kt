@@ -42,7 +42,7 @@ import com.example.autogestion.data.Client
 import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.ClientViewModel
 import com.example.autogestion.data.viewModels.VehicleViewModel
-import com.example.autogestion.ui.components.NavBar
+import com.example.autogestion.ui.components.SharedComposables.NavBar
 import com.example.autogestion.ui.components.SharedComposables.DisplayEntityInfoRow
 import kotlinx.coroutines.launch
 

@@ -22,7 +22,7 @@ import com.example.autogestion.data.Vehicle
 import com.example.autogestion.data.viewModels.VehicleViewModel
 import kotlinx.coroutines.launch
 import com.example.autogestion.ui.utils.getFilePathFromUri
-import com.example.autogestion.ui.components.NavBar
+import com.example.autogestion.ui.components.SharedComposables.NavBar
 
 class VehicleFormUpdate : ComponentActivity() {
 

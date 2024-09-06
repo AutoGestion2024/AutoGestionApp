@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.autogestion.ui.profiles.ClientProfile
 import com.example.autogestion.ui.Home
-import com.example.autogestion.ui.components.NavBar
 import com.example.autogestion.data.Client
 import com.example.autogestion.data.viewModels.ClientViewModel
+import com.example.autogestion.ui.components.SharedComposables.NavBar
 import com.example.autogestion.ui.utils.DateUtils.dateFormat
 import com.example.autogestion.ui.utils.NavigationUtils.navigateToClientProfile
 import kotlinx.coroutines.launch

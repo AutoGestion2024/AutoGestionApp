@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.example.autogestion.R
-import com.example.autogestion.ui.components.NavBar
+import com.example.autogestion.ui.components.SharedComposables.NavBar
 import com.example.autogestion.ui.components.SharedComposables.DisplayEntityInfoRow
 import com.example.autogestion.ui.utils.DateUtils
 import com.example.autogestion.ui.utils.NavigationUtils.navigateToClientProfile

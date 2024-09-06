@@ -22,7 +22,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.autogestion.ui.components.NavBar
+import com.example.autogestion.ui.components.SharedComposables.NavBar
 import com.example.autogestion.ui.profiles.VehicleProfile
 import com.example.autogestion.data.Repair
 import com.example.autogestion.data.viewModels.RepairViewModel
